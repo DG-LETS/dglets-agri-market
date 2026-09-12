@@ -11,7 +11,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   platforms: ['ios', 'android', 'web'],
   web: {
     favicon: './assets/favicon.png',
-    bundler: 'webpack',
+    bundler: 'metro',
   },
   splash: {
     image: './assets/splash.png',
