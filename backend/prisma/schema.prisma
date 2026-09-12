@@ -1,0 +1,528 @@
+// DG-LETS Agri Market — Prisma Schema
+// Run: npx prisma migrate dev --name init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ═══════════════════════════════════════
+// ENUMS
+// ═══════════════════════════════════════
+
+enum UserRole {
+  FARMER
+  BUYER
+  TRADER
+  AGGREGATOR
+  PROCESSOR
+  EXPORTER
+  HAULAGE
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  PAUSED
+  SOLD_OUT
+  DELETED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  READY_FOR_PICKUP
+  PICKED_UP
+  IN_TRANSIT
+  DELIVERED
+  COMPLETED
+  CANCELLED
+  DISPUTED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+enum NotificationType {
+  ORDER
+  PAYMENT
+  MESSAGE
+  VERIFICATION
+  DELIVERY
+  REWARD
+  SYSTEM
+  MARKET_PRICE
+}
+
+// ═══════════════════════════════════════
+// IDENTITY
+// ═══════════════════════════════════════
+
+model User {
+  id              String     @id @default(uuid())
+  email           String?    @unique
+  phone           String     @unique
+  passwordHash    String?
+  role            UserRole   @default(BUYER)
+  status          UserStatus @default(PENDING_VERIFICATION)
+  firstName       String
+  lastName        String
+  profileImage    String?
+  referralCode    String     @unique @default(uuid())
+  referredBy      String?
+  lastLoginAt     DateTime?
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  // Relations
+  farmerProfile   FarmerProfile?
+  buyerProfile    BuyerProfile?
+  otpTokens       OtpToken[]
+  refreshTokens   RefreshToken[]
+  products        Product[]
+  ordersAsBuyer   Order[]        @relation("BuyerOrders")
+  ordersAsSeller  Order[]        @relation("SellerOrders")
+  sentMessages    Message[]      @relation("SentMessages")
+  notifications   Notification[]
+  reviews         Review[]       @relation("ReviewAuthor")
+  receivedReviews Review[]       @relation("ReviewSubject")
+  rewardWallet    RewardWallet?
+  savedProducts   SavedProduct[]
+  verification    Verification?
+  auditLogs       AuditLog[]
+
+  @@map("users")
+}
+
+model FarmerProfile {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  farmName          String?
+  farmLocation      String?
+  state             String
+  lga               String?
+  geoLat            Float?
+  geoLng            Float?
+  products          String[]
+  productionCapacity String?
+  farmSize          String?
+  farmImages        String[]
+  bio               String?
+  yearsOfFarming    Int?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("farmer_profiles")
+}
+
+model BuyerProfile {
+  id           String   @id @default(uuid())
+  userId       String   @unique
+  businessName String?
+  buyerType    String?
+  state        String?
+  lga          String?
+  address      String?
+  geoLat       Float?
+  geoLng       Float?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("buyer_profiles")
+}
+
+// ═══════════════════════════════════════
+// AUTH TOKENS
+// ═══════════════════════════════════════
+
+model OtpToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String
+  purpose   String   // verify_phone | reset_password | verify_email
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("otp_tokens")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("refresh_tokens")
+}
+
+// ═══════════════════════════════════════
+// MARKETPLACE
+// ═══════════════════════════════════════
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  icon        String?
+  image       String?
+  isActive    Boolean   @default(true)
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id               String        @id @default(uuid())
+  sellerId         String
+  categoryId       String
+  name             String
+  slug             String
+  description      String?
+  price            Float
+  priceUnit        String        @default("kg")
+  quantity         Float
+  quantityUnit     String        @default("kg")
+  moq              Float         @default(1)
+  qualityGrade     String?
+  harvestDate      DateTime?
+  processingStatus String?
+  state            String
+  lga              String?
+  geoLat           Float?
+  geoLng           Float?
+  deliveryAvailable Boolean     @default(false)
+  images           String[]
+  status           ProductStatus @default(DRAFT)
+  viewCount        Int           @default(0)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  seller     User       @relation(fields: [sellerId], references: [id])
+  category   Category   @relation(fields: [categoryId], references: [id])
+  orderItems OrderItem[]
+  savedBy    SavedProduct[]
+  reviews    Review[]
+
+  @@index([sellerId])
+  @@index([categoryId])
+  @@index([status])
+  @@index([state])
+  @@map("products")
+}
+
+model SavedProduct {
+  id        String   @id @default(uuid())
+  userId    String
+  productId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
+  @@map("saved_products")
+}
+
+// ═══════════════════════════════════════
+// ORDERS
+// ═══════════════════════════════════════
+
+model Order {
+  id              String        @id @default(uuid())
+  orderNumber     String        @unique
+  buyerId         String
+  sellerId        String
+  status          OrderStatus   @default(PENDING)
+  paymentStatus   PaymentStatus @default(PENDING)
+  subtotal        Float
+  platformFee     Float         @default(0)
+  deliveryFee     Float         @default(0)
+  total           Float
+  deliveryAddress String?
+  deliveryState   String?
+  notes           String?
+  paidAt          DateTime?
+  confirmedAt     DateTime?
+  completedAt     DateTime?
+  cancelledAt     DateTime?
+  cancelReason    String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  buyer     User        @relation("BuyerOrders",  fields: [buyerId],  references: [id])
+  seller    User        @relation("SellerOrders",  fields: [sellerId], references: [id])
+  items     OrderItem[]
+  payment   Payment?
+  reviews   Review[]
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId   String
+  productId String
+  quantity  Float
+  unitPrice Float
+  subtotal  Float
+  createdAt DateTime @default(now())
+
+  order   Order   @relation(fields: [orderId],   references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+// ═══════════════════════════════════════
+// PAYMENTS
+// ═══════════════════════════════════════
+
+model Payment {
+  id              String        @id @default(uuid())
+  orderId         String        @unique
+  amount          Float
+  currency        String        @default("NGN")
+  provider        String        // paystack | flutterwave
+  providerRef     String?       @unique
+  status          PaymentStatus @default(PENDING)
+  platformFee     Float         @default(0)
+  sellerAmount    Float         @default(0)
+  metadata        Json?
+  paidAt          DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+}
+
+// ═══════════════════════════════════════
+// MESSAGING
+// ═══════════════════════════════════════
+
+model Conversation {
+  id           String    @id @default(uuid())
+  participants String[]
+  productId    String?
+  orderId      String?
+  lastMessageAt DateTime?
+  createdAt    DateTime  @default(now())
+
+  messages Message[]
+
+  @@map("conversations")
+}
+
+model Message {
+  id             String   @id @default(uuid())
+  conversationId String
+  senderId       String
+  body           String
+  attachments    String[]
+  readAt         DateTime?
+  createdAt      DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("SentMessages", fields: [senderId], references: [id])
+
+  @@index([conversationId])
+  @@map("messages")
+}
+
+// ═══════════════════════════════════════
+// TRUST & REPUTATION
+// ═══════════════════════════════════════
+
+model Verification {
+  id               String             @id @default(uuid())
+  userId           String             @unique
+  phoneVerified    Boolean            @default(false)
+  emailVerified    Boolean            @default(false)
+  identityStatus   VerificationStatus @default(UNVERIFIED)
+  businessStatus   VerificationStatus @default(UNVERIFIED)
+  farmStatus       VerificationStatus @default(UNVERIFIED)
+  identityDocUrl   String?
+  businessDocUrl   String?
+  farmDocUrl       String?
+  reviewedBy       String?
+  reviewedAt       DateTime?
+  rejectionReason  String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("verifications")
+}
+
+model Review {
+  id          String   @id @default(uuid())
+  orderId     String
+  authorId    String
+  subjectId   String
+  productId   String?
+  rating      Int
+  comment     String?
+  isVerified  Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  order   Order   @relation(fields: [orderId],   references: [id])
+  author  User    @relation("ReviewAuthor",  fields: [authorId],  references: [id])
+  subject User    @relation("ReviewSubject", fields: [subjectId], references: [id])
+  product Product? @relation(fields: [productId], references: [id])
+
+  @@index([subjectId])
+  @@map("reviews")
+}
+
+// ═══════════════════════════════════════
+// NOTIFICATIONS
+// ═══════════════════════════════════════
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  body      String
+  data      Json?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("notifications")
+}
+
+// ═══════════════════════════════════════
+// REWARDS
+// ═══════════════════════════════════════
+
+model RewardWallet {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  balance        Float    @default(0)
+  lifetimeEarned Float    @default(0)
+  lifetimeUsed   Float    @default(0)
+  level          String   @default("seed")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions RewardTransaction[]
+
+  @@map("reward_wallets")
+}
+
+model RewardTransaction {
+  id          String   @id @default(uuid())
+  walletId    String
+  amount      Float
+  type        String   // earn | redeem | reverse | expire
+  source      String   // order_complete | review | referral | signup | etc
+  description String
+  referenceId String?
+  balanceAfter Float
+  createdAt   DateTime @default(now())
+
+  wallet RewardWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId])
+  @@map("reward_transactions")
+}
+
+// ═══════════════════════════════════════
+// MARKET INTELLIGENCE
+// ═══════════════════════════════════════
+
+model MarketPrice {
+  id         String   @id @default(uuid())
+  product    String
+  categoryId String?
+  state      String
+  city       String?
+  priceMin   Float
+  priceMax   Float
+  priceAvg   Float
+  unit       String   @default("kg")
+  source     String   @default("admin")
+  recordedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  @@index([product])
+  @@index([state])
+  @@map("market_prices")
+}
+
+// ═══════════════════════════════════════
+// AUDIT
+// ═══════════════════════════════════════
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  action     String
+  entity     String
+  entityId   String?
+  oldValues  Json?
+  newValues  Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([entity])
+  @@map("audit_logs")
+}

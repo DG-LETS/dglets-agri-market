@@ -1,0 +1,106 @@
+import { create } from 'zustand';
+import * as SecureStore from 'expo-secure-store';
+import { User, AuthTokens } from '@types/index';
+import { authApi, usersApi } from '@services/api';
+
+interface AuthState {
+  user:           User | null;
+  accessToken:    string | null;
+  isAuthenticated: boolean;
+  isLoading:      boolean;
+  isInitialized:  boolean;
+
+  initialize:   () => Promise<void>;
+  login:        (identifier: string, password?: string) => Promise<any>;
+  verifyOtp:    (userId: string, token: string, purpose: string) => Promise<void>;
+  register:     (data: any) => Promise<any>;
+  logout:       () => Promise<void>;
+  refreshUser:  () => Promise<void>;
+  setTokens:    (tokens: AuthTokens) => Promise<void>;
+}
+
+export const useAuthStore = create<AuthState>((set, get) => ({
+  user:            null,
+  accessToken:     null,
+  isAuthenticated: false,
+  isLoading:       false,
+  isInitialized:   false,
+
+  /* ── Initialize: restore session from SecureStore ── */
+  initialize: async () => {
+    try {
+      const accessToken  = await SecureStore.getItemAsync('accessToken');
+      const refreshToken = await SecureStore.getItemAsync('refreshToken');
+      if (accessToken && refreshToken) {
+        const { data } = await usersApi.getMe();
+        set({ user: data, accessToken, isAuthenticated: true });
+      }
+    } catch {
+      await SecureStore.deleteItemAsync('accessToken');
+      await SecureStore.deleteItemAsync('refreshToken');
+    } finally {
+      set({ isInitialized: true });
+    }
+  },
+
+  /* ── Login ── */
+  login: async (identifier, password) => {
+    set({ isLoading: true });
+    try {
+      const { data } = await authApi.login({ identifier, password });
+      if (data.otpSent) return data;
+      await get().setTokens(data);
+      return data;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  /* ── Verify OTP ── */
+  verifyOtp: async (userId, token, purpose) => {
+    set({ isLoading: true });
+    try {
+      const { data } = await authApi.verifyOtp({ userId, token, purpose });
+      await get().setTokens(data);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  /* ── Register ── */
+  register: async (data) => {
+    set({ isLoading: true });
+    try {
+      const response = await authApi.register(data);
+      return response.data;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  /* ── Logout ── */
+  logout: async () => {
+    const refreshToken = await SecureStore.getItemAsync('refreshToken');
+    if (refreshToken) {
+      try { await authApi.logout(refreshToken); } catch { /* ignore */ }
+    }
+    await SecureStore.deleteItemAsync('accessToken');
+    await SecureStore.deleteItemAsync('refreshToken');
+    set({ user: null, accessToken: null, isAuthenticated: false });
+  },
+
+  /* ── Refresh user data ── */
+  refreshUser: async () => {
+    try {
+      const { data } = await usersApi.getMe();
+      set({ user: data });
+    } catch { /* ignore */ }
+  },
+
+  /* ── Save tokens and set state ── */
+  setTokens: async (tokens: AuthTokens) => {
+    await SecureStore.setItemAsync('accessToken',  tokens.accessToken);
+    await SecureStore.setItemAsync('refreshToken', tokens.refreshToken);
+    set({ user: tokens.user, accessToken: tokens.accessToken, isAuthenticated: true });
+  },
+}));
