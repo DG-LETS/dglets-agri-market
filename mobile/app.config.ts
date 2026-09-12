@@ -8,6 +8,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   orientation: 'portrait',
   icon: './assets/icon.png',
   userInterfaceStyle: 'light',
+  platforms: ['ios', 'android', 'web'],
+  web: {
+    favicon: './assets/favicon.png',
+    bundler: 'webpack',
+  },
   splash: {
     image: './assets/splash.png',
     resizeMode: 'contain',
