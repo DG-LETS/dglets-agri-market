@@ -33,7 +33,6 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
   },
   plugins: [
-    'expo-router',
     'expo-secure-store',
     ['expo-location', { locationAlwaysAndWhenInUsePermission: 'Allow DG-LETS to use your location to find nearby farmers.' }],
     ['expo-image-picker', { photosPermission: 'Allow DG-LETS to access your photos for product images.' }],
