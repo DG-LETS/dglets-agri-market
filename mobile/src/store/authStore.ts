@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import * as SecureStore from 'expo-secure-store';
+import { storage } from '@utils/storage';
 import { User, AuthTokens } from '@types/index';
 import { authApi, usersApi } from '@services/api';
 
@@ -29,15 +29,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   /* ── Initialize: restore session from SecureStore ── */
   initialize: async () => {
     try {
-      const accessToken  = await SecureStore.getItemAsync('accessToken');
-      const refreshToken = await SecureStore.getItemAsync('refreshToken');
+      const accessToken  = await storage.getItem('accessToken');
+      const refreshToken = await storage.getItem('refreshToken');
       if (accessToken && refreshToken) {
         const { data } = await usersApi.getMe();
         set({ user: data, accessToken, isAuthenticated: true });
       }
     } catch {
-      await SecureStore.deleteItemAsync('accessToken');
-      await SecureStore.deleteItemAsync('refreshToken');
+      await storage.deleteItem('accessToken');
+      await storage.deleteItem('refreshToken');
     } finally {
       set({ isInitialized: true });
     }
@@ -80,12 +80,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   /* ── Logout ── */
   logout: async () => {
-    const refreshToken = await SecureStore.getItemAsync('refreshToken');
+    const refreshToken = await storage.getItem('refreshToken');
     if (refreshToken) {
       try { await authApi.logout(refreshToken); } catch { /* ignore */ }
     }
-    await SecureStore.deleteItemAsync('accessToken');
-    await SecureStore.deleteItemAsync('refreshToken');
+    await storage.deleteItem('accessToken');
+    await storage.deleteItem('refreshToken');
     set({ user: null, accessToken: null, isAuthenticated: false });
   },
 
@@ -99,8 +99,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   /* ── Save tokens and set state ── */
   setTokens: async (tokens: AuthTokens) => {
-    await SecureStore.setItemAsync('accessToken',  tokens.accessToken);
-    await SecureStore.setItemAsync('refreshToken', tokens.refreshToken);
+    await storage.setItem('accessToken',  tokens.accessToken);
+    await storage.setItem('refreshToken', tokens.refreshToken);
     set({ user: tokens.user, accessToken: tokens.accessToken, isAuthenticated: true });
   },
 }));
