@@ -1,7 +1,15 @@
 module.exports = function (api) {
   api.cache(true);
   return {
-    presets: ['babel-preset-expo'],
+    presets: [
+      [
+        'babel-preset-expo',
+        {
+          /* Disable Expo Router auto-detection — we use React Navigation */
+          router: false,
+        },
+      ],
+    ],
     plugins: [
       /* Resolve @store/, @screens/, @services/ etc path aliases */
       [
