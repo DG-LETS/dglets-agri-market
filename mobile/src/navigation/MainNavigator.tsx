@@ -5,6 +5,7 @@ import { createStackNavigator }     from '@react-navigation/stack';
 import { useQuery }  from '@tanstack/react-query';
 import { Colors, Typography, Spacing } from '@theme/index';
 import { useCartStore } from '@store/cartStore';
+import { useAuthStore } from '@store/authStore';
 
 /* ── Screens ── */
 import { HomeScreen }           from '@screens/main/HomeScreen';
@@ -15,10 +16,15 @@ import { CartScreen }           from '@screens/main/CartScreen';
 import { SmartMapScreen }       from '@screens/main/SmartMapScreen';
 import { OrdersScreen }         from '@screens/main/OrdersScreen';
 import { OrderDetailScreen }    from '@screens/main/OrderDetailScreen';
-import { MessagesScreen }       from '@screens/main/MessagesScreen';
+import { RateReviewScreen }     from '@screens/main/RateReviewScreen';
+import { InboxScreen }          from '@screens/main/InboxScreen';
+import { ChatScreen }           from '@screens/main/ChatScreen';
 import { ProfileScreen }        from '@screens/main/ProfileScreen';
 import { EditProfileScreen }    from '@screens/main/EditProfileScreen';
-import { notificationsApi }     from '@services/api';
+import { SellerDashboardScreen } from '@screens/main/SellerDashboardScreen';
+import { SavedProductsScreen }  from '@screens/main/SavedProductsScreen';
+import { HaulageJobsScreen }    from '@screens/main/HaulageJobsScreen';
+import { notificationsApi, messagesApi } from '@services/api';
 
 /* ══════════════════════════════════════
    PARAM LISTS
@@ -28,6 +34,7 @@ export type MainTabParamList = {
   MarketTab:   { screen?: keyof MarketStackParamList; params?: any } | undefined;
   SmartMap:    undefined;
   OrdersTab:   { screen?: keyof OrdersStackParamList; params?: any } | undefined;
+  HaulageJobs: undefined;
   MessagesTab: undefined;
   ProfileTab:  { screen?: keyof ProfileStackParamList; params?: any } | undefined;
 };
@@ -42,11 +49,26 @@ export type MarketStackParamList = {
 export type OrdersStackParamList = {
   OrdersList:  undefined;
   OrderDetail: { orderId: string };
+  RateReview:  { orderId: string; subjectId: string; subjectName: string; isBuyer: boolean };
 };
 
 export type ProfileStackParamList = {
-  ProfileHome: undefined;
-  EditProfile: { section?: 'basic' | 'farmer' | 'buyer' } | undefined;
+  ProfileHome:     undefined;
+  EditProfile:     { section?: 'basic' | 'farmer' | 'buyer' } | undefined;
+  SellerDashboard: undefined;
+  SavedProducts:   undefined;
+};
+
+export type MessagesStackParamList = {
+  Inbox: undefined;
+  Chat:  {
+    conversationId: string;
+    recipientId:    string;
+    recipientName:  string;
+    recipientRole?: string;
+    productId?:     string;
+    productName?:   string;
+  };
 };
 
 /* ══════════════════════════════════════
@@ -75,7 +97,22 @@ function OrdersNavigator() {
     <OrdersStack.Navigator screenOptions={{ headerShown: false }}>
       <OrdersStack.Screen name="OrdersList"  component={OrdersScreen} />
       <OrdersStack.Screen name="OrderDetail" component={OrderDetailScreen} />
+      <OrdersStack.Screen name="RateReview"  component={RateReviewScreen} />
     </OrdersStack.Navigator>
+  );
+}
+
+/* ══════════════════════════════════════
+   MESSAGES STACK
+══════════════════════════════════════ */
+const MessagesStack = createStackNavigator<MessagesStackParamList>();
+
+function MessagesNavigator() {
+  return (
+    <MessagesStack.Navigator screenOptions={{ headerShown: false }}>
+      <MessagesStack.Screen name="Inbox" component={InboxScreen} />
+      <MessagesStack.Screen name="Chat"  component={ChatScreen} />
+    </MessagesStack.Navigator>
   );
 }
 
@@ -87,8 +124,10 @@ const ProfileStack = createStackNavigator<ProfileStackParamList>();
 function ProfileNavigator() {
   return (
     <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
-      <ProfileStack.Screen name="ProfileHome" component={ProfileScreen} />
-      <ProfileStack.Screen name="EditProfile" component={EditProfileScreen} />
+      <ProfileStack.Screen name="ProfileHome"     component={ProfileScreen} />
+      <ProfileStack.Screen name="EditProfile"     component={EditProfileScreen} />
+      <ProfileStack.Screen name="SellerDashboard" component={SellerDashboardScreen} />
+      <ProfileStack.Screen name="SavedProducts"   component={SavedProductsScreen} />
     </ProfileStack.Navigator>
   );
 }
@@ -124,12 +163,27 @@ export function MainNavigator() {
   const { data: notifData } = useQuery({
     queryKey: ['notifications-meta'],
     queryFn:  () => notificationsApi.getAll({ limit: 1 }).then(r => r.data),
-    refetchInterval: 30_000,
+    /* Only poll when backend is actually available */
+    refetchInterval: false,
+    retry: 0,
   });
   const unreadNotifs = notifData?.meta?.unread ?? 0;
 
   /* Cart item count → Market tab badge */
   const cartCount = useCartStore(state => state.itemCount());
+
+  /* Unread messages count → Messages tab badge */
+  const { data: unreadMsgData } = useQuery({
+    queryKey: ['messages-unread'],
+    queryFn:  () => messagesApi.getUnreadCount().then(r => r.data),
+    refetchInterval: 15_000,
+    retry: 0,
+  });
+  const unreadMessages = unreadMsgData?.count ?? 0;
+
+  /* Role check */
+  const { user } = useAuthStore();
+  const isHaulage = user?.role === 'HAULAGE';
 
   return (
     <Tab.Navigator
@@ -174,12 +228,23 @@ export function MainNavigator() {
             <TabIcon emoji="📦" label="Orders" focused={focused} badge={unreadNotifs} />,
         }}
       />
+      {/* Haulage Jobs tab — only visible to HAULAGE role */}
+      {isHaulage && (
+        <Tab.Screen
+          name="HaulageJobs"
+          component={HaulageJobsScreen}
+          options={{
+            tabBarIcon: ({ focused }) =>
+              <TabIcon emoji="🚛" label="Jobs" focused={focused} />,
+          }}
+        />
+      )}
       <Tab.Screen
         name="MessagesTab"
-        component={MessagesScreen}
+        component={MessagesNavigator}
         options={{
           tabBarIcon: ({ focused }) =>
-            <TabIcon emoji="💬" label="Chat" focused={focused} />,
+            <TabIcon emoji="💬" label="Chat" focused={focused} badge={unreadMessages} />,
         }}
       />
       <Tab.Screen

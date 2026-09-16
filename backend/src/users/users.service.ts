@@ -47,4 +47,14 @@ export class UsersService {
       update: data,
     });
   }
+
+  /* ── Register Expo push token ── */
+  async registerPushToken(userId: string, token: string, platform: string) {
+    /* Store in a JSON metadata field on the user — no schema change needed */
+    return this.prisma.user.update({
+      where: { id: userId },
+      data:  { pushToken: token } as any,
+      select: { id: true },
+    });
+  }
 }

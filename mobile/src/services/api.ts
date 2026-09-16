@@ -17,7 +17,8 @@ const emitSessionExpired = () => sessionListeners.forEach(fn => fn());
 
 export const api = axios.create({
   baseURL: API_URL,
-  timeout: 15000,
+  /* Short timeout in demo mode so failed requests fail fast, not slow */
+  timeout: API_URL.includes('localhost') || API_URL === 'http://10.217.112.100:3000/api/v1' ? 3000 : 15000,
   headers: { 'Content-Type': 'application/json' },
 });
 
@@ -73,6 +74,8 @@ export const usersApi = {
   updateMe:            (data: any) => api.patch('/users/me', data),
   updateFarmerProfile: (data: any) => api.patch('/users/me/farmer-profile', data),
   updateBuyerProfile:  (data: any) => api.patch('/users/me/buyer-profile', data),
+  registerPushToken:   (token: string, platform: string) =>
+    api.post('/users/me/push-token', { token, platform }),
 };
 
 /* ── Categories ── */
@@ -114,6 +117,87 @@ export const paymentsApi = {
   initPaystack:    (orderId: string)      => api.post(`/payments/paystack/init/${orderId}`),
   verifyPaystack:  (reference: string)    => api.get(`/payments/paystack/verify/${reference}`),
   getForOrder:     (orderId: string)      => api.get(`/payments/order/${orderId}`),
+};
+
+/* ── Haulage ── */
+export const haulageApi = {
+  /** Get open delivery jobs (orders needing haulage), optionally filtered by state */
+  getJobs: (params?: { state?: string; page?: number; limit?: number }) =>
+    api.get('/haulage/jobs', { params }),
+
+  /** Express interest in a delivery job */
+  applyForJob: (orderId: string) =>
+    api.post(`/haulage/jobs/${orderId}/apply`),
+
+  /** Get jobs the current haulage partner has applied for */
+  getMyApplications: () =>
+    api.get('/haulage/jobs/my-applications'),
+
+  /** Get jobs currently assigned to the haulage partner */
+  getMyActiveJobs: () =>
+    api.get('/haulage/jobs/my-active'),
+
+  /** Create or update haulage profile */
+  createProfile: (data: any) =>
+    api.post('/haulage/profile', data),
+
+  /** Get own haulage profile */
+  getProfile: () =>
+    api.get('/haulage/profile'),
+
+  /** Get applications for a specific job (seller) */
+  getJobApplications: (jobId: string) =>
+    api.get(`/haulage/jobs/${jobId}/applications`),
+
+  /** Award a job to an applicant (seller) */
+  awardJob: (jobId: string, applicationId: string) =>
+    api.patch(`/haulage/jobs/${jobId}/award/${applicationId}`),
+
+  /** Mark a job as delivered (haulage provider) */
+  completeJob: (jobId: string) =>
+    api.patch(`/haulage/jobs/${jobId}/complete`),
+};
+
+/* ── Messages ── */
+export const messagesApi = {
+  /** Get all conversations (inbox) */
+  getConversations: () =>
+    api.get('/messages'),
+
+  /** Get unread message count */
+  getUnreadCount: () =>
+    api.get('/messages/unread'),
+
+  /** Get or create a conversation with another user */
+  getOrCreateConversation: (recipientId: string, productId?: string, orderId?: string) =>
+    api.post('/messages/conversations', { recipientId, productId, orderId }),
+
+  /** Get messages in a conversation */
+  getMessages: (conversationId: string, page = 1, limit = 30) =>
+    api.get(`/messages/${conversationId}`, { params: { page, limit } }),
+
+  /** Send a message */
+  sendMessage: (conversationId: string, body: string) =>
+    api.post(`/messages/${conversationId}/send`, { body }),
+
+  /** Report a user */
+  reportUser: (conversationId: string, reportedId: string, reason: string) =>
+    api.post(`/messages/${conversationId}/report`, { reportedId, reason }),
+};
+
+/* ── Platform Fees ── */
+export const feesApi = {
+  /** Check if registration fee is required and its status */
+  getRegistrationStatus: () =>
+    api.get('/fees/registration-status'),
+
+  /** Initiate Paystack payment for registration fee */
+  initRegistrationPayment: () =>
+    api.post('/fees/registration/pay'),
+
+  /** List fees for current user */
+  listMyFees: (params?: { type?: string; status?: string }) =>
+    api.get('/fees', { params }),
 };
 
 /* ── Upload (multipart/form-data) ── */

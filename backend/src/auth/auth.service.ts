@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { UsersService } from '../users/users.service';
 import { SmsService } from '../sms/sms.service';
+import { FeesService } from '../fees/fees.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
@@ -23,6 +24,7 @@ export class AuthService {
     private readonly jwt:     JwtService,
     private readonly config:  ConfigService,
     private readonly sms:     SmsService,
+    private readonly fees:    FeesService,
   ) {}
 
   /* ── Register ── */
@@ -145,6 +147,14 @@ export class AuthService {
         where: { id: dto.userId },
         data:  { status: 'ACTIVE', lastLoginAt: new Date() },
       });
+
+      /* Create registration fee record for roles that require it */
+      try {
+        await this.fees.createRegistrationFee(dto.userId, user.role);
+      } catch (err) {
+        /* Non-fatal — log and continue */
+        this.logger.warn(`Registration fee creation failed for ${dto.userId}: ${err.message}`);
+      }
     }
 
     if (dto.purpose === 'login') {
@@ -154,7 +164,11 @@ export class AuthService {
       });
     }
 
-    return this.generateTokens(user);
+    const tokens = await this.generateTokens(user);
+
+    /* Attach registration fee status to the response */
+    const feeStatus = await this.fees.getRegistrationFeeStatus(user.id, user.role);
+    return { ...tokens, registrationFee: feeStatus };
   }
 
   /* ── Request password reset ── */

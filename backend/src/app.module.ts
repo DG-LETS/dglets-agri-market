@@ -11,27 +11,25 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { PaymentsModule } from './payments/payments.module';
 import { SmsModule }      from './sms/sms.module';
 import { UploadModule }   from './upload/upload.module';
+import { FeesModule }     from './fees/fees.module';
+import { HaulageModule }  from './haulage/haulage.module';
+import { MessagesModule } from './messages/messages.module';
 import appConfig from './config/app.config';
 import authConfig from './config/auth.config';
 import databaseConfig from './config/database.config';
 
 @Module({
   imports: [
-    /* Config — load env variables */
     ConfigModule.forRoot({
       isGlobal: true,
       load: [appConfig, authConfig, databaseConfig],
       envFilePath: ['.env.local', '.env'],
     }),
-
-    /* Rate limiting */
     ThrottlerModule.forRoot([
       { name: 'short',  ttl: 1000,  limit: 10  },
       { name: 'medium', ttl: 10000, limit: 50  },
       { name: 'long',   ttl: 60000, limit: 100 },
     ]),
-
-    /* Core modules */
     PrismaModule,
     AuthModule,
     UsersModule,
@@ -42,6 +40,9 @@ import databaseConfig from './config/database.config';
     PaymentsModule,
     SmsModule,
     UploadModule,
+    FeesModule,
+    HaulageModule,
+    MessagesModule,
   ],
 })
 export class AppModule {}

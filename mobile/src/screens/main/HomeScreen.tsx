@@ -38,22 +38,26 @@ export function HomeScreen({ navigation }: Props) {
   const { data: categories, refetch: refetchCats } = useQuery({
     queryKey: ['categories'],
     queryFn:  () => categoriesApi.getAll().then(r => r.data),
+    retry: 0,
   });
 
   const { data: featuredData, refetch: refetchFeatured } = useQuery({
     queryKey: ['featured-products'],
     queryFn:  () => marketplaceApi.search({ limit: 8, page: 1 }).then(r => r.data),
+    retry: 0,
   });
 
   const { data: pricesData } = useQuery({
     queryKey: ['market-prices'],
     queryFn:  () => marketplaceApi.getMarketPrices().then(r => r.data),
+    retry: 0,
   });
 
   const { data: notifData } = useQuery({
     queryKey: ['notifications-meta'],
     queryFn:  () => notificationsApi.getAll({ limit: 1 }).then(r => r.data),
-    refetchInterval: 30_000,
+    refetchInterval: false,
+    retry: 0,
   });
 
   const unread      = notifData?.meta?.unread ?? 0;

@@ -12,11 +12,12 @@ interface AuthState {
 
   initialize:   () => Promise<void>;
   login:        (identifier: string, password?: string) => Promise<any>;
-  verifyOtp:    (userId: string, token: string, purpose: string) => Promise<void>;
+  verifyOtp:    (userId: string, token: string, purpose: string) => Promise<any>;
   register:     (data: any) => Promise<any>;
   logout:       () => Promise<void>;
   refreshUser:  () => Promise<void>;
   setTokens:    (tokens: AuthTokens) => Promise<void>;
+  setDemoUser:  (user: any) => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
@@ -62,6 +63,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const { data } = await authApi.verifyOtp({ userId, token, purpose });
       await get().setTokens(data);
+      return data; /* return full response including registrationFee */
     } finally {
       set({ isLoading: false });
     }
@@ -102,5 +104,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     await storage.setItem('accessToken',  tokens.accessToken);
     await storage.setItem('refreshToken', tokens.refreshToken);
     set({ user: tokens.user, accessToken: tokens.accessToken, isAuthenticated: true });
+  },
+
+  /* ── Demo mode: inject mock user without API ── */
+  setDemoUser: (user: any) => {
+    set({ user, accessToken: 'demo-token', isAuthenticated: true, isInitialized: true });
   },
 }));

@@ -42,20 +42,20 @@
 
   <!-- ═══ Mobile navbar override — inline for cache reliability ═══ -->
   <style>
-    /* On mobile: hide desktop-only items, make WA button icon-only */
+    /* FIX #6: On mobile show ONLY logo + hamburger.
+       All other nav items (WA btn, Join Early Access, Coming Soon pill)
+       are hidden here and available inside the mobile-menu dropdown. */
     @media (max-width: 860px) {
-      .nav-cta-desktop          { display: none !important; }
-      .nav-logo-text .logo-sub  { display: none !important; }
-      .nav-links                { display: none !important; }
-      .hamburger                { display: flex !important; }
-      /* WhatsApp nav: show icon only, no text */
-      .btn-whatsapp-nav .nav-wa-label { display: none !important; }
-      .btn-whatsapp-nav {
-        padding: 8px 10px !important;
-        border-radius: 8px !important;
-      }
-      /* Tighten nav height */
-      .nav-inner { height: 60px !important; }
+      .nav-cta-desktop              { display: none !important; }
+      .nav-logo-text .logo-sub      { display: none !important; }
+      .nav-links                    { display: none !important; }
+      .hamburger                    { display: flex !important; }
+      /* Hide the WhatsApp nav button entirely — it's in the mobile menu */
+      .btn-whatsapp-nav             { display: none !important; }
+      /* Hide desktop-only pill and download button */
+      .nav-right .coming-soon-pill  { display: none !important; }
+      .nav-right .btn-download      { display: none !important; }
+      .nav-inner                    { height: 60px !important; }
     }
   </style>
 
@@ -169,7 +169,7 @@
      HERO
 ════════════════════════════════════ -->
 <section class="hero" id="home">
-  <div class="hero-left container">
+  <div class="hero-left">
     <h1 class="hero-brand-name">DG-LETS</h1>
     <p class="hero-brand-sub">AGRI MARKET PLACE APP</p>
     <p class="hero-tagline">Connect. Trade. Grow.</p>
@@ -224,7 +224,7 @@
     </form>
 
     <!-- BUYER FORM -->
-    <form class="ea-form" id="form-buyer" data-role="buyer" novalidate style="display:none">
+    <form class="ea-form" id="form-buyer" data-role="buyer" novalidate>
       <div class="form-row"><span class="f-icon">👤</span><input type="text" id="b-name" placeholder="Full Name" required /></div>
       <div class="form-row"><span class="f-icon">📞</span><input type="tel" id="b-phone" placeholder="Phone Number" required /></div>
       <div class="form-row"><span class="f-icon">✉️</span><input type="email" id="b-email" placeholder="Email Address (optional)" /></div>
@@ -263,7 +263,7 @@
     </form>
 
     <!-- SUPPLIER / TRADER FORM -->
-    <form class="ea-form" id="form-supplier" data-role="supplier" novalidate style="display:none">
+    <form class="ea-form" id="form-supplier" data-role="supplier" novalidate>
       <div class="form-row"><span class="f-icon">👤</span><input type="text" id="s-name" placeholder="Full Name / Business Name" required /></div>
       <div class="form-row"><span class="f-icon">📞</span><input type="tel" id="s-phone" placeholder="Phone Number" required /></div>
       <div class="form-row"><span class="f-icon">✉️</span><input type="email" id="s-email" placeholder="Email Address (optional)" /></div>
@@ -290,7 +290,7 @@
     </form>
 
     <!-- LOGISTICS FORM -->
-    <form class="ea-form" id="form-logistics" data-role="logistics" novalidate style="display:none">
+    <form class="ea-form" id="form-logistics" data-role="logistics" novalidate>
       <div class="form-row"><span class="f-icon">👤</span><input type="text" id="l-name" placeholder="Full Name / Company Name" required /></div>
       <div class="form-row"><span class="f-icon">📞</span><input type="tel" id="l-phone" placeholder="Phone Number" required /></div>
       <div class="form-row"><span class="f-icon">✉️</span><input type="email" id="l-email" placeholder="Email Address (optional)" /></div>
@@ -404,7 +404,7 @@
      STATUS BAR
 ════════════════════════════════════ -->
 <div class="status-bar" id="features">
-  <div class="status-bar-inner" style="max-width:1200px;margin:0 auto">
+  <div class="status-bar-inner">
     <div class="status-col"><span class="sc-icon">🤝</span><span class="sc-title">Farmers to Buyers</span><span class="sc-desc">Connecting quality produce to serious buyers.</span><span class="sc-badge on-way">ON THE WAY</span></div>
     <div class="status-col"><span class="sc-icon">🛠️</span><span class="sc-title">MVP Development</span><span class="sc-desc">Our Minimum Viable Product is in active development.</span><span class="sc-badge progress">IN PROGRESS</span></div>
     <div class="status-col"><span class="sc-icon">⚡</span><span class="sc-title">Platform Features</span><span class="sc-desc">Smart Map, AI matching, payments and delivery.</span><span class="sc-badge coming">COMING SOON</span></div>

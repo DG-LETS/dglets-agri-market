@@ -1,9 +1,15 @@
 import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService }  from '../prisma/prisma.service';
+import { HaulageService } from '../haulage/haulage.service';
+import { FeesService }    from '../fees/fees.service';
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma:   PrismaService,
+    private readonly haulage:  HaulageService,
+    private readonly fees:     FeesService,
+  ) {}
 
   private generateOrderNumber() {
     return `DG-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substr(2, 4).toUpperCase()}`;
@@ -95,7 +101,13 @@ export class OrdersService {
 
   /* ── Update order status ── */
   async updateStatus(id: string, userId: string, status: string) {
-    const order = await this.prisma.order.findUnique({ where: { id } });
+    const order = await this.prisma.order.findUnique({
+      where:   { id },
+      include: {
+        seller: { select: { farmerProfile: true } },
+        items:  { include: { product: { select: { name: true, quantityUnit: true } } } },
+      },
+    });
     if (!order) throw new NotFoundException('Order not found');
     if (order.sellerId !== userId && order.buyerId !== userId) throw new ForbiddenException('Access denied');
 
@@ -104,6 +116,31 @@ export class OrdersService {
     if (status === 'COMPLETED')  data.completedAt  = new Date();
     if (status === 'CANCELLED')  data.cancelledAt  = new Date();
 
-    return this.prisma.order.update({ where: { id }, data });
+    const updated = await this.prisma.order.update({ where: { id }, data });
+
+    /* When seller confirms an order that needs delivery → create HaulageJob */
+    if (status === 'CONFIRMED' && order.deliveryAddress && order.deliveryState) {
+      const sellerProfile = order.seller?.farmerProfile;
+      const cargoSummary  = order.items.map(i => i.product?.name).filter(Boolean).join(', ');
+      const totalWeight   = order.items.reduce((s, i) => s + i.quantity, 0);
+
+      await this.haulage.createJobFromOrder(id, {
+        sellerId:      order.sellerId,
+        sellerState:   sellerProfile?.state,
+        sellerLga:     sellerProfile?.lga ?? undefined,
+        deliveryState: order.deliveryState,
+        deliveryAddr:  order.deliveryAddress,
+        deliveryFee:   order.deliveryFee,
+        cargoSummary:  cargoSummary || 'Agricultural produce',
+        totalWeight,
+      });
+    }
+
+    /* Record transaction fee when order completes */
+    if (status === 'COMPLETED' && order.platformFee > 0) {
+      await this.fees.recordTransactionFee(order.sellerId, id, order.platformFee);
+    }
+
+    return updated;
   }
 }

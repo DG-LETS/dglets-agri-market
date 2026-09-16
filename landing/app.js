@@ -22,9 +22,11 @@ window.switchRole = function(role) {
     tab.classList.toggle('active', tab.dataset.role === role);
   });
 
-  /* Show correct form, hide others */
+  /* Show correct form, hide others — use class + style for reliability */
   document.querySelectorAll('.ea-form').forEach(form => {
-    form.style.display = form.dataset.role === role ? 'flex' : 'none';
+    const isActive = form.dataset.role === role;
+    form.classList.toggle('active-form', isActive);
+    form.style.display = isActive ? 'flex' : 'none';
   });
 
   /* Hide success state if visible */
@@ -46,29 +48,33 @@ window.scrollToRegister = function() {
    NAVBAR
 ══════════════════════════════════════ */
 const navbar = document.getElementById('navbar');
-window.addEventListener('scroll', () => {
-  navbar.style.boxShadow = window.scrollY > 10 ? '0 2px 12px rgba(0,0,0,.1)' : '';
-}, { passive: true });
+if (navbar) {
+  window.addEventListener('scroll', () => {
+    navbar.style.boxShadow = window.scrollY > 10 ? '0 2px 12px rgba(0,0,0,.1)' : '';
+  }, { passive: true });
+}
 
 /* ── Mobile menu ── */
 const hamburger  = document.getElementById('hamburger');
 const mobileMenu = document.getElementById('mobileMenu');
-hamburger.addEventListener('click', () => {
-  const open  = mobileMenu.classList.toggle('open');
-  hamburger.setAttribute('aria-expanded', open);
-  const spans = hamburger.querySelectorAll('span');
-  if (open) {
-    spans[0].style.cssText = 'transform:rotate(45deg) translate(5px,5px)';
-    spans[1].style.cssText = 'opacity:0';
-    spans[2].style.cssText = 'transform:rotate(-45deg) translate(5px,-5px)';
-  } else { spans.forEach(s => s.style.cssText = ''); }
-});
-mobileMenu.querySelectorAll('a').forEach(a => {
-  a.addEventListener('click', () => {
-    mobileMenu.classList.remove('open');
-    hamburger.querySelectorAll('span').forEach(s => s.style.cssText = '');
+if (hamburger && mobileMenu) {
+  hamburger.addEventListener('click', () => {
+    const open  = mobileMenu.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', open);
+    const spans = hamburger.querySelectorAll('span');
+    if (open) {
+      spans[0].style.cssText = 'transform:rotate(45deg) translate(5px,5px)';
+      spans[1].style.cssText = 'opacity:0';
+      spans[2].style.cssText = 'transform:rotate(-45deg) translate(5px,-5px)';
+    } else { spans.forEach(s => s.style.cssText = ''); }
   });
-});
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      mobileMenu.classList.remove('open');
+      hamburger.querySelectorAll('span').forEach(s => s.style.cssText = '');
+    });
+  });
+}
 
 /* ══════════════════════════════════════
    TOAST

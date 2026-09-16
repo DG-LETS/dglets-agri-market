@@ -45,3 +45,10 @@ coverage/
 # Temporary
 *.tmp
 *.temp
+
+# Expo
+mobile/.expo/
+mobile/web-build/
+
+# Package lock (use npm install, not lock-driven)
+# package-lock.json  # Keep this commented — lock files are useful for reproducible builds

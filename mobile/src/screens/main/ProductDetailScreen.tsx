@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Colors, Typography, Spacing, Radius, Shadow } from '@theme/index';
 import { Button, Badge, LoadingState } from '@components/ui';
-import { marketplaceApi, ordersApi } from '@services/api';
+import { marketplaceApi, ordersApi, messagesApi } from '@services/api';
 import { useAuthStore } from '@store/authStore';
 import { useCartStore } from '@store/cartStore';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -29,6 +29,7 @@ export function ProductDetailScreen({ navigation, route }: Props) {
   const [imageIdx,  setImageIdx]  = useState(0);
   const [qty,       setQty]       = useState(1);
   const [saved,     setSaved]     = useState(false);
+  const [messaging, setMessaging] = useState(false);
 
   /* ── Fetch product ── */
   const { data: product, isLoading } = useQuery({
@@ -106,6 +107,35 @@ export function ProductDetailScreen({ navigation, route }: Props) {
         { text: 'Place Order', onPress: () => orderMutation.mutate() },
       ],
     );
+  };
+
+  /* ── Ask seller — open or create conversation ── */
+  const handleAskSeller = async () => {
+    if (!product) return;
+    setMessaging(true);
+    try {
+      const res = await messagesApi.getOrCreateConversation(
+        product.sellerId,
+        product.id,
+        undefined,
+      );
+      const conv = res.data;
+      (navigation as any).navigate('MessagesTab', {
+        screen: 'Chat',
+        params: {
+          conversationId: conv.id,
+          recipientId:    product.sellerId,
+          recipientName:  `${product.seller?.firstName ?? ''} ${product.seller?.lastName ?? ''}`.trim(),
+          recipientRole:  product.seller?.role ?? 'FARMER',
+          productId:      product.id,
+          productName:    product.name,
+        },
+      });
+    } catch {
+      Alert.alert('Error', 'Could not open conversation. Please try again.');
+    } finally {
+      setMessaging(false);
+    }
   };
 
   if (isLoading) return <LoadingState fullScreen message="Loading product…" />;
@@ -252,8 +282,12 @@ export function ProductDetailScreen({ navigation, route }: Props) {
                   )}
                 </View>
                 {!isMine && (
-                  <TouchableOpacity style={styles.waBtn}>
-                    <Text style={styles.waBtnText}>💬</Text>
+                  <TouchableOpacity
+                    style={[styles.waBtn, messaging && { opacity: 0.6 }]}
+                    onPress={handleAskSeller}
+                    disabled={messaging}
+                  >
+                    <Text style={styles.waBtnText}>{messaging ? '⏳' : '💬'}</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -306,6 +340,14 @@ export function ProductDetailScreen({ navigation, route }: Props) {
       {/* Sticky bottom CTA */}
       {!isMine && (
         <View style={[styles.bottomBar, { paddingBottom: insets.bottom + Spacing[3] }]}>
+          <Button
+            title={messaging ? '⏳' : '💬 Ask'}
+            variant="outline"
+            fullWidth={false}
+            style={styles.askBtn}
+            onPress={handleAskSeller}
+            disabled={messaging}
+          />
           <Button
             title="Add to Cart"
             variant="outline"
@@ -400,4 +442,5 @@ const styles = StyleSheet.create({
   },
   cartBtn:  { flex: 1 },
   orderBtn: { flex: 2 },
+  askBtn:   { flex: 1 },
 });

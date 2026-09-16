@@ -14,16 +14,38 @@ export type RootStackParamList = {
 
 const Stack = createStackNavigator<RootStackParamList>();
 
+/* ─────────────────────────────────────────────────────────
+   DEMO_MODE = true  → skip backend, show full app with mock user
+   DEMO_MODE = false → normal auth flow (requires backend)
+───────────────────────────────────────────────────────── */
+const DEMO_MODE = true;
+
+const MOCK_USER = {
+  id:         'demo-001',
+  firstName:  'Daniel',
+  lastName:   'Osadolor',
+  phone:      '08070566642',
+  email:      'demo@dglets.com',
+  role:       'HAULAGE' as const,
+  isVerified: true,
+  isActive:   true,
+  createdAt:  new Date().toISOString(),
+};
+
 export function RootNavigator() {
-  const { isAuthenticated, isInitialized, initialize, logout } = useAuthStore();
+  const { isAuthenticated, isInitialized, initialize, logout, setDemoUser } = useAuthStore();
 
-  /* Boot — restore session from SecureStore */
-  useEffect(() => { initialize(); }, []);
-
-  /* When the Axios interceptor clears tokens after a failed refresh,
-     fire logout() so Zustand state resets and the navigator re-renders
-     to the Auth stack automatically. */
   useEffect(() => {
+    if (DEMO_MODE) {
+      /* Inject mock user — no API call needed */
+      setDemoUser(MOCK_USER);
+    } else {
+      initialize();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (DEMO_MODE) return;
     const unsub = onSessionExpired(() => logout());
     return unsub;
   }, [logout]);

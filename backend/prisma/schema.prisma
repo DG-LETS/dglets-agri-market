@@ -97,6 +97,7 @@ model User {
   profileImage    String?
   referralCode    String     @unique @default(uuid())
   referredBy      String?
+  pushToken       String?
   lastLoginAt     DateTime?
   createdAt       DateTime   @default(now())
   updatedAt       DateTime   @updatedAt
@@ -104,6 +105,7 @@ model User {
   // Relations
   farmerProfile   FarmerProfile?
   buyerProfile    BuyerProfile?
+  haulageProfile  HaulageProfile?
   otpTokens       OtpToken[]
   refreshTokens   RefreshToken[]
   products        Product[]
@@ -117,6 +119,9 @@ model User {
   savedProducts   SavedProduct[]
   verification    Verification?
   auditLogs       AuditLog[]
+  haulageApplications HaulageApplication[] @relation("HaulageApplications")
+  awardedHaulageJobs  HaulageJob[]         @relation("AwardedHaulageJobs")
+  platformFees        PlatformFee[]
 
   @@map("users")
 }
@@ -299,6 +304,7 @@ model Order {
   items     OrderItem[]
   payment   Payment?
   reviews   Review[]
+  haulageJob HaulageJob?
 
   @@index([buyerId])
   @@index([sellerId])
@@ -526,3 +532,136 @@ model AuditLog {
   @@index([entity])
   @@map("audit_logs")
 }
+
+// ═══════════════════════════════════════
+// HAULAGE
+// ═══════════════════════════════════════
+
+enum HaulageJobStatus {
+  OPEN          // accepting applications
+  AWARDED       // a haulage provider has been selected
+  IN_TRANSIT    // pickup confirmed, delivery in progress
+  DELIVERED     // delivery confirmed
+  CANCELLED     // job cancelled
+}
+
+enum HaulageApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+model HaulageProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  companyName     String?
+  bio             String?
+  vehicleType     String   // motorcycle | pickup | small-truck | medium-truck | large-truck | multiple
+  vehicleCapacity Float    // max tonnes per trip
+  licensePlate    String?
+  yearsExperience Int?
+  coverageStates  String[] // Nigerian states covered
+  coverageRoutes  String?  // free text e.g. "Lagos - Abuja - Kaduna"
+  isAvailable     Boolean  @default(true)
+  rating          Float    @default(0)
+  totalJobs       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applications HaulageApplication[]
+
+  @@map("haulage_profiles")
+}
+
+model HaulageJob {
+  id              String           @id @default(uuid())
+  orderId         String           @unique
+  status          HaulageJobStatus @default(OPEN)
+  awardedToId     String?          // userId of winning haulage provider
+  offeredFee      Float            @default(0)
+  agreedFee       Float?
+  platformCut     Float            @default(0)  // platform commission on haulage fee
+  pickupState     String?
+  pickupAddress   String?
+  deliveryState   String?
+  deliveryAddress String?
+  cargoSummary    String?
+  totalWeight     Float?
+  pickupDate      DateTime?
+  deliveredAt     DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  order        Order              @relation(fields: [orderId], references: [id])
+  awardedTo    User?              @relation("AwardedHaulageJobs", fields: [awardedToId], references: [id])
+  applications HaulageApplication[]
+
+  @@index([status])
+  @@index([pickupState])
+  @@index([deliveryState])
+  @@map("haulage_jobs")
+}
+
+model HaulageApplication {
+  id               String                   @id @default(uuid())
+  jobId            String
+  applicantId      String
+  haulageProfileId String
+  status           HaulageApplicationStatus @default(PENDING)
+  proposedFee      Float?
+  note             String?
+  appliedAt        DateTime                 @default(now())
+  respondedAt      DateTime?
+
+  job     HaulageJob     @relation(fields: [jobId],            references: [id], onDelete: Cascade)
+  applicant User         @relation("HaulageApplications",      fields: [applicantId],      references: [id])
+  profile HaulageProfile @relation(fields: [haulageProfileId], references: [id])
+
+  @@unique([jobId, applicantId])
+  @@index([applicantId])
+  @@map("haulage_applications")
+}
+
+// ═══════════════════════════════════════
+// FEES & REGISTRATION
+// ═══════════════════════════════════════
+
+enum FeeType {
+  REGISTRATION      // one-time account activation fee
+  TRANSACTION       // % of order value
+  HAULAGE_COMMISSION // % of delivery fee
+  LISTING           // fee to publish a product (future)
+}
+
+enum FeeStatus {
+  PENDING
+  PAID
+  WAIVED
+  FAILED
+}
+
+model PlatformFee {
+  id          String    @id @default(uuid())
+  userId      String
+  type        FeeType
+  amount      Float
+  currency    String    @default("NGN")
+  status      FeeStatus @default(PENDING)
+  referenceId String?   // orderId or jobId or "registration"
+  paystackRef String?   @unique
+  description String
+  dueAt       DateTime?
+  paidAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@map("platform_fees")
+}
+

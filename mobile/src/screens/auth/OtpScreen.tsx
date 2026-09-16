@@ -55,8 +55,21 @@ export function OtpScreen({ navigation, route }: Props) {
     const token = otp.join('');
     if (token.length < OTP_LENGTH) { Alert.alert('Enter all 6 digits'); return; }
     try {
-      await verifyOtp(userId, token, purpose);
-      /* Navigation handled by RootNavigator state change */
+      const result = await verifyOtp(userId, token, purpose);
+
+      /* After phone verification, route based on role and fee requirement */
+      if (purpose === 'verify_phone') {
+        const { user } = useAuthStore.getState();
+        const role = user?.role ?? '';
+        const regFee = (result as any)?.registrationFee;
+
+        if (role === 'HAULAGE') {
+          navigation.navigate('HaulageProfileSetup');
+        } else if (regFee?.required && !regFee?.paid) {
+          navigation.navigate('RegistrationFee');
+        }
+        /* Otherwise RootNavigator will auto-navigate to Main */
+      }
     } catch (error: any) {
       Alert.alert('Invalid OTP', error?.response?.data?.message || 'The code is incorrect or has expired.');
       setOtp(Array(OTP_LENGTH).fill(''));

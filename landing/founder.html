@@ -12,13 +12,14 @@
   <style>
     /* ── Mobile navbar override ── */
     @media (max-width: 860px) {
-      .nav-cta-desktop          { display: none !important; }
-      .nav-logo-text .logo-sub  { display: none !important; }
-      .nav-links                { display: none !important; }
-      .hamburger                { display: flex !important; }
-      .btn-whatsapp-nav .nav-wa-label { display: none !important; }
-      .btn-whatsapp-nav { padding: 8px 10px !important; }
-      .nav-inner { height: 60px !important; }
+      .nav-cta-desktop              { display: none !important; }
+      .nav-logo-text .logo-sub      { display: none !important; }
+      .nav-links                    { display: none !important; }
+      .hamburger                    { display: flex !important; }
+      .btn-whatsapp-nav             { display: none !important; }
+      .nav-right .coming-soon-pill  { display: none !important; }
+      .nav-right .btn-download      { display: none !important; }
+      .nav-inner                    { height: 60px !important; }
     }
 
     /* ── Founder page specific styles ── */
@@ -358,12 +359,12 @@
         <a href="index.html#contact">Contact Us</a>
       </div>
       <div class="nav-right">
-        <button class="btn-download nav-cta-desktop" onclick="window.location.href='index.html#early-access'">
+        <button class="btn-download nav-cta-desktop" onclick="window.location.href='index.html#register'">
           📥 <span>Get Early Access</span>
         </button>
         <span class="coming-soon-pill nav-cta-desktop">Coming Soon</span>
       </div>
-      <button class="hamburger" id="hamburger" aria-label="Open menu">
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -373,7 +374,9 @@
       <a href="index.html#how-it-works">How It Works</a>
       <a href="founder.html">About Us</a>
       <a href="index.html#contact">Contact Us</a>
-      <button class="btn-download" onclick="window.location.href='index.html#early-access'">📥 Get Early Access</button>
+      <a href="https://wa.me/2348070566642?text=Hello%20DG-LETS%2C%20I%20want%20to%20know%20more."
+         target="_blank" rel="noopener" class="mobile-whatsapp-link">💬 Chat on WhatsApp</a>
+      <button class="btn-download" onclick="window.location.href='index.html#register'">📥 Get Early Access</button>
     </div>
   </div>
 </nav>
@@ -610,7 +613,7 @@
     </form>
     <p class="founder-cta-note">🔒 No spam. Unsubscribe anytime.</p>
     <div style="margin-top:24px">
-      <a href="index.html#early-access" style="color:#74c69d;font-size:.88rem;font-weight:600;text-decoration:underline">
+      <a href="index.html#register" style="color:#74c69d;font-size:.88rem;font-weight:600;text-decoration:underline">
         Or fill the full early access form →
       </a>
     </div>

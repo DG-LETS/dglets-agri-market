@@ -43,7 +43,12 @@ export class MarketplaceService {
         take:    limit,
         include: {
           category: { select: { id: true, name: true, slug: true } },
-          seller:   { select: { id: true, firstName: true, lastName: true, profileImage: true } },
+          seller:   {
+            select: {
+              id: true, firstName: true, lastName: true, profileImage: true,
+              verification: { select: { phoneVerified: true, identityStatus: true } },
+            },
+          },
         },
         orderBy: { createdAt: 'desc' },
       }),

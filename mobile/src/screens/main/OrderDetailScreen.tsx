@@ -404,6 +404,46 @@ export function OrderDetailScreen({ navigation, route }: Props) {
             </View>
           </View>
         )}
+
+        {/* Rate & Review — shown when order is COMPLETED */}
+        {order.status === 'COMPLETED' && contact && (
+          <View style={styles.section}>
+            <Button
+              title={`⭐ Rate ${contactRole}`}
+              variant="outline"
+              onPress={() => (navigation as any).navigate('RateReview', {
+                orderId:     order.id,
+                subjectId:   contact.id,
+                subjectName: `${contact.firstName} ${contact.lastName}`,
+                isBuyer,
+              })}
+            />
+          </View>
+        )}
+
+        {/* Dispute flag — available on active orders */}
+        {!['COMPLETED','CANCELLED','REFUNDED'].includes(order.status) && (
+          <View style={styles.section}>
+            <TouchableOpacity
+              style={styles.disputeBtn}
+              onPress={() => Alert.alert(
+                '⚠️ Report an Issue',
+                'Describe your problem and our team will investigate.\n\nFor urgent issues, contact us on WhatsApp.',
+                [
+                  { text: 'Cancel', style: 'cancel' },
+                  {
+                    text: 'Contact Support',
+                    onPress: () => Linking.openURL(
+                      `https://wa.me/2348070566642?text=Hello%20DG-LETS%20Support%2C%20I%20have%20an%20issue%20with%20order%20%23${order.orderNumber}.`
+                    ),
+                  },
+                ],
+              )}
+            >
+              <Text style={styles.disputeBtnText}>⚠️ Report an Issue with this Order</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -494,4 +534,8 @@ const styles = StyleSheet.create({
   /* Pay Now */
   payNowWrap: { padding: Spacing[4], borderTopWidth: 1, borderTopColor: Colors.gray[100], gap: Spacing[3] },
   payNowNote: { ...Typography.caption, color: Colors.textMuted, textAlign: 'center', lineHeight: 16 },
+
+  /* Dispute */
+  disputeBtn:     { borderWidth: 1, borderColor: Colors.warning, borderRadius: Radius.lg, padding: Spacing[4], alignItems: 'center' },
+  disputeBtnText: { ...Typography.bodyMedium, color: Colors.warning, fontWeight: '700' },
 });

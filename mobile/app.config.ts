@@ -12,6 +12,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   web: {
     favicon: './assets/favicon.png',
     bundler: 'metro',
+    /* Disable Hermes on web — it does not support import.meta */
+    jsEngine: 'jsc',
   },
   splash: {
     image: './assets/splash.png',

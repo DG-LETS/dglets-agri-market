@@ -1,30 +1,37 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import Toast from 'react-native-toast-message';
+import { RootNavigator } from '@navigation/RootNavigator';
+import { usePushNotifications } from '@hooks/usePushNotifications';
 
-export default function App() {
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries:   { retry: 0, staleTime: 30_000 },
+    mutations: { retry: 0 },
+  },
+});
+
+/* Inner component so hooks can access QueryClient context */
+function AppInner() {
+  usePushNotifications();
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>🌾 DG-LETS Agri Market</Text>
-      <Text style={styles.sub}>App is loading correctly</Text>
-    </View>
+    <>
+      <RootNavigator />
+      <Toast />
+    </>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#1e5c3a',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#ffffff',
-    marginBottom: 12,
-  },
-  sub: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.8)',
-  },
-});
+export default function App() {
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <QueryClientProvider client={queryClient}>
+          <AppInner />
+        </QueryClientProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
+  );
+}

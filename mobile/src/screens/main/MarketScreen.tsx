@@ -105,6 +105,7 @@ export function MarketScreen({ navigation, route }: Props) {
               <ProductCard
                 {...item}
                 sellerName={`${item.seller?.firstName || ''} ${item.seller?.lastName || ''}`.trim()}
+                isVerified={item.seller?.verification?.identityStatus === 'VERIFIED' || item.seller?.verification?.phoneVerified === true}
                 onPress={() => navigation.navigate('ProductDetail', { productId: item.id })}
               />
             </View>

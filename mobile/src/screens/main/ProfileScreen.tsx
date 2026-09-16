@@ -142,8 +142,12 @@ export function ProfileScreen({ navigation }: Props) {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Account</Text>
         <View style={styles.card}>
+          {isSeller && (
+            <MenuItem emoji="📊" label="Seller Dashboard" onPress={() => navigation.navigate('SellerDashboard')} />
+          )}
           <MenuItem emoji="👤" label="Edit Profile"        onPress={() => navigation.navigate('EditProfile', { section: 'basic' })} />
           <MenuItem emoji="🌾" label="Farm / Business Profile" onPress={() => navigation.navigate('EditProfile', { section: isSeller ? 'farmer' : 'buyer' })} />
+          <MenuItem emoji="❤️" label="Saved Products"      onPress={() => navigation.navigate('SavedProducts')} />
           <MenuItem emoji="💳" label="Payout Details"      onPress={() => Alert.alert('Coming Soon', 'Payout details will be available when payments go live.')} />
           <MenuItem emoji="🔔" label="Notifications"       onPress={() => Alert.alert('Coming Soon', 'Notification preferences coming in the next update.')} />
           <MenuItem emoji="🌍" label="Language — English"  onPress={() => Alert.alert('Coming Soon', 'More languages coming soon.')} />
