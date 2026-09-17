@@ -1,0 +1,62 @@
+name: dglets-agri-backend
+services:
+  - name: api
+    type: web
+    git:
+      repository: github.com/Dglets/dglets-agri-market
+      branch: master
+    build:
+      dockerfile: backend/Dockerfile
+      build_command: ""
+    run:
+      command: "npx prisma migrate deploy && node dist/main"
+    instance_types:
+      - eco
+    ports:
+      - port: 3000
+        protocol: http
+    env:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: CORS_ORIGIN
+        value: "*"
+      - key: JWT_EXPIRES_IN
+        value: "7d"
+      - key: JWT_REFRESH_EXPIRES_IN
+        value: "30d"
+      - key: OTP_EXPIRES_MINUTES
+        value: "10"
+      - key: BCRYPT_ROUNDS
+        value: "12"
+      - key: TERMII_SENDER_ID
+        value: "DG-LETS"
+      - key: TERMII_BASE_URL
+        value: "https://api.ng.termii.com"
+      - key: PLATFORM_FEE_RATE
+        value: "0.0205"
+      - key: PLATFORM_FEE_MIN
+        value: "200"
+      - key: PLATFORM_FEE_CAP
+        value: "50000"
+      - key: REGISTRATION_FEE_FARMER
+        value: "2000"
+      - key: REGISTRATION_FEE_TRADER
+        value: "2000"
+      - key: REGISTRATION_FEE_AGGREGATOR
+        value: "2000"
+      - key: REGISTRATION_FEE_PROCESSOR
+        value: "2000"
+      - key: REGISTRATION_FEE_EXPORTER
+        value: "5000"
+      - key: REGISTRATION_FEE_HAULAGE
+        value: "3000"
+      - key: REGISTRATION_FEE_BUYER
+        value: "0"
+      - key: HAULAGE_COMMISSION_RATE
+        value: "0.05"
+      # These must be set as secrets in Koyeb dashboard:
+      # DATABASE_URL, JWT_SECRET, JWT_REFRESH_SECRET
+      # PAYSTACK_SECRET_KEY, TERMII_API_KEY
+      # CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
