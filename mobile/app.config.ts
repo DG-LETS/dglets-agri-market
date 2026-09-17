@@ -10,13 +10,13 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   userInterfaceStyle: 'light',
   platforms: ['ios', 'android', 'web'],
   web: {
-    favicon: './assets/favicon.png',
+    favicon: './assets/icon.png',
     bundler: 'metro',
     /* Disable Hermes on web — it does not support import.meta */
     jsEngine: 'jsc',
   },
   splash: {
-    image: './assets/splash.png',
+    image: './assets/icon.png',
     resizeMode: 'contain',
     backgroundColor: '#1e5c3a',
   },
@@ -27,8 +27,8 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: './assets/adaptive-icon.png',
-      backgroundColor: '#1e5c3a',
+      foregroundImage: './assets/icon.png',
+      backgroundColor: '#ffffff',
     },
     package: 'com.dglets.agrimarket',
     permissions: [
