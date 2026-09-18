@@ -5,6 +5,10 @@
   "author": "DG-LETS Agri & Tech Nig Ltd",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {
+    "node": "20.x",
+    "npm": ">=10"
+  },
   "scripts": {
     "build": "npx nest build",
     "start": "node dist/main",
