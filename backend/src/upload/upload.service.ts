@@ -46,12 +46,12 @@ export class UploadService {
       .update(paramsToSign)
       .digest('hex');
 
-    /* Build multipart form — use Uint8Array to avoid Buffer/BlobPart type conflict */
-    const uint8 = new Uint8Array(fileBuffer.buffer, fileBuffer.byteOffset, fileBuffer.byteLength);
-    const blob  = new Blob([uint8], { type: mimetype });
+    /* Build multipart form — convert buffer to base64 data URI to avoid BlobPart type issues */
+    const base64    = fileBuffer.toString('base64');
+    const dataUri   = `data:${mimetype};base64,${base64}`;
 
     const form = new FormData();
-    form.append('file',      blob, 'upload');
+    form.append('file',      dataUri);
     form.append('api_key',   apiKey);
     form.append('timestamp', timestamp);
     form.append('folder',    folder);
