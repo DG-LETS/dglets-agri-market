@@ -1,7 +1,8 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { createHmac } from 'crypto';
 
-interface CloudinaryUploadResult {
+export interface CloudinaryUploadResult {
   url:       string;
   publicId:  string;
   width:     number;
@@ -39,30 +40,25 @@ export class UploadService {
     }
 
     /* Build signed upload via Cloudinary REST API (no SDK needed) */
-    const timestamp = Math.floor(Date.now() / 1000).toString();
+    const timestamp    = Math.floor(Date.now() / 1000).toString();
     const paramsToSign = `folder=${folder}&timestamp=${timestamp}`;
-
-    /* Sign using Web Crypto (available in Node 18+) */
-    const encoder = new TextEncoder();
-    const keyData = encoder.encode(apiSecret);
-    const msgData = encoder.encode(paramsToSign);
-
-    const { createHmac } = await import('crypto');
-    const signature = createHmac('sha256', apiSecret)
-      .update(`${paramsToSign}`)
+    const signature    = createHmac('sha256', apiSecret)
+      .update(paramsToSign)
       .digest('hex');
 
-    /* Build multipart form */
+    /* Build multipart form — use Uint8Array to avoid Buffer/BlobPart type conflict */
+    const uint8 = new Uint8Array(fileBuffer.buffer, fileBuffer.byteOffset, fileBuffer.byteLength);
+    const blob  = new Blob([uint8], { type: mimetype });
+
     const form = new FormData();
-    const blob = new Blob([fileBuffer], { type: mimetype });
-    form.append('file',      blob);
+    form.append('file',      blob, 'upload');
     form.append('api_key',   apiKey);
     form.append('timestamp', timestamp);
     form.append('folder',    folder);
     form.append('signature', signature);
 
     const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
-    const response  = await fetch(uploadUrl, { method: 'POST', body: form as any });
+    const response  = await fetch(uploadUrl, { method: 'POST', body: form });
     const result    = await response.json() as any;
 
     if (!response.ok || result.error) {
