@@ -18,7 +18,7 @@ const Stack = createStackNavigator<RootStackParamList>();
    DEMO_MODE = true  → skip backend, show full app with mock user
    DEMO_MODE = false → normal auth flow (requires backend)
 ───────────────────────────────────────────────────────── */
-const DEMO_MODE = true;
+const DEMO_MODE = false;
 
 const MOCK_USER = {
   id:         'demo-001',

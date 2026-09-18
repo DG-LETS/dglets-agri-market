@@ -52,3 +52,17 @@ mobile/web-build/
 
 # Package lock (use npm install, not lock-driven)
 # package-lock.json  # Keep this commented — lock files are useful for reproducible builds
+
+# Deployment scripts (contain API keys)
+deploy.ps1
+deploy2.ps1
+
+# WhatsApp images
+*.jpeg
+*.jpg
+!landing/images/
+!docs/images/
+!images/founder.jpg
+
+# Duplicate root-level assets
+/images/logo.png
