@@ -22,7 +22,7 @@
         "simulator": true
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://REPLACE_WITH_RAILWAY_URL/api/v1"
+        "EXPO_PUBLIC_API_URL": "https://dglets-agri-backend.onrender.com/api/v1"
       }
     },
     "production": {
@@ -30,7 +30,7 @@
         "buildType": "app-bundle"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://REPLACE_WITH_RAILWAY_URL/api/v1"
+        "EXPO_PUBLIC_API_URL": "https://dglets-agri-backend.onrender.com/api/v1"
       }
     }
   },
