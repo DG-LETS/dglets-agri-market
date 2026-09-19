@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "DG-LETS Agri Market",
+    "slug": "dglets-agri-market",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "platforms": ["ios", "android", "web"],
+    "web": {
+      "favicon": "./assets/icon.png",
+      "bundler": "metro",
+      "jsEngine": "jsc"
+    },
+    "splash": {
+      "image": "./assets/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1e5c3a"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.dglets.agrimarket"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.dglets.agrimarket",
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "plugins": [
+      ["expo-location", { "locationAlwaysAndWhenInUsePermission": "Allow DG-LETS to use your location to find nearby farmers." }],
+      ["expo-image-picker", { "photosPermission": "Allow DG-LETS to access your photos for product images." }]
+    ],
+    "scheme": "dglets",
+    "extra": {
+      "eas": {
+        "projectId": "b1b43a34-d965-4e2a-96e2-a1d52b9cd7c1"
+      }
+    },
+    "owner": "devdanielcodes357"
+  }
+}
