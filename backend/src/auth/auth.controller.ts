@@ -88,17 +88,22 @@ export class AuthController {
     const user = await this.prisma.user.findUnique({ where: { phone } });
     if (!user) return { error: 'User not found' };
 
+    /* Activate the user */
     await this.prisma.user.update({
       where: { id: user.id },
-      data: { status: 'ACTIVE', lastLoginAt: new Date() },
+      data:  { status: 'ACTIVE', lastLoginAt: new Date() },
     });
     await this.prisma.verification.upsert({
       where:  { userId: user.id },
-      create: { userId: user.id, phoneVerified: true },
+      create: { userId: user.id, phoneVerified: true, emailVerified: false },
       update: { phoneVerified: true },
     });
 
-    return this.authService.login({ identifier: phone, password: undefined } as any)
-      .catch(() => ({ message: `User ${phone} activated. Login with password.` }));
+    return {
+      message:   `User ${user.firstName} ${user.lastName} (${user.role}) activated successfully`,
+      phone:     user.phone,
+      role:      user.role,
+      activated: true,
+    };
   }
 }
