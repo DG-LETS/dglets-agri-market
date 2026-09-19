@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Req, Get, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
@@ -9,11 +9,17 @@ import { RequestPasswordResetDto } from './dto/request-password-reset.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { PrismaService } from '../prisma/prisma.service';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('Authentication')
 @Controller({ path: 'auth', version: '1' })
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly prisma: PrismaService,
+    private readonly config: ConfigService,
+  ) {}
 
   @Post('register')
   @Throttle({ short: { limit: 3, ttl: 60000 } })
@@ -66,5 +72,33 @@ export class AuthController {
   @ApiOperation({ summary: 'Logout and revoke refresh token' })
   logout(@Body() dto: RefreshTokenDto) {
     return this.authService.logout(dto.refreshToken);
+  }
+
+  /* ── DEV ONLY: Activate user without OTP ── */
+  @Get('dev-activate/:phone')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'DEV ONLY — activate user by phone without OTP' })
+  async devActivate(
+    @Param('phone') phone: string,
+    @Query('secret') secret: string,
+  ) {
+    if (secret !== 'dglets-dev-2026') {
+      return { error: 'Unauthorized' };
+    }
+    const user = await this.prisma.user.findUnique({ where: { phone } });
+    if (!user) return { error: 'User not found' };
+
+    await this.prisma.user.update({
+      where: { id: user.id },
+      data: { status: 'ACTIVE', lastLoginAt: new Date() },
+    });
+    await this.prisma.verification.upsert({
+      where:  { userId: user.id },
+      create: { userId: user.id, phoneVerified: true },
+      update: { phoneVerified: true },
+    });
+
+    return this.authService.login({ identifier: phone, password: undefined } as any)
+      .catch(() => ({ message: `User ${phone} activated. Login with password.` }));
   }
 }
