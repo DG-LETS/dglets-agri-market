@@ -12,6 +12,7 @@ import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { useAuthStore } from '@store/authStore';
+import { useSettingsStore } from '@store/settingsStore';
 import { usersApi } from '@services/api';
 
 /* Configure how notifications appear when app is foregrounded */
@@ -25,14 +26,19 @@ Notifications.setNotificationHandler({
 
 export function usePushNotifications() {
   const { isAuthenticated } = useAuthStore();
-  const registered          = useRef(false);
-  const listenerRef         = useRef<Notifications.Subscription | null>(null);
+  const { notificationsEnabled } = useSettingsStore();
+  const registered = useRef(false);
+  const listenerRef = useRef<Notifications.Subscription | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated || registered.current) return;
-
-    /* Web doesn't support push */
     if (Platform.OS === 'web') return;
+
+    /* If notifications disabled by user, remove listener */
+    if (!notificationsEnabled) {
+      listenerRef.current?.remove();
+      return;
+    }
 
     let cancelled = false;
 
@@ -85,5 +91,5 @@ export function usePushNotifications() {
       cancelled = true;
       listenerRef.current?.remove();
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, notificationsEnabled]);
 }

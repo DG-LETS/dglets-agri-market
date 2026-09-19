@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image, Switch } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Colors, Typography, Spacing, Radius, Shadow } from '@theme/index';
 import { Badge } from '@components/ui';
 import { useAuthStore } from '@store/authStore';
+import { useSettingsStore } from '@store/settingsStore';
 import { usersApi } from '@services/api';
 import { useImageUpload } from '@hooks/useImageUpload';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -39,6 +40,7 @@ function MenuItem({ emoji, label, onPress, danger }: MenuItemProps) {
 export function ProfileScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { user, refreshUser, logout } = useAuthStore();
+  const { darkMode, notificationsEnabled, toggleDarkMode, toggleNotifications } = useSettingsStore();
   const queryClient = useQueryClient();
 
   /* ── Profile image upload ── */
@@ -149,7 +151,31 @@ export function ProfileScreen({ navigation }: Props) {
           <MenuItem emoji="🌾" label="Farm / Business Profile" onPress={() => navigation.navigate('EditProfile', { section: isSeller ? 'farmer' : 'buyer' })} />
           <MenuItem emoji="❤️" label="Saved Products"      onPress={() => navigation.navigate('SavedProducts')} />
           <MenuItem emoji="💳" label="Payout Details"      onPress={() => Alert.alert('Coming Soon', 'Payout details will be available when payments go live.')} />
-          <MenuItem emoji="🔔" label="Notifications"       onPress={() => Alert.alert('Coming Soon', 'Notification preferences coming in the next update.')} />
+
+          {/* Dark Mode Toggle */}
+          <View style={styles.menuItem}>
+            <Text style={styles.menuEmoji}>🌙</Text>
+            <Text style={styles.menuLabel}>Dark Mode</Text>
+            <Switch
+              value={darkMode}
+              onValueChange={toggleDarkMode}
+              trackColor={{ false: Colors.gray[200], true: Colors.green[600] }}
+              thumbColor={darkMode ? Colors.green[200] : Colors.white}
+            />
+          </View>
+
+          {/* Notifications Toggle */}
+          <View style={styles.menuItem}>
+            <Text style={styles.menuEmoji}>🔔</Text>
+            <Text style={styles.menuLabel}>Notifications</Text>
+            <Switch
+              value={notificationsEnabled}
+              onValueChange={toggleNotifications}
+              trackColor={{ false: Colors.gray[200], true: Colors.green[600] }}
+              thumbColor={notificationsEnabled ? Colors.green[200] : Colors.white}
+            />
+          </View>
+
           <MenuItem emoji="🌍" label="Language — English"  onPress={() => Alert.alert('Coming Soon', 'More languages coming soon.')} />
         </View>
       </View>

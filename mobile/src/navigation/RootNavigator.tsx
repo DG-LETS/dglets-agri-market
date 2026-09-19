@@ -1,11 +1,40 @@
 import React, { useEffect } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { useAuthStore } from '@store/authStore';
+import { useSettingsStore } from '@store/settingsStore';
 import { onSessionExpired } from '@services/api';
 import { AuthNavigator } from './AuthNavigator';
 import { MainNavigator } from './MainNavigator';
 import { LoadingState } from '@components/ui';
+import { Colors } from '@theme/colors';
+
+/* Custom DG-LETS dark theme for React Navigation */
+const DGLetsDarkTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    primary:    Colors.green[700],
+    background: '#0f1a14',
+    card:       '#1a2d20',
+    text:       '#f0f7f1',
+    border:     '#2d4a35',
+    notification: Colors.green[400],
+  },
+};
+
+const DGLetsLightTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary:    Colors.green[700],
+    background: '#f9fafb',
+    card:       '#ffffff',
+    text:       '#111827',
+    border:     '#e5e7eb',
+    notification: Colors.green[700],
+  },
+};
 
 export type RootStackParamList = {
   Auth: undefined;
@@ -34,6 +63,7 @@ const MOCK_USER = {
 
 export function RootNavigator() {
   const { isAuthenticated, isInitialized, initialize, logout, setDemoUser } = useAuthStore();
+  const { darkMode } = useSettingsStore();
 
   useEffect(() => {
     if (DEMO_MODE) {
@@ -53,7 +83,7 @@ export function RootNavigator() {
   if (!isInitialized) return <LoadingState fullScreen message="Loading DG-LETS…" />;
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={darkMode ? DGLetsDarkTheme : DGLetsLightTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isAuthenticated ? (
           <Stack.Screen name="Main" component={MainNavigator} />
