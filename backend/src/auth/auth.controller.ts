@@ -81,14 +81,39 @@ export class AuthController {
   async devActivate(
     @Param('phone') phone: string,
     @Query('secret') secret: string,
+    @Query('role') role?: string,
+    @Query('firstName') firstName?: string,
+    @Query('lastName') lastName?: string,
+    @Query('password') password?: string,
   ) {
     if (secret !== 'dglets-dev-2026') {
       return { error: 'Unauthorized' };
     }
-    const user = await this.prisma.user.findUnique({ where: { phone } });
+
+    let user = await this.prisma.user.findUnique({ where: { phone } });
+
+    /* If user doesn't exist and credentials provided, create them */
+    if (!user && firstName && lastName && password) {
+      const bcrypt = await import('bcrypt');
+      const hash   = await bcrypt.hash(password, 12);
+      user = await this.prisma.user.create({
+        data: {
+          phone,
+          firstName,
+          lastName,
+          role:         (role as any) || 'BUYER',
+          passwordHash: hash,
+          referralCode: Math.random().toString(36).substring(2, 10).toUpperCase(),
+          status:       'PENDING_VERIFICATION',
+          verification: { create: { phoneVerified: false } },
+          rewardWallet: { create: {} },
+        },
+      });
+    }
+
     if (!user) return { error: 'User not found' };
 
-    /* Activate the user */
+    /* Activate */
     await this.prisma.user.update({
       where: { id: user.id },
       data:  { status: 'ACTIVE', lastLoginAt: new Date() },
