@@ -1,4 +1,5 @@
 name: dglets-agri-backend
+
 services:
   - name: api
     type: web
@@ -7,9 +8,24 @@ services:
       branch: master
     build:
       dockerfile: backend/Dockerfile
-      build_command: ""
     run:
+      # Applies tracked migrations then starts the server.
+      # `prisma migrate deploy` is safe for production — it applies
+      # only version-controlled SQL files; it never drops data.
+      # `prisma db push` and startup.sh (which uses --accept-data-loss)
+      # must NOT be used in production.
       command: "npx prisma migrate deploy && node dist/main"
+    health_checks:
+      - path: /api/v1/health
+        port: 3000
+        initial_delay_seconds: 15
+        period_seconds: 30
+        timeout_seconds: 5
+        success_threshold: 1
+        failure_threshold: 3
+    scaling:
+      min: 1
+      max: 1
     instance_types:
       - eco
     ports:
@@ -20,8 +36,13 @@ services:
         value: production
       - key: PORT
         value: "3000"
+      # CORS_ORIGIN must be set to the real frontend origin(s) in the Koyeb dashboard.
+      # Example: https://app.dglets.com,https://dglets.com
+      # NEVER leave this as * in production.
       - key: CORS_ORIGIN
-        value: "*"
+        value: "REPLACE_WITH_YOUR_FRONTEND_ORIGIN"
+      - key: API_PREFIX
+        value: "api"
       - key: JWT_EXPIRES_IN
         value: "7d"
       - key: JWT_REFRESH_EXPIRES_IN
@@ -34,6 +55,8 @@ services:
         value: "DG-LETS"
       - key: TERMII_BASE_URL
         value: "https://api.ng.termii.com"
+      - key: PAYSTACK_CALLBACK_URL
+        value: "REPLACE_WITH_YOUR_API_URL/api/v1/payments/paystack/callback"
       - key: PLATFORM_FEE_RATE
         value: "0.0205"
       - key: PLATFORM_FEE_MIN
@@ -56,7 +79,12 @@ services:
         value: "0"
       - key: HAULAGE_COMMISSION_RATE
         value: "0.05"
-      # These must be set as secrets in Koyeb dashboard:
-      # DATABASE_URL, JWT_SECRET, JWT_REFRESH_SECRET
-      # PAYSTACK_SECRET_KEY, TERMII_API_KEY
-      # CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
+      # ── Secrets — set these in the Koyeb dashboard as secret env vars ──
+      # DATABASE_URL         postgresql://user:pass@host:5432/dbname
+      # JWT_SECRET           (strong random string, min 64 chars)
+      # JWT_REFRESH_SECRET   (different strong random string, min 64 chars)
+      # PAYSTACK_SECRET_KEY  sk_live_...
+      # TERMII_API_KEY       your Termii key
+      # CLOUDINARY_CLOUD_NAME
+      # CLOUDINARY_API_KEY
+      # CLOUDINARY_API_SECRET

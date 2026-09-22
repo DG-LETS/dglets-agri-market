@@ -6,39 +6,77 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    "platforms": ["ios", "android", "web"],
-    "web": {
-      "favicon": "./assets/icon.png",
-      "bundler": "metro",
-      "jsEngine": "jsc"
-    },
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "splash": {
-      "image": "./assets/icon.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#1e5c3a"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.dglets.agrimarket"
+      "bundleIdentifier": "com.dglets.agrimarket",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Allow DG-LETS to use your location to find nearby farmers.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Allow DG-LETS to use your location to find nearby farmers.",
+        "NSCameraUsageDescription": "Allow DG-LETS to access your camera for product images.",
+        "NSPhotoLibraryUsageDescription": "Allow DG-LETS to access your photos for product images.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1e5c3a"
       },
       "package": "com.dglets.agrimarket",
+      "versionCode": 1,
       "permissions": [
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION",
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.VIBRATE",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.RECORD_AUDIO"
       ]
     },
+    "notification": {
+      "icon": "./assets/icon.png",
+      "color": "#1e5c3a",
+      "androidMode": "default"
+    },
     "plugins": [
-      ["expo-location", { "locationAlwaysAndWhenInUsePermission": "Allow DG-LETS to use your location to find nearby farmers." }],
-      ["expo-image-picker", { "photosPermission": "Allow DG-LETS to access your photos for product images." }]
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#1e5c3a",
+          "sounds": []
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow DG-LETS to use your location to find nearby farmers."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow DG-LETS to access your photos for product images.",
+          "cameraPermission": "Allow DG-LETS to access your camera for product images."
+        }
+      ]
     ],
     "scheme": "dglets",
     "extra": {

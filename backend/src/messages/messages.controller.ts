@@ -6,7 +6,7 @@ import { MessagesService } from './messages.service';
 import { JwtAuthGuard }    from '../auth/guards/jwt-auth.guard';
 import { CurrentUser }     from '../auth/decorators/current-user.decorator';
 
-@Controller('messages')
+@Controller({ path: 'messages', version: '1' })
 @UseGuards(JwtAuthGuard)
 export class MessagesController {
   constructor(private readonly messages: MessagesService) {}

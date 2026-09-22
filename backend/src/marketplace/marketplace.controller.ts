@@ -16,10 +16,24 @@ export class MarketplaceController {
   @ApiQuery({ name: 'state',      required: false })
   @ApiQuery({ name: 'minPrice',   required: false, type: Number })
   @ApiQuery({ name: 'maxPrice',   required: false, type: Number })
+  @ApiQuery({ name: 'lat',        required: false, type: Number, description: 'Latitude for near-me filter' })
+  @ApiQuery({ name: 'lng',        required: false, type: Number, description: 'Longitude for near-me filter' })
+  @ApiQuery({ name: 'radiusKm',   required: false, type: Number, description: 'Search radius in km (default 100)' })
   @ApiQuery({ name: 'page',       required: false, type: Number })
   @ApiQuery({ name: 'limit',      required: false, type: Number })
   search(@Query() query: any) {
-    return this.marketplace.searchProducts(query);
+    /* Coerce numeric strings from query params */
+    const parsed = {
+      ...query,
+      minPrice:  query.minPrice  ? +query.minPrice  : undefined,
+      maxPrice:  query.maxPrice  ? +query.maxPrice  : undefined,
+      lat:       query.lat       ? +query.lat       : undefined,
+      lng:       query.lng       ? +query.lng       : undefined,
+      radiusKm:  query.radiusKm  ? +query.radiusKm  : undefined,
+      page:      query.page      ? +query.page      : 1,
+      limit:     query.limit     ? +query.limit      : 20,
+    };
+    return this.marketplace.searchProducts(parsed);
   }
 
   @Get('products/my')

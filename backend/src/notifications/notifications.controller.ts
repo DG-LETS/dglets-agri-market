@@ -13,19 +13,25 @@ export class NotificationsController {
 
   @Get()
   @ApiOperation({ summary: 'Get my notifications' })
-  findAll(@CurrentUser() user: any, @Query('page') page?: number, @Query('limit') limit?: number) {
+  findAll(
+    @CurrentUser() user: any,
+    @Query('page')  page?:  number,
+    @Query('limit') limit?: number,
+  ) {
     return this.notifications.getMyNotifications(user.id, page, limit);
   }
 
-  @Patch(':id/read')
-  @ApiOperation({ summary: 'Mark notification as read' })
-  markRead(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.notifications.markRead(user.id, id);
-  }
-
+  /* ⚠️ Literal route MUST come before the parameterised :id route,
+     otherwise NestJS would match "read-all" as the :id parameter. */
   @Patch('read-all')
   @ApiOperation({ summary: 'Mark all notifications as read' })
   markAllRead(@CurrentUser() user: any) {
     return this.notifications.markAllRead(user.id);
+  }
+
+  @Patch(':id/read')
+  @ApiOperation({ summary: 'Mark a single notification as read' })
+  markRead(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.notifications.markRead(user.id, id);
   }
 }

@@ -7,15 +7,18 @@ export class MarketplaceService {
 
   /* ── Search / browse products ── */
   async searchProducts(query: {
-    keyword?: string;
+    keyword?:    string;
     categoryId?: string;
-    state?: string;
-    minPrice?: number;
-    maxPrice?: number;
+    state?:      string;
+    minPrice?:   number;
+    maxPrice?:   number;
     minQuantity?: number;
-    sellerId?: string;
-    page?: number;
-    limit?: number;
+    sellerId?:   string;
+    lat?:        number;
+    lng?:        number;
+    radiusKm?:   number;
+    page?:       number;
+    limit?:      number;
   }) {
     const page  = query.page  || 1;
     const limit = query.limit || 20;
@@ -36,6 +39,12 @@ export class MarketplaceService {
     }
     if (query.minQuantity) where.quantity = { gte: query.minQuantity };
 
+    /* When lat/lng provided, only include products with geo coords */
+    if (query.lat != null && query.lng != null) {
+      where.geoLat = { not: null };
+      where.geoLng = { not: null };
+    }
+
     const [items, total] = await Promise.all([
       this.prisma.product.findMany({
         where,
@@ -55,10 +64,50 @@ export class MarketplaceService {
       this.prisma.product.count({ where }),
     ]);
 
+    /* Attach isVerified flag and optionally distance */
+    const shaped = items.map(p => {
+      let distanceKm: number | null = null;
+      if (query.lat != null && query.lng != null && p.geoLat != null && p.geoLng != null) {
+        distanceKm = this.haversineKm(query.lat, query.lng, p.geoLat, p.geoLng);
+      }
+      return {
+        ...p,
+        distanceKm,
+        seller: p.seller
+          ? {
+              ...p.seller,
+              isVerified: (p.seller as any).verification?.identityStatus === 'VERIFIED',
+            }
+          : p.seller,
+      };
+    });
+
+    /* If geo filter active, apply radius and sort by distance */
+    let filtered = shaped;
+    if (query.lat != null && query.lng != null) {
+      const radius = query.radiusKm ?? 100;
+      filtered = shaped
+        .filter(p => p.distanceKm != null && p.distanceKm <= radius)
+        .sort((a, b) => (a.distanceKm ?? 9999) - (b.distanceKm ?? 9999));
+    }
+
     return {
-      data:  items,
+      data:  filtered,
       meta:  { total, page, limit, pages: Math.ceil(total / limit) },
     };
+  }
+
+  /* ── Haversine distance in km ── */
+  private haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLng = ((lng2 - lng1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
 
   /* ── Get product by id ── */
@@ -82,7 +131,15 @@ export class MarketplaceService {
     });
     if (!product) throw new NotFoundException('Product not found');
     await this.prisma.product.update({ where: { id }, data: { viewCount: { increment: 1 } } });
-    return product;
+    return {
+      ...product,
+      seller: product.seller
+        ? {
+            ...product.seller,
+            isVerified: (product.seller as any).verification?.identityStatus === 'VERIFIED',
+          }
+        : product.seller,
+    };
   }
 
   /* ── Create product ── */

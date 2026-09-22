@@ -5,7 +5,7 @@ import { FeesService } from './fees.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
-@Controller('fees')
+@Controller({ path: 'fees', version: '1' })
 @UseGuards(JwtAuthGuard)
 export class FeesController {
   constructor(private readonly fees: FeesService) {}

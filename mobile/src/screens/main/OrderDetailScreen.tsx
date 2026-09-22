@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
   TouchableOpacity, Alert, Linking,
@@ -6,9 +6,9 @@ import {
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Colors, Typography, Spacing, Radius, Shadow } from '@theme/index';
+import { useThemeColors, Typography, Spacing, Radius, Shadow } from '@theme/index';
 import { Badge, LoadingState, Button } from '@components/ui';
-import { ordersApi, paymentsApi } from '@services/api';
+import { ordersApi, paymentsApi, haulageApi } from '@services/api';
 import { useAuthStore } from '@store/authStore';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import type { RouteProp } from '@react-navigation/native';
@@ -19,19 +19,19 @@ type Props = {
   route:      RouteProp<OrdersStackParamList, 'OrderDetail'>;
 };
 
-/* ── Status config ── */
+/* â”€â”€ Status config â”€â”€ */
 const STATUS_CONFIG: Record<string, { label: string; variant: any; emoji: string }> = {
-  PENDING:          { label: 'Pending',           variant: 'warning', emoji: '⏳' },
-  CONFIRMED:        { label: 'Confirmed',          variant: 'info',    emoji: '✅' },
-  PROCESSING:       { label: 'Processing',         variant: 'info',    emoji: '⚙️' },
-  READY_FOR_PICKUP: { label: 'Ready for Pickup',   variant: 'info',    emoji: '📦' },
-  PICKED_UP:        { label: 'Picked Up',          variant: 'info',    emoji: '🚗' },
-  IN_TRANSIT:       { label: 'In Transit',         variant: 'info',    emoji: '🚚' },
-  DELIVERED:        { label: 'Delivered',          variant: 'success', emoji: '🏠' },
-  COMPLETED:        { label: 'Completed',          variant: 'success', emoji: '🎉' },
-  CANCELLED:        { label: 'Cancelled',          variant: 'error',   emoji: '❌' },
-  DISPUTED:         { label: 'Disputed',           variant: 'error',   emoji: '⚠️' },
-  REFUNDED:         { label: 'Refunded',           variant: 'gray',    emoji: '↩️' },
+  PENDING:          { label: 'Pending',           variant: 'warning', emoji: 'â³' },
+  CONFIRMED:        { label: 'Confirmed',          variant: 'info',    emoji: 'âœ…' },
+  PROCESSING:       { label: 'Processing',         variant: 'info',    emoji: 'âš™ï¸' },
+  READY_FOR_PICKUP: { label: 'Ready for Pickup',   variant: 'info',    emoji: 'ðŸ“¦' },
+  PICKED_UP:        { label: 'Picked Up',          variant: 'info',    emoji: 'ðŸš—' },
+  IN_TRANSIT:       { label: 'In Transit',         variant: 'info',    emoji: 'ðŸšš' },
+  DELIVERED:        { label: 'Delivered',          variant: 'success', emoji: 'ðŸ ' },
+  COMPLETED:        { label: 'Completed',          variant: 'success', emoji: 'ðŸŽ‰' },
+  CANCELLED:        { label: 'Cancelled',          variant: 'error',   emoji: 'âŒ' },
+  DISPUTED:         { label: 'Disputed',           variant: 'error',   emoji: 'âš ï¸' },
+  REFUNDED:         { label: 'Refunded',           variant: 'gray',    emoji: 'â†©ï¸' },
 };
 
 /* Full lifecycle in order */
@@ -80,6 +80,15 @@ export function OrderDetailScreen({ navigation, route }: Props) {
     queryFn:  () => ordersApi.getById(orderId).then(r => r.data),
   });
 
+  /* Fetch haulage job for this order so buyer can rate the driver */
+  const { data: haulageJobsData } = useQuery({
+    queryKey: ['order-haulage-job', orderId],
+    queryFn:  () => haulageApi.getMyActiveJobs().then(r => r.data),
+    select:   (jobs: any[]) => jobs?.find((j: any) => j.order?.id === orderId || j.orderId === orderId),
+    enabled:  !!orderId,
+    retry:    0,
+  });
+
   const statusMutation = useMutation({
     mutationFn: (status: string) => ordersApi.updateStatus(orderId, status).then(r => r.data),
     onSuccess: () => {
@@ -91,7 +100,7 @@ export function OrderDetailScreen({ navigation, route }: Props) {
     },
   });
 
-  /* ── Pay Now ── */
+  /* â”€â”€ Pay Now â”€â”€ */
   const payMutation = useMutation({
     mutationFn: () => paymentsApi.initPaystack(orderId).then(r => r.data),
     onSuccess: async (result) => {
@@ -120,7 +129,7 @@ export function OrderDetailScreen({ navigation, route }: Props) {
   const handlePayNow = () => {
     Alert.alert(
       'Pay with Paystack',
-      `You will be redirected to Paystack to complete payment of ₦${order?.total?.toLocaleString()}.`,
+      `You will be redirected to Paystack to complete payment of â‚¦${order?.total?.toLocaleString()}.`,
       [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Continue to Payment', onPress: () => payMutation.mutate() },
@@ -130,7 +139,7 @@ export function OrderDetailScreen({ navigation, route }: Props) {
 
   const handleStatusAction = (next: string, label: string) => {    Alert.alert(
       'Confirm Action',
-      `${label} — are you sure?`,
+      `${label} â€” are you sure?`,
       [
         { text: 'Cancel', style: 'cancel' },
         { text: 'Confirm', onPress: () => statusMutation.mutate(next) },
@@ -151,11 +160,11 @@ export function OrderDetailScreen({ navigation, route }: Props) {
     Linking.openURL(`https://wa.me/${phone.replace(/\D/g, '')}?text=${msg}`);
   };
 
-  if (isLoading || !order) return <LoadingState fullScreen message="Loading order…" />;
+  if (isLoading || !order) return <LoadingState fullScreen message="Loading orderâ€¦" />;
 
   const isSeller    = order.sellerId === user?.id;
   const isBuyer     = order.buyerId  === user?.id;
-  const cfg         = STATUS_CONFIG[order.status] ?? { label: order.status, variant: 'gray', emoji: '📋' };
+  const cfg         = STATUS_CONFIG[order.status] ?? { label: order.status, variant: 'gray', emoji: 'ðŸ“‹' };
   const timelinePos = STATUS_TIMELINE.indexOf(order.status);
   const actions     = isSeller ? (SELLER_ACTIONS[order.status] ?? []) : (BUYER_ACTIONS[order.status] ?? []);
   const contact     = isBuyer ? order.seller : order.buyer;
@@ -166,7 +175,7 @@ export function OrderDetailScreen({ navigation, route }: Props) {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backText}>←</Text>
+          <Text style={styles.backText}>â†</Text>
         </TouchableOpacity>
         <View style={styles.headerCenter}>
           <Text style={styles.headerTitle}>Order Detail</Text>
@@ -203,7 +212,7 @@ export function OrderDetailScreen({ navigation, route }: Props) {
                   <View key={s} style={styles.timelineStep}>
                     <View style={styles.timelineTrack}>
                       <View style={[styles.timelineDot, done && styles.timelineDotDone, current && styles.timelineDotCurrent]}>
-                        {done && <Text style={styles.timelineDotCheck}>✓</Text>}
+                        {done && <Text style={styles.timelineDotCheck}>âœ“</Text>}
                       </View>
                       {i < STATUS_TIMELINE.length - 1 && (
                         <View style={[styles.timelineLine, done && styles.timelineLineDone]} />
@@ -237,7 +246,7 @@ export function OrderDetailScreen({ navigation, route }: Props) {
                     />
                   ) : (
                     <View style={[styles.orderItemImage, styles.orderItemImagePlaceholder]}>
-                      <Text style={{ fontSize: 20 }}>🌾</Text>
+                      <Text style={{ fontSize: 20 }}>ðŸŒ¾</Text>
                     </View>
                   )}
                 </View>
@@ -246,11 +255,11 @@ export function OrderDetailScreen({ navigation, route }: Props) {
                     {item.product?.name ?? 'Product'}
                   </Text>
                   <Text style={styles.orderItemQty}>
-                    {item.quantity} × ₦{item.unitPrice?.toLocaleString()}
+                    {item.quantity} Ã— â‚¦{item.unitPrice?.toLocaleString()}
                   </Text>
                 </View>
                 <Text style={styles.orderItemSubtotal}>
-                  ₦{item.subtotal?.toLocaleString()}
+                  â‚¦{item.subtotal?.toLocaleString()}
                 </Text>
               </View>
             ))}
@@ -263,21 +272,21 @@ export function OrderDetailScreen({ navigation, route }: Props) {
           <View style={styles.card}>
             <View style={styles.priceRow}>
               <Text style={styles.priceLabel}>Subtotal</Text>
-              <Text style={styles.priceVal}>₦{order.subtotal?.toLocaleString()}</Text>
+              <Text style={styles.priceVal}>â‚¦{order.subtotal?.toLocaleString()}</Text>
             </View>
             <View style={styles.priceRow}>
               <Text style={styles.priceLabel}>Platform fee</Text>
-              <Text style={styles.priceVal}>₦{order.platformFee?.toLocaleString()}</Text>
+              <Text style={styles.priceVal}>â‚¦{order.platformFee?.toLocaleString()}</Text>
             </View>
             <View style={styles.priceRow}>
               <Text style={styles.priceLabel}>Delivery fee</Text>
               <Text style={styles.priceVal}>
-                {order.deliveryFee > 0 ? `₦${order.deliveryFee.toLocaleString()}` : 'Arranged with seller'}
+                {order.deliveryFee > 0 ? `â‚¦${order.deliveryFee.toLocaleString()}` : 'Arranged with seller'}
               </Text>
             </View>
             <View style={[styles.priceRow, styles.priceTotal]}>
               <Text style={styles.priceTotalLabel}>Total</Text>
-              <Text style={styles.priceTotalVal}>₦{order.total?.toLocaleString()}</Text>
+              <Text style={styles.priceTotalVal}>â‚¦{order.total?.toLocaleString()}</Text>
             </View>
             <View style={styles.paymentStatusRow}>
               <Text style={styles.priceLabel}>Payment status</Text>
@@ -288,18 +297,18 @@ export function OrderDetailScreen({ navigation, route }: Props) {
               />
             </View>
 
-            {/* Pay Now — only for buyer when payment not yet done */}
+            {/* Pay Now â€” only for buyer when payment not yet done */}
             {isBuyer && ['PENDING', 'PROCESSING'].includes(order.paymentStatus) && (
               <View style={styles.payNowWrap}>
                 <Button
-                  title={payMutation.isPending ? 'Opening payment…' : '💳 Pay Now with Paystack'}
+                  title={payMutation.isPending ? 'Opening paymentâ€¦' : 'ðŸ’³ Pay Now with Paystack'}
                   onPress={handlePayNow}
                   disabled={payMutation.isPending}
                   variant="gold"
                   size="lg"
                 />
                 <Text style={styles.payNowNote}>
-                  🔒 Secure payment via Paystack. You'll return here after completing payment.
+                  ðŸ”’ Secure payment via Paystack. You'll return here after completing payment.
                 </Text>
               </View>
             )}
@@ -312,7 +321,7 @@ export function OrderDetailScreen({ navigation, route }: Props) {
             <Text style={styles.sectionTitle}>Delivery Address</Text>
             <View style={styles.card}>
               <Text style={styles.addressText}>
-                📍 {[order.deliveryAddress, order.deliveryState].filter(Boolean).join(', ')}
+                ðŸ“ {[order.deliveryAddress, order.deliveryState].filter(Boolean).join(', ')}
               </Text>
             </View>
           </View>
@@ -353,13 +362,13 @@ export function OrderDetailScreen({ navigation, route }: Props) {
                       style={[styles.contactBtn, styles.contactBtnCall]}
                       onPress={() => callContact(contact.phone)}
                     >
-                      <Text style={styles.contactBtnText}>📞</Text>
+                      <Text style={styles.contactBtnText}>ðŸ“ž</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.contactBtn, styles.contactBtnWa]}
                       onPress={() => whatsappContact(contact.phone, contact.firstName)}
                     >
-                      <Text style={styles.contactBtnText}>💬</Text>
+                      <Text style={styles.contactBtnText}>ðŸ’¬</Text>
                     </TouchableOpacity>
                   </>
                 )}
@@ -394,7 +403,7 @@ export function OrderDetailScreen({ navigation, route }: Props) {
               {actions.map(action => (
                 <Button
                   key={action.next}
-                  title={statusMutation.isPending ? 'Updating…' : action.label}
+                  title={statusMutation.isPending ? 'Updatingâ€¦' : action.label}
                   variant={action.variant}
                   onPress={() => handleStatusAction(action.next, action.label)}
                   disabled={statusMutation.isPending}
@@ -405,11 +414,11 @@ export function OrderDetailScreen({ navigation, route }: Props) {
           </View>
         )}
 
-        {/* Rate & Review — shown when order is COMPLETED */}
+        {/* Rate & Review â€” shown when order is COMPLETED */}
         {order.status === 'COMPLETED' && contact && (
           <View style={styles.section}>
             <Button
-              title={`⭐ Rate ${contactRole}`}
+              title={`â­ Rate ${contactRole}`}
               variant="outline"
               onPress={() => (navigation as any).navigate('RateReview', {
                 orderId:     order.id,
@@ -421,13 +430,39 @@ export function OrderDetailScreen({ navigation, route }: Props) {
           </View>
         )}
 
-        {/* Dispute flag — available on active orders */}
+        {/* Rate Delivery Driver â€” shown when order has a delivered haulage job */}
+        {['DELIVERED', 'COMPLETED'].includes(order.status) &&
+          haulageJobsData &&
+          haulageJobsData.awardedToId &&
+          haulageJobsData.status === 'DELIVERED' && (
+          <View style={styles.section}>
+            <Button
+              title="ðŸš› Rate the Delivery Driver"
+              variant="outline"
+              onPress={() => {
+                const driver = haulageJobsData.awardedTo;
+                navigation.navigate('RateReview', {
+                  orderId:         order.id,
+                  haulageJobId:    haulageJobsData.id,
+                  subjectId:       haulageJobsData.awardedToId,
+                  subjectName:     driver
+                    ? `${driver.firstName} ${driver.lastName}`
+                    : 'Delivery Driver',
+                  isBuyer:         true,
+                  isHaulageRating: true,
+                });
+              }}
+            />
+          </View>
+        )}
+
+        {/* Dispute flag â€” available on active orders */}
         {!['COMPLETED','CANCELLED','REFUNDED'].includes(order.status) && (
           <View style={styles.section}>
             <TouchableOpacity
               style={styles.disputeBtn}
               onPress={() => Alert.alert(
-                '⚠️ Report an Issue',
+                'âš ï¸ Report an Issue',
                 'Describe your problem and our team will investigate.\n\nFor urgent issues, contact us on WhatsApp.',
                 [
                   { text: 'Cancel', style: 'cancel' },
@@ -440,7 +475,7 @@ export function OrderDetailScreen({ navigation, route }: Props) {
                 ],
               )}
             >
-              <Text style={styles.disputeBtnText}>⚠️ Report an Issue with this Order</Text>
+              <Text style={styles.disputeBtnText}>âš ï¸ Report an Issue with this Order</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -450,92 +485,93 @@ export function OrderDetailScreen({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  flex:   { flex: 1, backgroundColor: Colors.background },
+  flex:   { flex: 1, backgroundColor: C.background },
 
   /* Header */
-  header:       { backgroundColor: Colors.white, flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing[5], paddingVertical: Spacing[4], borderBottomWidth: 1, borderBottomColor: Colors.border },
+  header:       { backgroundColor: C.white, flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing[5], paddingVertical: Spacing[4], borderBottomWidth: 1, borderBottomColor: C.border },
   backBtn:      { width: 40 },
-  backText:     { fontSize: 22, color: Colors.textSecondary },
+  backText:     { fontSize: 22, color: C.textSecondary },
   headerCenter: { flex: 1, alignItems: 'center' },
-  headerTitle:  { ...Typography.titleLarge, color: Colors.textPrimary },
-  headerSub:    { ...Typography.bodySmall, color: Colors.textMuted },
+  headerTitle:  { ...Typography.titleLarge, color: C.textPrimary },
+  headerSub:    { ...Typography.bodySmall, color: C.textMuted },
 
   /* Status card */
-  statusCard:   { backgroundColor: Colors.white, margin: Spacing[4], borderRadius: Radius.xl, padding: Spacing[5], borderWidth: 1, borderColor: Colors.border, ...Shadow.sm },
+  statusCard:   { backgroundColor: C.white, margin: Spacing[4], borderRadius: Radius.xl, padding: Spacing[5], borderWidth: 1, borderColor: C.border, ...Shadow.sm },
   statusTop:    { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing[3], marginBottom: Spacing[5] },
   statusEmoji:  { fontSize: 36 },
   statusInfo:   { gap: Spacing[2] },
-  statusDate:   { ...Typography.bodySmall, color: Colors.textMuted },
+  statusDate:   { ...Typography.bodySmall, color: C.textMuted },
 
   /* Timeline */
   timeline:       { flexDirection: 'row', alignItems: 'flex-start' },
   timelineStep:   { flex: 1, alignItems: 'center' },
   timelineTrack:  { flexDirection: 'row', alignItems: 'center', width: '100%' },
-  timelineDot:    { width: 18, height: 18, borderRadius: 9, backgroundColor: Colors.gray[200], borderWidth: 2, borderColor: Colors.gray[300], alignItems: 'center', justifyContent: 'center', zIndex: 1 },
-  timelineDotDone:    { backgroundColor: Colors.green[700], borderColor: Colors.green[700] },
-  timelineDotCurrent: { backgroundColor: Colors.green[500], borderColor: Colors.green[700], width: 22, height: 22, borderRadius: 11 },
-  timelineDotCheck:   { fontSize: 9, color: Colors.white, fontWeight: '900' },
-  timelineLine:       { flex: 1, height: 2, backgroundColor: Colors.gray[200] },
-  timelineLineDone:   { backgroundColor: Colors.green[700] },
-  timelineLabel:      { ...Typography.caption, color: Colors.gray[400], marginTop: Spacing[1], textAlign: 'center', fontSize: 9 },
-  timelineLabelDone:  { color: Colors.green[700], fontWeight: '700' },
+  timelineDot:    { width: 18, height: 18, borderRadius: 9, backgroundColor: C.gray[200], borderWidth: 2, borderColor: C.gray[300], alignItems: 'center', justifyContent: 'center', zIndex: 1 },
+  timelineDotDone:    { backgroundColor: C.green[700], borderColor: C.green[700] },
+  timelineDotCurrent: { backgroundColor: C.green[500], borderColor: C.green[700], width: 22, height: 22, borderRadius: 11 },
+  timelineDotCheck:   { fontSize: 9, color: C.white, fontWeight: '900' },
+  timelineLine:       { flex: 1, height: 2, backgroundColor: C.gray[200] },
+  timelineLineDone:   { backgroundColor: C.green[700] },
+  timelineLabel:      { ...Typography.caption, color: C.gray[400], marginTop: Spacing[1], textAlign: 'center', fontSize: 9 },
+  timelineLabelDone:  { color: C.green[700], fontWeight: '700' },
 
   /* Sections */
   section:      { paddingHorizontal: Spacing[4], marginBottom: Spacing[4] },
-  sectionTitle: { ...Typography.labelLarge, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: Spacing[3] },
-  card:         { backgroundColor: Colors.white, borderRadius: Radius.xl, borderWidth: 1, borderColor: Colors.border, overflow: 'hidden' },
+  sectionTitle: { ...Typography.labelLarge, color: C.textMuted, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: Spacing[3] },
+  card:         { backgroundColor: C.white, borderRadius: Radius.xl, borderWidth: 1, borderColor: C.border, overflow: 'hidden' },
 
   /* Order items */
   orderItem:             { flexDirection: 'row', alignItems: 'center', padding: Spacing[4], gap: Spacing[3] },
-  orderItemBorder:       { borderBottomWidth: 1, borderBottomColor: Colors.gray[100] },
-  orderItemImageWrap:    { width: 52, height: 52, borderRadius: Radius.md, overflow: 'hidden', backgroundColor: Colors.green[50] },
+  orderItemBorder:       { borderBottomWidth: 1, borderBottomColor: C.gray[100] },
+  orderItemImageWrap:    { width: 52, height: 52, borderRadius: Radius.md, overflow: 'hidden', backgroundColor: C.green[50] },
   orderItemImage:        { width: 52, height: 52 },
   orderItemImagePlaceholder: { alignItems: 'center', justifyContent: 'center' },
   orderItemInfo:         { flex: 1 },
-  orderItemName:         { ...Typography.titleMedium, color: Colors.textPrimary, marginBottom: 2 },
-  orderItemQty:          { ...Typography.bodySmall, color: Colors.textMuted },
-  orderItemSubtotal:     { ...Typography.titleMedium, color: Colors.textPrimary },
+  orderItemName:         { ...Typography.titleMedium, color: C.textPrimary, marginBottom: 2 },
+  orderItemQty:          { ...Typography.bodySmall, color: C.textMuted },
+  orderItemSubtotal:     { ...Typography.titleMedium, color: C.textPrimary },
 
   /* Price rows */
-  priceRow:       { flexDirection: 'row', justifyContent: 'space-between', padding: Spacing[4], borderBottomWidth: 1, borderBottomColor: Colors.gray[100] },
-  priceLabel:     { ...Typography.bodyMedium, color: Colors.textSecondary },
-  priceVal:       { ...Typography.bodyMedium, color: Colors.textPrimary, fontWeight: '600' },
+  priceRow:       { flexDirection: 'row', justifyContent: 'space-between', padding: Spacing[4], borderBottomWidth: 1, borderBottomColor: C.gray[100] },
+  priceLabel:     { ...Typography.bodyMedium, color: C.textSecondary },
+  priceVal:       { ...Typography.bodyMedium, color: C.textPrimary, fontWeight: '600' },
   priceTotal:     { borderBottomWidth: 0 },
-  priceTotalLabel:{ ...Typography.titleLarge, color: Colors.textPrimary },
-  priceTotalVal:  { ...Typography.headingSmall, color: Colors.green[700] },
-  paymentStatusRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: Spacing[4], borderTopWidth: 1, borderTopColor: Colors.gray[100] },
+  priceTotalLabel:{ ...Typography.titleLarge, color: C.textPrimary },
+  priceTotalVal:  { ...Typography.headingSmall, color: C.green[700] },
+  paymentStatusRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: Spacing[4], borderTopWidth: 1, borderTopColor: C.gray[100] },
 
   /* Address / notes */
-  addressText:  { ...Typography.bodyLarge, color: Colors.textSecondary, padding: Spacing[4] },
-  notesText:    { ...Typography.bodyLarge, color: Colors.textSecondary, padding: Spacing[4], fontStyle: 'italic' },
+  addressText:  { ...Typography.bodyLarge, color: C.textSecondary, padding: Spacing[4] },
+  notesText:    { ...Typography.bodyLarge, color: C.textSecondary, padding: Spacing[4], fontStyle: 'italic' },
 
   /* Contact */
-  contactCard:       { backgroundColor: Colors.white, borderRadius: Radius.xl, borderWidth: 1, borderColor: Colors.border, flexDirection: 'row', alignItems: 'center', padding: Spacing[4], gap: Spacing[3] },
-  contactAvatar:     { width: 48, height: 48, borderRadius: 24, backgroundColor: Colors.green[700], alignItems: 'center', justifyContent: 'center' },
-  contactAvatarText: { ...Typography.titleLarge, color: Colors.white },
+  contactCard:       { backgroundColor: C.white, borderRadius: Radius.xl, borderWidth: 1, borderColor: C.border, flexDirection: 'row', alignItems: 'center', padding: Spacing[4], gap: Spacing[3] },
+  contactAvatar:     { width: 48, height: 48, borderRadius: 24, backgroundColor: C.green[700], alignItems: 'center', justifyContent: 'center' },
+  contactAvatarText: { ...Typography.titleLarge, color: C.white },
   contactInfo:       { flex: 1 },
-  contactName:       { ...Typography.titleMedium, color: Colors.textPrimary },
-  contactPhone:      { ...Typography.bodySmall, color: Colors.textMuted, marginTop: 2 },
+  contactName:       { ...Typography.titleMedium, color: C.textPrimary },
+  contactPhone:      { ...Typography.bodySmall, color: C.textMuted, marginTop: 2 },
   contactBtns:       { flexDirection: 'row', gap: Spacing[2] },
   contactBtn:        { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
-  contactBtnCall:    { backgroundColor: Colors.green[50], borderWidth: 1, borderColor: Colors.green[200] },
+  contactBtnCall:    { backgroundColor: C.green[50], borderWidth: 1, borderColor: C.green[200] },
   contactBtnWa:      { backgroundColor: '#e8faf0', borderWidth: 1, borderColor: '#25d36640' },
   contactBtnText:    { fontSize: 18 },
 
   /* Timestamps */
-  tsRow:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: Spacing[4], borderBottomWidth: 1, borderBottomColor: Colors.gray[100] },
-  tsLabel: { ...Typography.bodyMedium, color: Colors.textSecondary },
-  tsVal:   { ...Typography.bodySmall, color: Colors.textMuted },
+  tsRow:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: Spacing[4], borderBottomWidth: 1, borderBottomColor: C.gray[100] },
+  tsLabel: { ...Typography.bodyMedium, color: C.textSecondary },
+  tsVal:   { ...Typography.bodySmall, color: C.textMuted },
 
   /* Actions */
   actionsWrap: { gap: Spacing[3] },
   actionBtn:   {},
 
   /* Pay Now */
-  payNowWrap: { padding: Spacing[4], borderTopWidth: 1, borderTopColor: Colors.gray[100], gap: Spacing[3] },
-  payNowNote: { ...Typography.caption, color: Colors.textMuted, textAlign: 'center', lineHeight: 16 },
+  payNowWrap: { padding: Spacing[4], borderTopWidth: 1, borderTopColor: C.gray[100], gap: Spacing[3] },
+  payNowNote: { ...Typography.caption, color: C.textMuted, textAlign: 'center', lineHeight: 16 },
 
   /* Dispute */
-  disputeBtn:     { borderWidth: 1, borderColor: Colors.warning, borderRadius: Radius.lg, padding: Spacing[4], alignItems: 'center' },
-  disputeBtnText: { ...Typography.bodyMedium, color: Colors.warning, fontWeight: '700' },
+  disputeBtn:     { borderWidth: 1, borderColor: C.warning, borderRadius: Radius.lg, padding: Spacing[4], alignItems: 'center' },
+  disputeBtnText: { ...Typography.bodyMedium, color: C.warning, fontWeight: '700' },
 });
+

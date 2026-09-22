@@ -12,8 +12,8 @@
   "scripts": {
     "build": "npx nest build",
     "start": "node dist/main",
-    "start:dev": "npx nest start --watch",
-    "start:debug": "nest start --debug --watch",
+    "start:dev": "ts-node -T src/main.ts",
+    "start:watch": "npx nodemon --watch src --ext ts --exec \"ts-node -T src/main.ts\"",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "test": "jest",

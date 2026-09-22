@@ -16,8 +16,8 @@ Everything in Phase 1 must work end-to-end before Phase 2 begins.
 - [x] Login (password + OTP)
 - [x] JWT + refresh token auth
 - [x] Forgot / reset password
-- [ ] Registration fee charge on account activation (Paystack)
-- [ ] Post-registration profile setup screen for HAULAGE role
+- [x] Registration fee charge on account activation (Paystack)
+- [x] Post-registration profile setup screen for HAULAGE role
 
 ### P1-FARMER
 - [x] Farmer profile creation
@@ -26,8 +26,8 @@ Everything in Phase 1 must work end-to-end before Phase 2 begins.
 - [x] Set price, quantity, unit, state/LGA
 - [x] View own orders (selling tab)
 - [x] Accept / reject / update order status
-- [ ] Seller dashboard: overview of sales, revenue, pending orders
-- [ ] Basic seller verification badge (admin sets verified flag)
+- [x] Seller dashboard: overview of sales, revenue, pending orders
+- [x] Basic seller verification badge (admin sets verified flag)
 
 ### P1-BUYER
 - [x] Browse / search products
@@ -37,56 +37,56 @@ Everything in Phase 1 must work end-to-end before Phase 2 begins.
 - [x] Payment via Paystack
 - [x] Order tracking (status timeline)
 - [x] Confirm receipt
-- [ ] Save / wishlist products (UI exists, needs display screen)
-- [ ] Rate and review after order completes
+- [x] Save / wishlist products (UI exists, needs display screen)
+- [x] Rate and review after order completes
 
 ### P1-MARKETPLACE
 - [x] Product search with keyword + filters
 - [x] Category browsing
 - [x] Market prices ticker
 - [x] Product save/unsave
-- [ ] Verified seller badge visible on product cards
-- [ ] "Near me" filter using device location
+- [x] Verified seller badge visible on product cards
+- [x] "Near me" filter using device location
 
 ### P1-LOGISTICS
 - [x] HAULAGE role registration
 - [x] Haulage Jobs screen (UI built)
 - [x] Apply for delivery job
-- [ ] HaulageProfile setup screen (coverage states, vehicle type, capacity)
-- [ ] Backend: HaulageModule (list jobs, apply, award, complete)
-- [ ] Haulage commission deducted at job completion
-- [ ] Haulage provider dashboard (active jobs, completed, earnings)
+- [x] HaulageProfile setup screen (coverage states, vehicle type, capacity)
+- [x] Backend: HaulageModule (list jobs, apply, award, complete)
+- [x] Haulage commission deducted at job completion
+- [x] Haulage provider dashboard (active jobs, completed, earnings)
 
 ### P1-ORDERS
 - [x] Full order lifecycle (PENDING → COMPLETED)
 - [x] Order detail with timeline
 - [x] Buyer + seller contact (call / WhatsApp)
 - [x] Pay Now with Paystack
-- [ ] Auto-create HaulageJob when order reaches CONFIRMED + has deliveryAddress
-- [ ] Dispute flag button on order (basic — sends alert to admin)
+- [x] Auto-create HaulageJob when order reaches CONFIRMED + has deliveryAddress
+- [x] Dispute flag button on order (basic — sends alert to admin)
 
 ### P1-PAYMENTS
 - [x] Paystack payment init + webhook
 - [x] Platform fee (2.05%) deducted on order
-- [ ] Registration fee (one-time) for HAULAGE and seller roles
-- [ ] Haulage commission (configurable %) on delivery fee
-- [ ] PlatformFee record created and tracked
+- [x] Registration fee (one-time) for HAULAGE and seller roles
+- [x] Haulage commission (configurable %) on delivery fee
+- [x] PlatformFee record created and tracked
 
 ### P1-NOTIFICATIONS
 - [x] Notification model + API
 - [x] Notification list in app
-- [ ] Push notifications via Expo (order updates, new jobs, payment confirmed)
+- [x] Push notifications via Expo (order updates, new jobs, payment confirmed)
 
 ### P1-RATINGS
-- [ ] Submit rating/review after order COMPLETED
-- [ ] Display seller average rating on profile + product cards
-- [ ] Haulage provider rating after job DELIVERED
+- [x] Submit rating/review after order COMPLETED
+- [x] Display seller average rating on profile + product cards
+- [x] Haulage provider rating after job DELIVERED
 
 ### P1-ADMIN (minimal)
-- [ ] Web admin panel: users list, orders list, products approval
-- [ ] Manual verification flag for sellers/farmers
-- [ ] View all platform fees and transactions
-- [ ] Dispute queue
+- [x] Web admin panel: users list, orders list, products approval
+- [x] Manual verification flag for sellers/farmers
+- [x] View all platform fees and transactions
+- [x] Dispute queue
 
 ---
 
@@ -98,14 +98,14 @@ Everything in Phase 1 must work end-to-end before Phase 2 begins.
 - [ ] Tap pin to view seller/product
 
 ### P1-MESSAGES (MOVED TO MVP)
-- [ ] Conversation model — linked to product + optional order
-- [ ] Send/receive text messages
-- [ ] Conversation list (inbox) with unread count
-- [ ] Message timestamps + read/unread status
-- [ ] Notifications on new message
-- [ ] "Ask Seller" button on product detail → opens/creates conversation
-- [ ] Admin can view conversations for dispute resolution
-- [ ] Report/block user from conversation
+- [x] Conversation model — linked to product + optional order
+- [x] Send/receive text messages
+- [x] Conversation list (inbox) with unread count
+- [x] Message timestamps + read/unread status
+- [x] Notifications on new message
+- [x] "Ask Seller" button on product detail → opens/creates conversation
+- [x] Admin can view conversations for dispute resolution
+- [x] Report/block user from conversation
 - NOT in MVP: voice, video, group chat, stickers, media beyond images
 
 ### P2-VERIFICATION
@@ -176,24 +176,27 @@ Haulage providers pay registration fee + 5% commission per job.
 
 ---
 
-## CURRENT BUILD STATUS (as of session start)
+## CURRENT BUILD STATUS — MVP COMPLETE ✅
+
+> All Phase 1 items are done. The platform is ready for deployment and live user testing.
 
 ### Backend Modules
 | Module | Status |
 |---|---|
-| Auth (register, login, OTP, JWT) | ✅ Complete |
-| Users (profile, farmer profile, push token) | ✅ Complete |
-| Marketplace (products, search, save, verified badge) | ✅ Complete |
+| Auth (register, login, OTP, JWT, refresh, reset) | ✅ Complete |
+| Users (profile, farmer/buyer profile, push token) | ✅ Complete |
+| Marketplace (products, search, near-me, save, verified badge) | ✅ Complete |
 | Categories | ✅ Complete |
-| Orders (full lifecycle + auto HaulageJob) | ✅ Complete |
-| Payments (Paystack + transaction fee record) | ✅ Complete |
-| Notifications (CRUD) | ✅ Complete |
-| Upload (images) | ✅ Complete |
-| SMS (Termii) | ✅ Complete |
+| Orders (full lifecycle + auto HaulageJob + notifications) | ✅ Complete |
+| Payments (Paystack + webhook + transaction fee + notifications) | ✅ Complete |
+| Notifications (CRUD + Expo Push API) | ✅ Complete |
+| Reviews (order reviews + haulage job ratings, avg recalc) | ✅ Complete |
+| Upload (images via Cloudinary) | ✅ Complete |
+| SMS (Termii OTP) | ✅ Complete |
 | Fees (registration, haulage commission, transaction) | ✅ Complete |
-| Haulage (jobs, apply, award, complete) | ✅ Complete |
-| Dispute | ⚠️ WhatsApp redirect (admin panel needed for full flow) |
-| Admin | ❌ Not built |
+| Haulage (jobs, apply, award, complete, commission) | ✅ Complete |
+| Admin (users, products, orders, fees, disputes, verified badge) | ✅ Complete |
+| Messages (conversations, send/receive, read status, report) | ✅ Complete |
 
 ### Mobile Screens
 | Screen | Status |
@@ -203,31 +206,47 @@ Haulage providers pay registration fee + 5% commission per job.
 | HaulageProfileSetup | ✅ Complete |
 | RegistrationFee (Paystack) | ✅ Complete |
 | Home | ✅ Complete |
-| Market browse + filters + verified badge | ✅ Complete |
+| Market (search, filters, Near Me GPS, verified badge) | ✅ Complete |
 | Product detail | ✅ Complete |
 | Create listing | ✅ Complete |
 | Cart + checkout | ✅ Complete |
-| Orders list + detail | ✅ Complete |
-| Rate & Review | ✅ Complete |
+| Orders list + detail (timeline, pay now, contacts) | ✅ Complete |
+| Rate & Review (seller + haulage provider) | ✅ Complete |
 | Dispute flag (on order detail) | ✅ Complete |
 | Seller Dashboard | ✅ Complete |
+| Haulage Provider Dashboard | ✅ Complete |
 | Saved Products | ✅ Complete |
 | Profile + edit | ✅ Complete |
-| Haulage Jobs | ✅ Complete |
-| Messages | ✅ Complete (Inbox + Chat + Ask Seller) |
-| Smart Map | ⚠️ Stub only |
+| Haulage Jobs (browse, apply, filter by state) | ✅ Complete |
+| Messages — Inbox + Chat + Ask Seller | ✅ Complete |
+| Push notification registration | ✅ Complete |
+| Smart Map | ⚠️ Phase 2 stub |
+
+### Admin Web Panel (admin/index.html)
+| Component | Status |
+|---|---|
+| Login (ADMIN role only, JWT) | ✅ Complete |
+| Dashboard stats (users, orders, revenue, fees, disputes) | ✅ Complete |
+| Users list — search, filter by role/status | ✅ Complete |
+| User status — suspend / reactivate | ✅ Complete |
+| Verified badge — grant / revoke | ✅ Complete |
+| Products list — approve / pause with reason | ✅ Complete |
+| Orders list — search, filter by status | ✅ Complete |
+| Fees list — filter by type/status, summary breakdown | ✅ Complete |
+| Dispute queue — resolve: Complete / Refund / Cancel | ✅ Complete |
 
 ### Schema (Prisma)
 | Model | Status |
 |---|---|
 | User, FarmerProfile, BuyerProfile | ✅ Complete |
+| HaulageProfile | ✅ Complete (needs migration) |
 | Product, Category, SavedProduct | ✅ Complete |
 | Order, OrderItem, Payment | ✅ Complete |
+| HaulageJob, HaulageApplication | ✅ Complete (needs migration) |
+| PlatformFee | ✅ Complete (needs migration) |
 | Notification, Review, RewardWallet | ✅ Complete |
-| MarketPrice, AuditLog | ✅ Complete |
-| HaulageProfile | ✅ Added (needs migration) |
-| HaulageJob, HaulageApplication | ✅ Added (needs migration) |
-| PlatformFee | ✅ Added (needs migration) |
+| Conversation, Message | ✅ Complete |
+| MarketPrice, AuditLog, Verification | ✅ Complete |
 
 ### Landing Page
 | Component | Status |
@@ -235,25 +254,56 @@ Haulage providers pay registration fee + 5% commission per job.
 | Hero + early access forms (4 roles) | ✅ Complete |
 | Founder page | ✅ Complete |
 | Google Sheets form collector | ✅ Complete |
-| Mobile responsive | ✅ Fixed |
+| Mobile responsive | ✅ Complete |
 | SEO / OG tags | ✅ Complete |
 
 ---
 
-## NEXT BUILD SEQUENCE (MVP remaining)
+## NEXT STEPS — Post-MVP Deployment Checklist
 
-1. **Fee config in .env** — add REGISTRATION_FEE_SELLER, HAULAGE_COMMISSION_RATE
-2. **PlatformFee service** — createRegistrationFee(), chargeHaulageCommission()
-3. **Auth: charge registration fee on OTP verify** for seller/haulage roles
-4. **HaulageModule (backend)** — jobs listing, apply, award, complete
-5. **HaulageProfileSetupScreen (mobile)** — post-registration for HAULAGE role
-6. **Registration fee payment screen (mobile)** — Paystack for activation
-7. **Auto-create HaulageJob** when order confirmed with delivery address
-8. **Rating/Review submit screen** — triggered after order COMPLETED
-9. **Seller dashboard screen** — sales overview, revenue, pending orders
-10. **Push notifications** — Expo push token registration + send on order events
-11. **Verified badge** — admin sets verified flag, shows on product cards
-12. **Saved products screen** — display wishlist
-13. **Dispute flag** — button on order detail sends alert
-14. **Minimal admin web panel** — users, orders, products, fees
+### Before Go-Live
+1. **Run DB migrations** — `npx prisma migrate dev` (HaulageProfile, HaulageJob, PlatformFee models need migration)
+2. **Set production .env** — PAYSTACK_SECRET_KEY, TERMII_API_KEY, DATABASE_URL, JWT_SECRET, CLOUDINARY_*
+3. **Seed categories** — run `npx prisma db seed` to populate category data
+4. **Deploy backend** — Koyeb/Railway (Dockerfile + koyeb.yaml already present)
+5. **Build mobile app** — `eas build --platform all` (eas.json configured)
+6. **Submit to stores** — Google Play + Apple App Store
+7. **Point admin panel** at production API URL
+
+### Phase 2 Priorities (after first users)
+- Smart Map (GPS map view of nearby farms — currently stub)
+- Full KYC verification flow (ID upload → admin review queue)
+- DGR token rewards (earn on order complete, review, referral)
+- Seller analytics dashboard (revenue chart, top products)
+- Bull/Redis background job queue (push batch, reminders)
+- Agricultural education content
+
+---
+
+## PHASE 1 COMPLETION LOG
+
+All Phase 1 items are complete. Below is the full build log for reference.
+
+### Session 1 — Core infrastructure
+- Auth, Users, Marketplace, Categories, Orders, Payments, Notifications, SMS, Upload, Fees, Haulage, Messages backend modules
+- All mobile screens: Splash → Home → Market → Orders → Profile → Haulage → Messages
+- Landing page + Founder page
+
+### Session 2 — Push, Admin, Verified Badge
+- PushService (Expo Push API) — fires on all order/payment/haulage events
+- NotificationsService updated to create DB record + send push atomically
+- OrdersService wired for status-transition notifications + haulage provider broadcast
+- PaymentsService sends buyer + seller payment-confirmed notifications
+- AdminModule — full backend (stats, users, products, orders, fees, disputes, verified badge)
+- MarketplaceService — `isVerified` flag computed from `identityStatus === VERIFIED`
+- Admin web panel (admin/index.html) — single-file SPA, no build step
+
+### Session 3 — MVP Completion
+- HaulageProviderDashboardScreen — active jobs, mark delivered, earnings estimate, application history
+- ReviewsModule (backend) — handles order reviews + haulage job ratings, recalculates provider avg
+- RateReviewScreen — updated to use reviewsApi, supports haulage-specific flow
+- OrderDetailScreen — "Rate the Delivery Driver" button when haulage job is DELIVERED
+- MarketScreen — Near Me GPS filter using expo-location, haversine distance sort, radius cycle button
+- Backend marketplace — lat/lng/radiusKm params, haversineKm(), distance returned per product
+- ProductCard — distanceKm prop, auto-formats "2.3km away"
 

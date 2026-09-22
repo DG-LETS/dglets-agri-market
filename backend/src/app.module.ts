@@ -14,6 +14,9 @@ import { UploadModule }   from './upload/upload.module';
 import { FeesModule }     from './fees/fees.module';
 import { HaulageModule }  from './haulage/haulage.module';
 import { MessagesModule } from './messages/messages.module';
+import { AdminModule }    from './admin/admin.module';
+import { ReviewsModule }  from './reviews/reviews.module';
+import { HealthModule }   from './health/health.module';
 import appConfig from './config/app.config';
 import authConfig from './config/auth.config';
 import databaseConfig from './config/database.config';
@@ -43,6 +46,9 @@ import databaseConfig from './config/database.config';
     FeesModule,
     HaulageModule,
     MessagesModule,
+    AdminModule,
+    ReviewsModule,
+    HealthModule,
   ],
 })
 export class AppModule {}

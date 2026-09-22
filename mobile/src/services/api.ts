@@ -85,7 +85,18 @@ export const categoriesApi = {
 
 /* ── Marketplace ── */
 export const marketplaceApi = {
-  search:         (params: any)       => api.get('/marketplace/products', { params }),
+  search: (params: {
+    keyword?:    string;
+    categoryId?: string;
+    state?:      string;
+    minPrice?:   number;
+    maxPrice?:   number;
+    lat?:        number;
+    lng?:        number;
+    radiusKm?:   number;
+    page?:       number;
+    limit?:      number;
+  }) => api.get('/marketplace/products', { params }),
   getProduct:     (id: string)        => api.get(`/marketplace/products/${id}`),
   getMyProducts:  (status?: string)   => api.get('/marketplace/products/my', { params: { status } }),
   createProduct:  (data: any)         => api.post('/marketplace/products', data),
@@ -185,9 +196,30 @@ export const messagesApi = {
     api.post(`/messages/${conversationId}/report`, { reportedId, reason }),
 };
 
+/* ── Reviews ── */
+export const reviewsApi = {
+  /** Submit a review for an order or haulage job */
+  submit: (data: {
+    orderId?:      string;
+    haulageJobId?: string;
+    subjectId:     string;
+    productId?:    string;
+    rating:        number;
+    comment?:      string;
+    tags?:         string[];
+  }) => api.post('/reviews', data),
+
+  /** Get all reviews for a subject (seller/haulage provider) */
+  getForSubject: (userId: string, page = 1, limit = 20) =>
+    api.get(`/reviews/subject/${userId}`, { params: { page, limit } }),
+
+  /** Check if current user already reviewed an order */
+  hasReviewed: (orderId: string) =>
+    api.get('/reviews/check', { params: { orderId } }),
+};
+
 /* ── Platform Fees ── */
-export const feesApi = {
-  /** Check if registration fee is required and its status */
+export const feesApi = {  /** Check if registration fee is required and its status */
   getRegistrationStatus: () =>
     api.get('/fees/registration-status'),
 

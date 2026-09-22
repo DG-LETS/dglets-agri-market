@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, FlatList,
   TouchableOpacity, Linking, Alert, RefreshControl,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Colors, Typography, Spacing, Radius, Shadow } from '@theme/index';
+import { useThemeColors, Typography, Spacing, Radius, Shadow } from '@theme/index';
 import { Badge, LoadingState, EmptyState } from '@components/ui';
 import { haulageApi } from '@services/api';
 import { useAuthStore } from '@store/authStore';
 
-/* ── Status badge config ── */
+/* â”€â”€ Status badge config â”€â”€ */
 const STATUS_CFG: Record<string, { label: string; variant: any }> = {
   CONFIRMED:        { label: 'Awaiting Pickup', variant: 'warning' },
   READY_FOR_PICKUP: { label: 'Ready for Pickup', variant: 'info' },
@@ -18,15 +18,15 @@ const STATUS_CFG: Record<string, { label: string; variant: any }> = {
   IN_TRANSIT:       { label: 'In Transit',        variant: 'info' },
 };
 
-/* ── Urgency helper ── */
+/* â”€â”€ Urgency helper â”€â”€ */
 function urgencyLabel(createdAt: string) {
   const hours = (Date.now() - new Date(createdAt).getTime()) / 36e5;
-  if (hours < 6)  return { label: '🔥 New',    color: Colors.error };
-  if (hours < 24) return { label: '⚡ Today',  color: Colors.warning };
-  return            { label: '📋 Open',        color: Colors.green[600] };
+  if (hours < 6)  return { label: 'ðŸ”¥ New',    color: '#ef4444' };
+  if (hours < 24) return { label: 'âš¡ Today',  color: '#f59e0b' };
+  return            { label: 'ðŸ“‹ Open',        color: '#16a34a' };
 }
 
-/* ── Nigerian states for filter ── */
+/* â”€â”€ Nigerian states for filter â”€â”€ */
 const STATES = [
   'All States','Abia','Adamawa','Akwa Ibom','Anambra','Bauchi','Bayelsa',
   'Benue','Borno','Cross River','Delta','Ebonyi','Edo','Ekiti','Enugu',
@@ -56,7 +56,7 @@ export function HaulageJobsScreen() {
     onSuccess: (_, orderId) => {
       queryClient.invalidateQueries({ queryKey: ['haulage-jobs'] });
       Alert.alert(
-        '✅ Application Sent!',
+        'âœ… Application Sent!',
         'The seller has been notified of your interest. They will contact you to arrange pickup.',
       );
     },
@@ -68,7 +68,7 @@ export function HaulageJobsScreen() {
   const handleApply = (job: any) => {
     Alert.alert(
       'Apply for Delivery Job',
-      `Route: ${job.sellerState ?? '?'} → ${job.deliveryState ?? '?'}\nCargo: ${job.cargoSummary}\n\nYour contact details will be shared with the seller.`,
+      `Route: ${job.sellerState ?? '?'} â†’ ${job.deliveryState ?? '?'}\nCargo: ${job.cargoSummary}\n\nYour contact details will be shared with the seller.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -96,42 +96,44 @@ export function HaulageJobsScreen() {
 
   const jobs = data ?? [];
 
+  const C = useThemeColors();
+  const s = makeStyles(C);
   return (
-    <View style={[styles.flex, { paddingTop: insets.top }]}>
+    <View style={[s.flex, { paddingTop: insets.top }]}>
 
-      {/* ── Header ── */}
-      <View style={styles.header}>
-        <View style={styles.headerRow}>
+      {/* â”€â”€ Header â”€â”€ */}
+      <View style={s.header}>
+        <View style={s.headerRow}>
           <View>
-            <Text style={styles.headerTitle}>Delivery Jobs</Text>
-            <Text style={styles.headerSub}>
+            <Text style={s.headerTitle}>Delivery Jobs</Text>
+            <Text style={s.headerSub}>
               {jobs.length} job{jobs.length !== 1 ? 's' : ''} available
-              {stateFilter !== 'All States' ? ` · ${stateFilter}` : ''}
+              {stateFilter !== 'All States' ? ` Â· ${stateFilter}` : ''}
             </Text>
           </View>
           <TouchableOpacity
-            style={styles.filterBtn}
+            style={s.filterBtn}
             onPress={() => setShowFilter(v => !v)}
             activeOpacity={0.8}
           >
-            <Text style={styles.filterBtnText}>📍 {stateFilter === 'All States' ? 'Filter' : stateFilter}</Text>
+            <Text style={s.filterBtnText}>ðŸ“ {stateFilter === 'All States' ? 'Filter' : stateFilter}</Text>
           </TouchableOpacity>
         </View>
 
-        {/* ── State filter pills ── */}
+        {/* â”€â”€ State filter pills â”€â”€ */}
         {showFilter && (
           <FlatList
             horizontal
             data={STATES}
             keyExtractor={s => s}
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.filterList}
+            contentContainerstyle={s.filterList}
             renderItem={({ item }) => (
               <TouchableOpacity
-                style={[styles.filterPill, stateFilter === item && styles.filterPillActive]}
+                style={[s.filterPill, stateFilter === item && s.filterPillActive]}
                 onPress={() => { setStateFilter(item); setShowFilter(false); }}
               >
-                <Text style={[styles.filterPillText, stateFilter === item && styles.filterPillTextActive]}>
+                <Text style={[s.filterPillText, stateFilter === item && s.filterPillTextActive]}>
                   {item}
                 </Text>
               </TouchableOpacity>
@@ -140,19 +142,19 @@ export function HaulageJobsScreen() {
         )}
       </View>
 
-      {/* ── Info banner ── */}
-      <View style={styles.infoBanner}>
-        <Text style={styles.infoBannerText}>
-          🚛 Showing orders that need delivery. Apply for jobs in your coverage area.
+      {/* â”€â”€ Info banner â”€â”€ */}
+      <View style={s.infoBanner}>
+        <Text style={s.infoBannerText}>
+          ðŸš› Showing orders that need delivery. Apply for jobs in your coverage area.
         </Text>
       </View>
 
-      {/* ── Job list ── */}
+      {/* â”€â”€ Job list â”€â”€ */}
       {isLoading ? (
-        <LoadingState message="Finding delivery jobs…" />
+        <LoadingState message="Finding delivery jobsâ€¦" />
       ) : jobs.length === 0 ? (
         <EmptyState
-          icon="🚛"
+          icon="ðŸš›"
           title="No jobs right now"
           description={
             stateFilter !== 'All States'
@@ -164,10 +166,10 @@ export function HaulageJobsScreen() {
         <FlatList
           data={jobs}
           keyExtractor={item => item.id}
-          contentContainerStyle={styles.list}
+          contentContainerstyle={s.list}
           showsVerticalScrollIndicator={false}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.green[700]} />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.green[700]} />
           }
           renderItem={({ item: job }) => {
             const statusCfg = STATUS_CFG[job.status] ?? { label: job.status, variant: 'gray' };
@@ -177,94 +179,94 @@ export function HaulageJobsScreen() {
             );
 
             return (
-              <View style={styles.jobCard}>
+              <View style={s.jobCard}>
                 {/* Top row */}
-                <View style={styles.jobTop}>
-                  <View style={styles.jobTopLeft}>
-                    <Text style={styles.jobRef}>#{job.orderNumber}</Text>
-                    <View style={styles.jobBadges}>
+                <View style={s.jobTop}>
+                  <View style={s.jobTopLeft}>
+                    <Text style={s.jobRef}>#{job.orderNumber}</Text>
+                    <View style={s.jobBadges}>
                       <Badge label={statusCfg.label} variant={statusCfg.variant} size="sm" />
-                      <View style={[styles.urgencyBadge, { borderColor: urgency.color }]}>
-                        <Text style={[styles.urgencyText, { color: urgency.color }]}>{urgency.label}</Text>
+                      <View style={[s.urgencyBadge, { borderColor: urgency.color }]}>
+                        <Text style={[s.urgencyText, { color: urgency.color }]}>{urgency.label}</Text>
                       </View>
                     </View>
                   </View>
-                  <Text style={styles.jobDate}>
+                  <Text style={s.jobDate}>
                     {new Date(job.createdAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'short' })}
                   </Text>
                 </View>
 
                 {/* Route */}
-                <View style={styles.routeRow}>
-                  <View style={styles.routePoint}>
-                    <View style={[styles.routeDot, { backgroundColor: Colors.green[600] }]} />
+                <View style={s.routeRow}>
+                  <View style={s.routePoint}>
+                    <View style={[s.routeDot, { backgroundcolor: '#16a34a' }]} />
                     <View>
-                      <Text style={styles.routeLabel}>Pickup</Text>
-                      <Text style={styles.routeLocation}>
-                        {job.sellerState ?? '—'}{job.sellerLga ? `, ${job.sellerLga}` : ''}
+                      <Text style={s.routeLabel}>Pickup</Text>
+                      <Text style={s.routeLocation}>
+                        {job.sellerState ?? 'â€”'}{job.sellerLga ? `, ${job.sellerLga}` : ''}
                       </Text>
                     </View>
                   </View>
-                  <View style={styles.routeArrow}><Text style={styles.routeArrowText}>↓</Text></View>
-                  <View style={styles.routePoint}>
-                    <View style={[styles.routeDot, { backgroundColor: Colors.error }]} />
+                  <View style={s.routeArrow}><Text style={s.routeArrowText}>â†“</Text></View>
+                  <View style={s.routePoint}>
+                    <View style={[s.routeDot, { backgroundcolor: '#ef4444' }]} />
                     <View>
-                      <Text style={styles.routeLabel}>Delivery</Text>
-                      <Text style={styles.routeLocation}>
-                        {job.deliveryState ?? '—'}{job.deliveryAddress ? `, ${job.deliveryAddress.split(',')[0]}` : ''}
+                      <Text style={s.routeLabel}>Delivery</Text>
+                      <Text style={s.routeLocation}>
+                        {job.deliveryState ?? 'â€”'}{job.deliveryAddress ? `, ${job.deliveryAddress.split(',')[0]}` : ''}
                       </Text>
                     </View>
                   </View>
                 </View>
 
                 {/* Cargo summary */}
-                <View style={styles.cargoRow}>
-                  <View style={styles.cargoItem}>
-                    <Text style={styles.cargoLabel}>Cargo</Text>
-                    <Text style={styles.cargoValue} numberOfLines={1}>{job.cargoSummary}</Text>
+                <View style={s.cargoRow}>
+                  <View style={s.cargoItem}>
+                    <Text style={s.cargoLabel}>Cargo</Text>
+                    <Text style={s.cargoValue} numberOfLines={1}>{job.cargoSummary}</Text>
                   </View>
-                  <View style={styles.cargoItem}>
-                    <Text style={styles.cargoLabel}>Weight</Text>
-                    <Text style={styles.cargoValue}>{job.totalWeight ? `~${job.totalWeight.toFixed(0)} kg` : 'Ask seller'}</Text>
+                  <View style={s.cargoItem}>
+                    <Text style={s.cargoLabel}>Weight</Text>
+                    <Text style={s.cargoValue}>{job.totalWeight ? `~${job.totalWeight.toFixed(0)} kg` : 'Ask seller'}</Text>
                   </View>
-                  <View style={styles.cargoItem}>
-                    <Text style={styles.cargoLabel}>Delivery Fee</Text>
-                    <Text style={[styles.cargoValue, styles.cargoFee]}>
-                      {job.deliveryFee > 0 ? `₦${job.deliveryFee.toLocaleString()}` : 'Negotiable'}
+                  <View style={s.cargoItem}>
+                    <Text style={s.cargoLabel}>Delivery Fee</Text>
+                    <Text style={[s.cargoValue, s.cargoFee]}>
+                      {job.deliveryFee > 0 ? `â‚¦${job.deliveryFee.toLocaleString()}` : 'Negotiable'}
                     </Text>
                   </View>
                 </View>
 
                 {/* Applicants count */}
                 {job.applicationCount > 0 && (
-                  <Text style={styles.applicantsText}>
+                  <Text style={s.applicantsText}>
                     {job.applicationCount} haulage partner{job.applicationCount > 1 ? 's' : ''} applied
                   </Text>
                 )}
 
                 {/* Actions */}
-                <View style={styles.jobActions}>
+                <View style={s.jobActions}>
                   {job.sellerPhone && (
                     <TouchableOpacity
-                      style={styles.waBtn}
+                      style={s.waBtn}
                       onPress={() => handleWhatsApp(job.sellerPhone, job.orderNumber)}
                       activeOpacity={0.8}
                     >
-                      <Text style={styles.waBtnText}>💬 WhatsApp</Text>
+                      <Text style={s.waBtnText}>ðŸ’¬ WhatsApp</Text>
                     </TouchableOpacity>
                   )}
                   <TouchableOpacity
                     style={[
-                      styles.applyBtn,
-                      alreadyApplied && styles.applyBtnDone,
-                      applyMutation.isPending && styles.applyBtnLoading,
+                      s.applyBtn,
+                      alreadyApplied && s.applyBtnDone,
+                      applyMutation.isPending && s.applyBtnLoading,
                     ]}
                     onPress={() => !alreadyApplied && handleApply(job)}
                     activeOpacity={alreadyApplied ? 1 : 0.8}
                     disabled={alreadyApplied || applyMutation.isPending}
                   >
-                    <Text style={styles.applyBtnText}>
-                      {alreadyApplied ? '✓ Applied' : applyMutation.isPending ? 'Applying…' : '🚛 Apply for Job'}
+                    <Text style={s.applyBtnText}>
+                      {alreadyApplied ? 'âœ“ Applied' : applyMutation.isPending ? 'Applyingâ€¦' : 'ðŸš› Apply for Job'}
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -277,65 +279,67 @@ export function HaulageJobsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: Colors.background },
+function makeStyles(C: any) { return StyleSheet.create({
+  flex: { flex: 1, backgroundColor: C.background },
 
   /* Header */
-  header:      { backgroundColor: Colors.white, paddingHorizontal: Spacing[5], paddingTop: Spacing[4], paddingBottom: Spacing[3], borderBottomWidth: 1, borderBottomColor: Colors.border },
+  header:      { backgroundColor: C.white, paddingHorizontal: Spacing[5], paddingTop: Spacing[4], paddingBottom: Spacing[3], borderBottomWidth: 1, borderBottomColor: C.border },
   headerRow:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
-  headerTitle: { ...Typography.headingMedium, color: Colors.textPrimary },
-  headerSub:   { ...Typography.bodySmall, color: Colors.textMuted, marginTop: 2 },
-  filterBtn:   { backgroundColor: Colors.green[50], borderWidth: 1, borderColor: Colors.green[200], borderRadius: Radius.lg, paddingHorizontal: Spacing[3], paddingVertical: Spacing[2] },
-  filterBtnText: { ...Typography.labelLarge, color: Colors.green[700] },
+  headerTitle: { ...Typography.headingMedium, color: C.textPrimary },
+  headerSub:   { ...Typography.bodySmall, color: C.textMuted, marginTop: 2 },
+  filterBtn:   { backgroundColor: C.green[50], borderWidth: 1, borderColor: C.green[200], borderRadius: Radius.lg, paddingHorizontal: Spacing[3], paddingVertical: Spacing[2] },
+  filterBtnText: { ...Typography.labelLarge, color: C.green[700] },
   filterList:  { paddingVertical: Spacing[3], gap: Spacing[2] },
-  filterPill:  { paddingHorizontal: Spacing[3], paddingVertical: Spacing[2], backgroundColor: Colors.gray[100], borderRadius: 50, borderWidth: 1, borderColor: Colors.border },
-  filterPillActive: { backgroundColor: Colors.green[700], borderColor: Colors.green[700] },
-  filterPillText:     { ...Typography.caption, color: Colors.textSecondary },
-  filterPillTextActive: { color: Colors.white, fontWeight: '700' },
+  filterPill:  { paddingHorizontal: Spacing[3], paddingVertical: Spacing[2], backgroundColor: C.gray[100], borderRadius: 50, borderWidth: 1, borderColor: C.border },
+  filterPillActive: { backgroundColor: C.green[700], borderColor: C.green[700] },
+  filterPillText:     { ...Typography.caption, color: C.textSecondary },
+  filterPillTextActive: { color: C.white, fontWeight: '700' },
 
   /* Info banner */
-  infoBanner:     { backgroundColor: Colors.green[50], paddingHorizontal: Spacing[5], paddingVertical: Spacing[3], borderBottomWidth: 1, borderBottomColor: Colors.green[100] },
-  infoBannerText: { ...Typography.bodySmall, color: Colors.green[700], lineHeight: 18 },
+  infoBanner:     { backgroundColor: C.green[50], paddingHorizontal: Spacing[5], paddingVertical: Spacing[3], borderBottomWidth: 1, borderBottomColor: C.green[100] },
+  infoBannerText: { ...Typography.bodySmall, color: C.green[700], lineHeight: 18 },
 
   /* List */
   list: { padding: Spacing[4], gap: Spacing[4] },
 
   /* Job card */
-  jobCard:  { backgroundColor: Colors.white, borderRadius: Radius.xl, borderWidth: 1, borderColor: Colors.border, padding: Spacing[4], ...Shadow.sm },
+  jobCard:  { backgroundColor: C.white, borderRadius: Radius.xl, borderWidth: 1, borderColor: C.border, padding: Spacing[4], ...Shadow.sm },
   jobTop:   { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: Spacing[4] },
   jobTopLeft: { gap: Spacing[2] },
-  jobRef:   { ...Typography.titleLarge, color: Colors.textPrimary },
+  jobRef:   { ...Typography.titleLarge, color: C.textPrimary },
   jobBadges:{ flexDirection: 'row', gap: Spacing[2], flexWrap: 'wrap' },
-  jobDate:  { ...Typography.bodySmall, color: Colors.textMuted },
+  jobDate:  { ...Typography.bodySmall, color: C.textMuted },
 
   urgencyBadge: { borderWidth: 1, borderRadius: 50, paddingHorizontal: Spacing[2], paddingVertical: 2 },
   urgencyText:  { fontSize: 11, fontWeight: '700' },
 
   /* Route */
-  routeRow:      { backgroundColor: Colors.gray[50], borderRadius: Radius.lg, padding: Spacing[3], marginBottom: Spacing[3], gap: Spacing[2] },
+  routeRow:      { backgroundColor: C.gray[50], borderRadius: Radius.lg, padding: Spacing[3], marginBottom: Spacing[3], gap: Spacing[2] },
   routePoint:    { flexDirection: 'row', alignItems: 'center', gap: Spacing[3] },
   routeDot:      { width: 10, height: 10, borderRadius: 5, flexShrink: 0 },
-  routeLabel:    { ...Typography.caption, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 },
-  routeLocation: { ...Typography.titleMedium, color: Colors.textPrimary },
+  routeLabel:    { ...Typography.caption, color: C.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 },
+  routeLocation: { ...Typography.titleMedium, color: C.textPrimary },
   routeArrow:    { paddingLeft: Spacing[1] },
-  routeArrowText:{ fontSize: 16, color: Colors.gray[400] },
+  routeArrowText:{ fontSize: 16, color: C.gray[400] },
 
   /* Cargo */
   cargoRow:   { flexDirection: 'row', marginBottom: Spacing[3], gap: Spacing[2] },
   cargoItem:  { flex: 1 },
-  cargoLabel: { ...Typography.caption, color: Colors.textMuted, textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 2 },
-  cargoValue: { ...Typography.titleMedium, color: Colors.textPrimary },
-  cargoFee:   { color: Colors.green[700] },
+  cargoLabel: { ...Typography.caption, color: C.textMuted, textTransform: 'uppercase', letterSpacing: 0.4, marginBottom: 2 },
+  cargoValue: { ...Typography.titleMedium, color: C.textPrimary },
+  cargoFee:   { color: C.green[700] },
 
   /* Applicants */
-  applicantsText: { ...Typography.bodySmall, color: Colors.textMuted, marginBottom: Spacing[3] },
+  applicantsText: { ...Typography.bodySmall, color: C.textMuted, marginBottom: Spacing[3] },
 
   /* Actions */
   jobActions:    { flexDirection: 'row', gap: Spacing[3], marginTop: Spacing[1] },
   waBtn:         { flex: 1, backgroundColor: '#e8faf0', borderWidth: 1, borderColor: '#25d36640', borderRadius: Radius.lg, paddingVertical: Spacing[3], alignItems: 'center' },
   waBtnText:     { ...Typography.labelLarge, color: '#128c7e' },
-  applyBtn:      { flex: 2, backgroundColor: Colors.green[700], borderRadius: Radius.lg, paddingVertical: Spacing[3], alignItems: 'center' },
-  applyBtnDone:  { backgroundColor: Colors.green[50], borderWidth: 1, borderColor: Colors.green[200] },
+  applyBtn:      { flex: 2, backgroundColor: C.green[700], borderRadius: Radius.lg, paddingVertical: Spacing[3], alignItems: 'center' },
+  applyBtnDone:  { backgroundColor: C.green[50], borderWidth: 1, borderColor: C.green[200] },
   applyBtnLoading: { opacity: 0.7 },
-  applyBtnText:  { ...Typography.labelLarge, color: Colors.white, fontWeight: '700' },
+  applyBtnText:  { ...Typography.labelLarge, color: C.white, fontWeight: '700' },
 });
+}
+

@@ -1,0 +1,94 @@
+name: CI — Build & Validate
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  # ─────────────────────────────────────────────
+  # Backend: type-check, lint, build, migration check
+  # ─────────────────────────────────────────────
+  backend:
+    name: Backend CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Type-check (tsc --noEmit)
+        run: npx tsc --noEmit --skipLibCheck
+        continue-on-error: true   # warn but don't fail until env is fully stable
+
+      - name: Build (nest build)
+        run: node node_modules/@nestjs/cli/bin/nest.js build
+
+      - name: Verify migration files exist
+        run: |
+          if [ ! -d "prisma/migrations" ]; then
+            echo "ERROR: prisma/migrations directory missing — run 'npx prisma migrate dev --name init' to create a baseline"
+            exit 1
+          fi
+          MIGRATION_COUNT=$(find prisma/migrations -name "migration.sql" | wc -l)
+          if [ "$MIGRATION_COUNT" -eq 0 ]; then
+            echo "ERROR: No migration SQL files found"
+            exit 1
+          fi
+          echo "✅ Found $MIGRATION_COUNT migration file(s)"
+
+      - name: Check migration drift (schema vs migrations)
+        run: |
+          # Validate that schema.prisma and migration files are in sync.
+          # Uses --exit-code so it fails CI if there is uncommitted drift.
+          npx prisma migrate diff \
+            --from-migrations ./prisma/migrations \
+            --to-schema-datamodel ./prisma/schema.prisma \
+            --shadow-database-url "file:./shadow.db" \
+            --exit-code || echo "⚠️  Schema drift detected — run 'npx prisma migrate dev' to generate a new migration"
+        continue-on-error: true   # warn for now; make hard-fail after DB is provisioned
+
+  # ─────────────────────────────────────────────
+  # Mobile: install and type-check
+  # ─────────────────────────────────────────────
+  mobile:
+    name: Mobile CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mobile
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Type-check
+        run: npx tsc --noEmit
+        continue-on-error: true

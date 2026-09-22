@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DG-LETS Admin Panel</title>
+  <style>
+    /* ── Reset & Base ───────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green-900: #14532d;
+      --green-700: #15803d;
+      --green-600: #16a34a;
+      --green-100: #dcfce7;
+      --green-50:  #f0fdf4;
+      --gold-600:  #ca8a04;
+      --gold-100:  #fef9c3;
+      --red-600:   #dc2626;
+      --red-100:   #fee2e2;
+      --blue-600:  #2563eb;
+      --blue-100:  #dbeafe;
+      --gray-900:  #111827;
+      --gray-700:  #374151;
+      --gray-500:  #6b7280;
+      --gray-300:  #d1d5db;
+      --gray-100:  #f3f4f6;
+      --gray-50:   #f9fafb;
+      --white:     #ffffff;
+      --sidebar-w: 220px;
+      --header-h:  60px;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px; color: var(--gray-700);
+      background: var(--gray-50);
+    }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; }
+
+    /* ── Layout ─────────────────────────────────────── */
+    #app { display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    #sidebar {
+      width: var(--sidebar-w); background: var(--green-900);
+      position: fixed; top: 0; left: 0; height: 100vh;
+      display: flex; flex-direction: column; overflow-y: auto;
+      z-index: 100;
+    }
+    .sidebar-logo {
+      padding: 20px 18px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.1);
+    }
+    .sidebar-logo h1 {
+      font-size: 16px; font-weight: 800; color: #fff; line-height: 1.2;
+    }
+    .sidebar-logo span { font-size: 11px; color: rgba(255,255,255,.5); }
+    nav { padding: 10px 0; flex: 1; }
+    .nav-section { padding: 8px 18px 4px; font-size: 10px; font-weight: 700;
+      letter-spacing: 1px; color: rgba(255,255,255,.35); text-transform: uppercase; }
+    nav a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 18px; color: rgba(255,255,255,.75); font-size: 13.5px;
+      transition: background .15s;
+    }
+    nav a:hover, nav a.active {
+      background: rgba(255,255,255,.1); color: #fff;
+    }
+    nav a.active { border-left: 3px solid #4ade80; padding-left: 15px; }
+    .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+    .sidebar-footer {
+      padding: 14px 18px; border-top: 1px solid rgba(255,255,255,.1);
+      font-size: 12px; color: rgba(255,255,255,.4);
+    }
+
+    /* Main */
+    #main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; }
+
+    /* Header */
+    #header {
+      height: var(--header-h); background: var(--white);
+      border-bottom: 1px solid var(--gray-300);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; position: sticky; top: 0; z-index: 50;
+    }
+    #header h2 { font-size: 16px; font-weight: 700; color: var(--gray-900); }
+    .header-right { display: flex; align-items: center; gap: 14px; }
+    .badge-admin {
+      background: var(--green-100); color: var(--green-700);
+      font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 50px;
+    }
+    #btn-logout {
+      background: none; border: 1px solid var(--gray-300);
+      padding: 6px 14px; border-radius: 6px; font-size: 13px; color: var(--gray-700);
+    }
+    #btn-logout:hover { background: var(--gray-100); }
+
+    /* Content */
+    #content { padding: 28px; flex: 1; }
+
+    /* ── Login overlay ───────────────────────────────── */
+    #login-overlay {
+      position: fixed; inset: 0; background: var(--green-900);
+      display: flex; align-items: center; justify-content: center; z-index: 200;
+    }
+    .login-box {
+      background: var(--white); border-radius: 16px; padding: 40px 36px;
+      width: 360px; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.3);
+    }
+    .login-box h2 { font-size: 22px; font-weight: 800; color: var(--gray-900); margin-bottom: 4px; }
+    .login-box p { color: var(--gray-500); font-size: 13px; margin-bottom: 28px; }
+    .form-group { text-align: left; margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600;
+      color: var(--gray-700); margin-bottom: 6px; }
+    .form-group input {
+      width: 100%; padding: 10px 14px; border: 1px solid var(--gray-300);
+      border-radius: 8px; font-size: 14px; outline: none;
+    }
+    .form-group input:focus { border-color: var(--green-600); }
+    #btn-login {
+      width: 100%; background: var(--green-700); color: var(--white);
+      border: none; padding: 12px; border-radius: 8px;
+      font-size: 14px; font-weight: 700; margin-top: 6px;
+    }
+    #btn-login:hover { background: var(--green-600); }
+    #login-error { color: var(--red-600); font-size: 13px; margin-top: 10px; }
+
+    /* ── Cards & Stats ───────────────────────────────── */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(180px,1fr)); gap: 16px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--white); border: 1px solid var(--gray-300);
+      border-radius: 12px; padding: 18px 20px;
+    }
+    .stat-card .label { font-size: 12px; color: var(--gray-500); margin-bottom: 4px; }
+    .stat-card .value { font-size: 26px; font-weight: 800; color: var(--gray-900); line-height: 1; }
+    .stat-card .sub { font-size: 11px; color: var(--gray-500); margin-top: 4px; }
+    .stat-green { border-top: 3px solid var(--green-600); }
+    .stat-gold  { border-top: 3px solid var(--gold-600); }
+    .stat-red   { border-top: 3px solid var(--red-600); }
+    .stat-blue  { border-top: 3px solid var(--blue-600); }
+
+    /* ── Tables ──────────────────────────────────────── */
+    .table-card {
+      background: var(--white); border: 1px solid var(--gray-300);
+      border-radius: 12px; overflow: hidden; margin-bottom: 28px;
+    }
+    .table-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px; border-bottom: 1px solid var(--gray-100);
+    }
+    .table-header h3 { font-size: 14px; font-weight: 700; color: var(--gray-900); }
+    .table-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .table-controls input, .table-controls select {
+      padding: 7px 12px; border: 1px solid var(--gray-300);
+      border-radius: 7px; font-size: 13px; outline: none;
+    }
+    .table-controls input:focus, .table-controls select:focus {
+      border-color: var(--green-600);
+    }
+    .table-controls input { width: 200px; }
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      text-align: left; padding: 10px 16px; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .5px;
+      color: var(--gray-500); background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+    }
+    td {
+      padding: 11px 16px; border-bottom: 1px solid var(--gray-100);
+      font-size: 13px; vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--gray-50); }
+    .mono { font-family: monospace; font-size: 12px; }
+
+    /* ── Badges ──────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 9px; border-radius: 50px; font-size: 11px; font-weight: 600;
+    }
+    .badge-green  { background: var(--green-100); color: var(--green-700); }
+    .badge-red    { background: var(--red-100);   color: var(--red-600); }
+    .badge-gold   { background: var(--gold-100);  color: var(--gold-600); }
+    .badge-blue   { background: var(--blue-100);  color: var(--blue-600); }
+    .badge-gray   { background: var(--gray-100);  color: var(--gray-500); }
+
+    /* ── Action buttons ──────────────────────────────── */
+    .btn { border: none; border-radius: 7px; padding: 6px 14px;
+      font-size: 12px; font-weight: 600; cursor: pointer; }
+    .btn-sm { padding: 4px 10px; font-size: 11px; }
+    .btn-green  { background: var(--green-600); color: #fff; }
+    .btn-green:hover { background: var(--green-700); }
+    .btn-red    { background: var(--red-600); color: #fff; }
+    .btn-red:hover { opacity: .85; }
+    .btn-gold   { background: var(--gold-600); color: #fff; }
+    .btn-ghost  { background: none; border: 1px solid var(--gray-300); color: var(--gray-700); }
+    .btn-ghost:hover { background: var(--gray-100); }
+    .btn + .btn { margin-left: 6px; }
+
+    /* ── Pagination ──────────────────────────────────── */
+    .pagination {
+      display: flex; align-items: center; gap: 8px;
+      padding: 14px 20px; border-top: 1px solid var(--gray-100);
+      font-size: 13px; color: var(--gray-500);
+    }
+    .pagination button {
+      padding: 5px 12px; border: 1px solid var(--gray-300);
+      border-radius: 6px; background: var(--white); color: var(--gray-700);
+      font-size: 12px;
+    }
+    .pagination button:hover { background: var(--gray-100); }
+    .pagination button:disabled { opacity: .4; pointer-events: none; }
+
+    /* ── Spinner / Empty ─────────────────────────────── */
+    .loading { padding: 40px; text-align: center; color: var(--gray-500); }
+    .loading::after { content: ''; display: inline-block; width: 20px; height: 20px;
+      border: 2px solid var(--gray-300); border-top-color: var(--green-600);
+      border-radius: 50%; animation: spin .6s linear infinite; margin-left: 10px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty { padding: 40px; text-align: center; color: var(--gray-500); font-size: 13px; }
+
+    /* ── Toast ───────────────────────────────────────── */
+    #toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--gray-900); color: #fff;
+      padding: 12px 20px; border-radius: 10px; font-size: 13px;
+      opacity: 0; transition: opacity .25s; pointer-events: none;
+      z-index: 999; max-width: 320px;
+    }
+    #toast.show { opacity: 1; }
+    #toast.success { background: var(--green-700); }
+    #toast.error   { background: var(--red-600); }
+
+    /* ── Modal ───────────────────────────────────────── */
+    #modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 150;
+      align-items: center; justify-content: center;
+    }
+    #modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--white); border-radius: 14px; padding: 28px;
+      width: 480px; max-width: 95vw;
+    }
+    .modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
+    .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .modal-field { margin-bottom: 14px; }
+    .modal-field label { display: block; font-size: 12px; font-weight: 600;
+      color: var(--gray-700); margin-bottom: 6px; }
+    .modal-field select, .modal-field textarea, .modal-field input {
+      width: 100%; padding: 9px 12px; border: 1px solid var(--gray-300);
+      border-radius: 8px; font-size: 13px; outline: none; resize: vertical;
+    }
+
+    /* ── API URL bar ─────────────────────────────────── */
+    #api-config {
+      background: var(--gold-100); border-bottom: 1px solid #fde68a;
+      padding: 8px 28px; font-size: 12px; color: var(--gray-700);
+      display: flex; align-items: center; gap: 10px;
+    }
+    #api-config input {
+      flex: 1; padding: 5px 10px; border: 1px solid var(--gray-300);
+      border-radius: 6px; font-size: 12px; outline: none; font-family: monospace;
+    }
+    #api-config button {
+      padding: 5px 14px; background: var(--green-700); color: #fff;
+      border: none; border-radius: 6px; font-size: 12px; cursor: pointer;
+    }
+
+    /* ── Responsive tweak ────────────────────────────── */
+    @media(max-width:768px) {
+      #sidebar { width: 58px; }
+      .sidebar-logo h1, .sidebar-logo span,
+      nav a span, .nav-section { display: none; }
+      #main { margin-left: 58px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════ LOGIN OVERLAY ════════ -->
+<div id="login-overlay">
+  <div class="login-box">
+    <div style="font-size:40px;margin-bottom:12px">🌾</div>
+    <h2>DG-LETS Admin</h2>
+    <p>Sign in with your ADMIN account credentials</p>
+    <div class="form-group">
+      <label>Phone or Email</label>
+      <input id="login-identifier" type="text" placeholder="+2348012345678" autocomplete="username" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input id="login-password" type="password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+    <button id="btn-login" onclick="doLogin()">Sign In</button>
+    <div id="login-error"></div>
+  </div>
+</div>
+
+<!-- ════════ LAYOUT ════════ -->
+<div id="app" style="display:none">
+
+  <!-- Sidebar -->
+  <aside id="sidebar">
+    <div class="sidebar-logo">
+      <h1>🌾 DG-LETS</h1>
+      <span>Admin Panel</span>
+    </div>
+    <nav>
+      <div class="nav-section">Main</div>
+      <a href="#" onclick="showPage('dashboard')" id="nav-dashboard" class="active">
+        <span class="nav-icon">📊</span><span>Dashboard</span>
+      </a>
+      <div class="nav-section">Management</div>
+      <a href="#" onclick="showPage('users')" id="nav-users">
+        <span class="nav-icon">👥</span><span>Users</span>
+      </a>
+      <a href="#" onclick="showPage('products')" id="nav-products">
+        <span class="nav-icon">📦</span><span>Products</span>
+      </a>
+      <a href="#" onclick="showPage('orders')" id="nav-orders">
+        <span class="nav-icon">🛒</span><span>Orders</span>
+      </a>
+      <div class="nav-section">Finance</div>
+      <a href="#" onclick="showPage('fees')" id="nav-fees">
+        <span class="nav-icon">💰</span><span>Fees</span>
+      </a>
+      <div class="nav-section">Support</div>
+      <a href="#" onclick="showPage('disputes')" id="nav-disputes">
+        <span class="nav-icon">⚖️</span><span>Disputes</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">v1.0 — MVP</div>
+  </aside>
+
+  <!-- Main -->
+  <div id="main">
+    <!-- API config bar -->
+    <div id="api-config">
+      <span>⚙️ API URL:</span>
+      <input id="api-url-input" value="http://localhost:3000/api/v1" />
+      <button onclick="saveApiUrl()">Save</button>
+    </div>
+
+    <!-- Header -->
+    <header id="header">
+      <h2 id="page-title">Dashboard</h2>
+      <div class="header-right">
+        <span class="badge-admin">ADMIN</span>
+        <span id="admin-name" style="font-size:13px;color:var(--gray-500)"></span>
+        <button id="btn-logout" onclick="doLogout()">Sign out</button>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div id="content">
+      <!-- Injected by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ════════ MODAL ════════ -->
+<div id="modal-overlay">
+  <div class="modal" id="modal-box">
+    <h3 id="modal-title">Action</h3>
+    <div id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-green" id="modal-confirm-btn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════ TOAST ════════ -->
+<div id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════ */
+let TOKEN       = localStorage.getItem('dg_admin_token') || '';
+let ADMIN_USER  = JSON.parse(localStorage.getItem('dg_admin_user') || 'null');
+let API_BASE    = localStorage.getItem('dg_api_url') || 'http://localhost:3000/api/v1';
+let CURRENT_PAGE = 'dashboard';
+let MODAL_ACTION = null;
+
+/* State per page */
+const pageState = {
+  users:    { page: 1, search: '', role: '', status: '' },
+  products: { page: 1, search: '', status: '' },
+  orders:   { page: 1, search: '', status: '' },
+  disputes: { page: 1 },
+  fees:     { page: 1, type: '', status: '' },
+};
+
+/* ═══════════════════════════════════════════════════════════
+   BOOT
+═══════════════════════════════════════════════════════════ */
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('api-url-input').value = API_BASE;
+  if (TOKEN && ADMIN_USER) {
+    showApp();
+    showPage('dashboard');
+  }
+});
+
+function saveApiUrl() {
+  API_BASE = document.getElementById('api-url-input').value.trim().replace(/\/$/, '');
+  localStorage.setItem('dg_api_url', API_BASE);
+  toast('API URL saved. Reloading data…', 'success');
+  loadCurrentPage();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════════════════════ */
+async function doLogin() {
+  const identifier = document.getElementById('login-identifier').value.trim();
+  const password   = document.getElementById('login-password').value;
+  const errEl      = document.getElementById('login-error');
+  const btn        = document.getElementById('btn-login');
+
+  errEl.textContent = '';
+  btn.textContent   = 'Signing in…';
+  btn.disabled      = true;
+
+  try {
+    const res  = await apiFetch('/auth/login', 'POST', { identifier, password }, false);
+    if (res.otpSent) {
+      errEl.textContent = 'OTP-only login not supported in admin panel. Please use a password account.';
+      return;
+    }
+    if (res.user?.role !== 'ADMIN') {
+      errEl.textContent = '⛔ This account does not have admin access.';
+      return;
+    }
+    TOKEN      = res.accessToken;
+    ADMIN_USER = res.user;
+    localStorage.setItem('dg_admin_token', TOKEN);
+    localStorage.setItem('dg_admin_user',  JSON.stringify(ADMIN_USER));
+    showApp();
+    showPage('dashboard');
+  } catch(e) {
+    errEl.textContent = e.message || 'Login failed. Check your credentials.';
+  } finally {
+    btn.textContent = 'Sign In';
+    btn.disabled    = false;
+  }
+}
+
+function doLogout() {
+  TOKEN = '';
+  ADMIN_USER = null;
+  localStorage.removeItem('dg_admin_token');
+  localStorage.removeItem('dg_admin_user');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-overlay').style.display = 'flex';
+}
+
+function showApp() {
+  document.getElementById('login-overlay').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('admin-name').textContent =
+    ADMIN_USER ? `${ADMIN_USER.firstName} ${ADMIN_USER.lastName}` : '';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   API HELPERS
+═══════════════════════════════════════════════════════════ */
+async function apiFetch(path, method = 'GET', body = null, auth = true) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (auth && TOKEN) headers['Authorization'] = `Bearer ${TOKEN}`;
+  const opts = { method, headers };
+  if (body) opts.body = JSON.stringify(body);
+
+  const res = await fetch(API_BASE + path, opts);
+  if (res.status === 401) { doLogout(); throw new Error('Session expired — please log in again.'); }
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || `HTTP ${res.status}`);
+  return data;
+}
+
+function buildQuery(obj) {
+  const params = new URLSearchParams();
+  for (const [k, v] of Object.entries(obj)) {
+    if (v !== undefined && v !== null && v !== '') params.set(k, v);
+  }
+  const s = params.toString();
+  return s ? '?' + s : '';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════════════════════ */
+function showPage(name) {
+  CURRENT_PAGE = name;
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + name);
+  if (navEl) navEl.classList.add('active');
+
+  const titles = {
+    dashboard: 'Dashboard', users: 'Users', products: 'Products',
+    orders: 'Orders', fees: 'Platform Fees', disputes: 'Dispute Queue',
+  };
+  document.getElementById('page-title').textContent = titles[name] || name;
+  loadCurrentPage();
+  return false;
+}
+
+function loadCurrentPage() {
+  const pages = { dashboard, users, products, orders, fees, disputes };
+  (pages[CURRENT_PAGE] || dashboard)();
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════════════ */
+let toastTimer;
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className   = 'show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.className = '', 3000);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════════════════ */
+function openModal(title, bodyHtml, onConfirm, confirmLabel = 'Confirm', confirmClass = 'btn-green') {
+  document.getElementById('modal-title').textContent     = title;
+  document.getElementById('modal-body').innerHTML        = bodyHtml;
+  const btn = document.getElementById('modal-confirm-btn');
+  btn.textContent  = confirmLabel;
+  btn.className    = 'btn ' + confirmClass;
+  MODAL_ACTION     = onConfirm;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  MODAL_ACTION = null;
+}
+document.getElementById('modal-confirm-btn').onclick = async () => {
+  if (!MODAL_ACTION) return;
+  try {
+    await MODAL_ACTION();
+    closeModal();
+  } catch(e) {
+    toast('Error: ' + e.message, 'error');
+  }
+};
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+});
+
+/* ═══════════════════════════════════════════════════════════
+   HELPERS — render
+═══════════════════════════════════════════════════════════ */
+function statusBadge(status) {
+  const map = {
+    ACTIVE: 'green', INACTIVE: 'gray', SUSPENDED: 'red', PENDING_VERIFICATION: 'gold',
+    PUBLISHED: 'green', DRAFT: 'gray', PAUSED: 'gold', DELETED: 'red',
+    PENDING: 'gold', CONFIRMED: 'blue', COMPLETED: 'green',
+    CANCELLED: 'red', DISPUTED: 'red', IN_TRANSIT: 'blue',
+    PAID: 'green', FAILED: 'red',
+    OPEN: 'gold', AWARDED: 'blue', DELIVERED: 'green',
+    REGISTRATION: 'blue', TRANSACTION: 'green', HAULAGE_COMMISSION: 'gold',
+  };
+  const cls = map[status] || 'gray';
+  return `<span class="badge badge-${cls}">${status}</span>`;
+}
+
+function roleBadge(role) {
+  const map = { FARMER:'green', BUYER:'blue', TRADER:'gold', HAULAGE:'gold',
+    AGGREGATOR:'blue', PROCESSOR:'blue', EXPORTER:'blue', ADMIN:'red' };
+  return `<span class="badge badge-${map[role]||'gray'}">${role}</span>`;
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-NG', { day:'numeric', month:'short', year:'numeric' });
+}
+
+function fmtMoney(n) {
+  if (n == null) return '—';
+  return '₦' + Number(n).toLocaleString('en-NG', { minimumFractionDigits: 0 });
+}
+
+function renderPagination(containerId, meta, onNav) {
+  const { page, limit, total } = meta;
+  const pages = Math.ceil(total / limit);
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  el.innerHTML = `
+    <button onclick="${onNav}(${page-1})" ${page <= 1 ? 'disabled' : ''}>← Prev</button>
+    <span>Page ${page} of ${pages} &nbsp;·&nbsp; ${total} total</span>
+    <button onclick="${onNav}(${page+1})" ${page >= pages ? 'disabled' : ''}>Next →</button>
+  `;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PAGE: DASHBOARD
+═══════════════════════════════════════════════════════════ */
+async function dashboard() {
+  const c = document.getElementById('content');
+  c.innerHTML = `<div class="loading">Loading stats </div>`;
+  try {
+    const s = await apiFetch('/admin/stats');
+    c.innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card stat-green">
+          <div class="label">Total Users</div>
+          <div class="value">${s.users.total}</div>
+          <div class="sub">${s.users.active} active · ${s.users.pendingVerification} pending</div>
+        </div>
+        <div class="stat-card stat-blue">
+          <div class="label">Products</div>
+          <div class="value">${s.products.published}</div>
+          <div class="sub">${s.products.total} total listings</div>
+        </div>
+        <div class="stat-card stat-gold">
+          <div class="label">Orders</div>
+          <div class="value">${s.orders.total}</div>
+          <div class="sub">${s.orders.pending} pending · ${s.orders.completed} completed</div>
+        </div>
+        <div class="stat-card stat-green">
+          <div class="label">Gross Revenue</div>
+          <div class="value" style="font-size:20px">${fmtMoney(s.revenue.total)}</div>
+          <div class="sub">All paid orders</div>
+        </div>
+        <div class="stat-card stat-green">
+          <div class="label">Fees Collected</div>
+          <div class="value" style="font-size:20px">${fmtMoney(s.fees.collected)}</div>
+          <div class="sub">Platform fees (all types)</div>
+        </div>
+        <div class="stat-card stat-red">
+          <div class="label">Open Disputes</div>
+          <div class="value">${s.disputes.open}</div>
+          <div class="sub"><a href="#" onclick="showPage('disputes')" style="color:var(--red-600)">View queue →</a></div>
+        </div>
+        <div class="stat-card stat-gold">
+          <div class="label">Open Haulage Jobs</div>
+          <div class="value">${s.haulageJobs.open}</div>
+          <div class="sub">Awaiting haulage providers</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex-wrap:wrap">
+        <div class="table-card" style="padding:20px">
+          <h3 style="margin-bottom:14px;font-size:14px">Quick Actions</h3>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button class="btn btn-green" onclick="showPage('products')">📦 Review Product Listings</button>
+            <button class="btn btn-gold"  onclick="showPage('disputes')">⚖️ Handle Disputes (${s.disputes.open})</button>
+            <button class="btn btn-ghost" onclick="showPage('users')">👥 Manage Users</button>
+            <button class="btn btn-ghost" onclick="showPage('fees')">💰 View Fees</button>
+          </div>
+        </div>
+        <div class="table-card" style="padding:20px">
+          <h3 style="margin-bottom:14px;font-size:14px">Platform Summary</h3>
+          <table><tbody>
+            <tr><td style="color:var(--gray-500)">Transaction fee rate</td><td><b>2.05%</b></td></tr>
+            <tr><td style="color:var(--gray-500)">Haulage commission</td><td><b>5%</b></td></tr>
+            <tr><td style="color:var(--gray-500)">Farmer reg. fee</td><td><b>₦2,000</b></td></tr>
+            <tr><td style="color:var(--gray-500)">Haulage reg. fee</td><td><b>₦3,000</b></td></tr>
+            <tr><td style="color:var(--gray-500)">Exporter reg. fee</td><td><b>₦5,000</b></td></tr>
+            <tr><td style="color:var(--gray-500)">Buyer reg. fee</td><td><b>Free</b></td></tr>
+          </tbody></table>
+        </div>
+      </div>
+    `;
+  } catch(e) {
+    c.innerHTML = `<div class="empty">Failed to load stats: ${e.message}</div>`;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PAGE: USERS
+═══════════════════════════════════════════════════════════ */
+async function users(pg) {
+  const s = pageState.users;
+  if (pg !== undefined) s.page = pg;
+
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Users</h3>
+        <div class="table-controls">
+          <input id="user-search" placeholder="Search name / phone / email…"
+            value="${s.search}" onkeydown="if(event.key==='Enter'){pageState.users.search=this.value;users(1)}" />
+          <select id="user-role" onchange="pageState.users.role=this.value;users(1)">
+            <option value="">All Roles</option>
+            ${['FARMER','BUYER','TRADER','AGGREGATOR','PROCESSOR','EXPORTER','HAULAGE','ADMIN']
+              .map(r=>`<option ${s.role===r?'selected':''}>${r}</option>`).join('')}
+          </select>
+          <select id="user-status" onchange="pageState.users.status=this.value;users(1)">
+            <option value="">All Status</option>
+            ${['ACTIVE','INACTIVE','SUSPENDED','PENDING_VERIFICATION']
+              .map(r=>`<option ${s.status===r?'selected':''}>${r}</option>`).join('')}
+          </select>
+          <button class="btn btn-ghost" onclick="pageState.users.search=document.getElementById('user-search').value;users(1)">🔍</button>
+        </div>
+      </div>
+      <div id="users-table-body"><div class="loading">Loading users </div></div>
+      <div class="pagination" id="users-pagination"></div>
+    </div>
+  `;
+
+  try {
+    const q = buildQuery({ page: s.page, limit: 30, role: s.role, status: s.status, search: s.search });
+    const { data, meta } = await apiFetch('/admin/users' + q);
+    const tbody = document.getElementById('users-table-body');
+
+    if (!data.length) { tbody.innerHTML = '<div class="empty">No users found.</div>'; return; }
+
+    tbody.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th><th>Phone</th><th>Role</th><th>Status</th>
+            <th>Phone Verified</th><th>Verified Badge</th><th>Joined</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.map(u => `
+          <tr>
+            <td><b>${u.firstName} ${u.lastName}</b>${u.email?`<br><span style="color:var(--gray-500);font-size:11px">${u.email}</span>`:''}</td>
+            <td class="mono">${u.phone}</td>
+            <td>${roleBadge(u.role)}</td>
+            <td>${statusBadge(u.status)}</td>
+            <td>${u.verification?.phoneVerified ? '✅' : '—'}</td>
+            <td>${u.verification?.identityStatus === 'VERIFIED'
+              ? '<span class="badge badge-green">✓ Verified</span>'
+              : '<span class="badge badge-gray">Unverified</span>'}</td>
+            <td>${fmtDate(u.createdAt)}</td>
+            <td>
+              ${u.verification?.identityStatus !== 'VERIFIED'
+                ? `<button class="btn btn-sm btn-green" onclick="grantBadge('${u.id}','${u.firstName} ${u.lastName}')">✓ Verify</button>`
+                : `<button class="btn btn-sm btn-ghost"  onclick="revokeBadge('${u.id}','${u.firstName} ${u.lastName}')">Revoke</button>`
+              }
+              ${u.status !== 'SUSPENDED'
+                ? `<button class="btn btn-sm btn-red"   onclick="suspendUser('${u.id}','${u.firstName}')">Suspend</button>`
+                : `<button class="btn btn-sm btn-ghost" onclick="activateUser('${u.id}','${u.firstName}')">Reactivate</button>`
+              }
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    `;
+    renderPagination('users-pagination', meta, 'users');
+  } catch(e) {
+    document.getElementById('users-table-body').innerHTML =
+      `<div class="empty">Failed: ${e.message}</div>`;
+  }
+}
+
+async function grantBadge(userId, name) {
+  openModal(
+    '✅ Grant Verified Badge',
+    `<p>Grant the <b>Verified Seller</b> badge to <b>${name}</b>?<br><br>
+     Their listings will show a ✓ verified badge on the marketplace.</p>`,
+    async () => {
+      await apiFetch(`/admin/users/${userId}/verified`, 'PATCH', { verified: true });
+      toast(`${name} is now verified ✓`, 'success');
+      users();
+    },
+    'Grant Badge', 'btn-green',
+  );
+}
+async function revokeBadge(userId, name) {
+  openModal(
+    '⚠️ Revoke Verified Badge',
+    `<p>Remove the verified badge from <b>${name}</b>?</p>`,
+    async () => {
+      await apiFetch(`/admin/users/${userId}/verified`, 'PATCH', { verified: false });
+      toast(`Badge removed from ${name}`, '');
+      users();
+    },
+    'Revoke', 'btn-red',
+  );
+}
+async function suspendUser(userId, name) {
+  openModal(
+    '🚫 Suspend User',
+    `<p>Suspend <b>${name}</b>'s account? They will not be able to log in.</p>`,
+    async () => {
+      await apiFetch(`/admin/users/${userId}/status`, 'PATCH', { status: 'SUSPENDED' });
+      toast(`${name} suspended`, 'error');
+      users();
+    },
+    'Suspend', 'btn-red',
+  );
+}
+async function activateUser(userId, name) {
+  openModal(
+    '✅ Reactivate User',
+    `<p>Reactivate <b>${name}</b>'s account?</p>`,
+    async () => {
+      await apiFetch(`/admin/users/${userId}/status`, 'PATCH', { status: 'ACTIVE' });
+      toast(`${name} reactivated`, 'success');
+      users();
+    },
+    'Reactivate', 'btn-green',
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PAGE: PRODUCTS
+═══════════════════════════════════════════════════════════ */
+async function products(pg) {
+  const s = pageState.products;
+  if (pg !== undefined) s.page = pg;
+
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Products</h3>
+        <div class="table-controls">
+          <input id="prod-search" placeholder="Search products…"
+            value="${s.search}" onkeydown="if(event.key==='Enter'){pageState.products.search=this.value;products(1)}" />
+          <select id="prod-status" onchange="pageState.products.status=this.value;products(1)">
+            <option value="">All Status</option>
+            ${['DRAFT','PUBLISHED','PAUSED','DELETED']
+              .map(r=>`<option ${s.status===r?'selected':''}>${r}</option>`).join('')}
+          </select>
+          <button class="btn btn-ghost" onclick="pageState.products.search=document.getElementById('prod-search').value;products(1)">🔍</button>
+        </div>
+      </div>
+      <div id="products-table-body"><div class="loading">Loading products </div></div>
+      <div class="pagination" id="products-pagination"></div>
+    </div>
+  `;
+
+  try {
+    const q = buildQuery({ page: s.page, limit: 30, status: s.status, search: s.search });
+    const { data, meta } = await apiFetch('/admin/products' + q);
+    const tbody = document.getElementById('products-table-body');
+
+    if (!data.length) { tbody.innerHTML = '<div class="empty">No products found.</div>'; return; }
+
+    tbody.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th><th>Category</th><th>Seller</th><th>Price</th>
+            <th>Qty</th><th>State</th><th>Status</th><th>Created</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.map(p => `
+          <tr>
+            <td><b>${p.name}</b></td>
+            <td>${p.category?.name || '—'}</td>
+            <td>${p.seller?.firstName||''} ${p.seller?.lastName||''}<br>
+              <span class="mono" style="font-size:11px">${p.seller?.phone||''}</span></td>
+            <td>${fmtMoney(p.price)}/${p.priceUnit}</td>
+            <td>${p.quantity} ${p.quantityUnit}</td>
+            <td>${p.state}</td>
+            <td>${statusBadge(p.status)}</td>
+            <td>${fmtDate(p.createdAt)}</td>
+            <td>
+              ${p.status !== 'PUBLISHED'
+                ? `<button class="btn btn-sm btn-green" onclick="approveProduct('${p.id}','${p.name.replace(/'/g,'&apos;')}')">✅ Approve</button>`
+                : ''}
+              ${p.status === 'PUBLISHED'
+                ? `<button class="btn btn-sm btn-red" onclick="rejectProduct('${p.id}','${p.name.replace(/'/g,'&apos;')}')">Pause</button>`
+                : ''}
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    `;
+    renderPagination('products-pagination', meta, 'products');
+  } catch(e) {
+    document.getElementById('products-table-body').innerHTML =
+      `<div class="empty">Failed: ${e.message}</div>`;
+  }
+}
+
+async function approveProduct(id, name) {
+  openModal(
+    '✅ Approve Listing',
+    `<p>Publish <b>${name}</b> to the marketplace? It will be visible to all buyers.</p>`,
+    async () => {
+      await apiFetch(`/admin/products/${id}/approve`, 'PATCH');
+      toast(`"${name}" approved`, 'success');
+      products();
+    },
+    'Approve', 'btn-green',
+  );
+}
+async function rejectProduct(id, name) {
+  openModal(
+    '⚠️ Pause Listing',
+    `<p>Pause <b>${name}</b>? The seller will be notified.</p>
+     <div class="modal-field" style="margin-top:16px">
+       <label>Reason (shown to seller)</label>
+       <textarea id="reject-reason" rows="2" placeholder="e.g. Missing product images, incomplete description…"></textarea>
+     </div>`,
+    async () => {
+      const reason = document.getElementById('reject-reason').value || 'Does not meet listing standards';
+      await apiFetch(`/admin/products/${id}/reject`, 'PATCH', { reason });
+      toast(`"${name}" paused`, '');
+      products();
+    },
+    'Pause Listing', 'btn-red',
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PAGE: ORDERS
+═══════════════════════════════════════════════════════════ */
+async function orders(pg) {
+  const s = pageState.orders;
+  if (pg !== undefined) s.page = pg;
+
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Orders</h3>
+        <div class="table-controls">
+          <input id="order-search" placeholder="Order number…"
+            value="${s.search}" onkeydown="if(event.key==='Enter'){pageState.orders.search=this.value;orders(1)}" />
+          <select id="order-status" onchange="pageState.orders.status=this.value;orders(1)">
+            <option value="">All Status</option>
+            ${['PENDING','CONFIRMED','PROCESSING','READY_FOR_PICKUP','PICKED_UP',
+               'IN_TRANSIT','DELIVERED','COMPLETED','CANCELLED','DISPUTED','REFUNDED']
+              .map(r=>`<option ${s.status===r?'selected':''}>${r}</option>`).join('')}
+          </select>
+          <button class="btn btn-ghost" onclick="pageState.orders.search=document.getElementById('order-search').value;orders(1)">🔍</button>
+        </div>
+      </div>
+      <div id="orders-table-body"><div class="loading">Loading orders </div></div>
+      <div class="pagination" id="orders-pagination"></div>
+    </div>
+  `;
+
+  try {
+    const q = buildQuery({ page: s.page, limit: 30, status: s.status, search: s.search });
+    const { data, meta } = await apiFetch('/admin/orders' + q);
+    const tbody = document.getElementById('orders-table-body');
+
+    if (!data.length) { tbody.innerHTML = '<div class="empty">No orders found.</div>'; return; }
+
+    tbody.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Order #</th><th>Buyer</th><th>Seller</th>
+            <th>Total</th><th>Items</th><th>Payment</th><th>Status</th><th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.map(o => `
+          <tr>
+            <td class="mono">${o.orderNumber}</td>
+            <td>${o.buyer?.firstName||''} ${o.buyer?.lastName||''}<br>
+              <span class="mono" style="font-size:11px">${o.buyer?.phone||''}</span></td>
+            <td>${o.seller?.firstName||''} ${o.seller?.lastName||''}<br>
+              <span class="mono" style="font-size:11px">${o.seller?.phone||''}</span></td>
+            <td><b>${fmtMoney(o.total)}</b></td>
+            <td>${o._count?.items ?? '—'}</td>
+            <td>${statusBadge(o.paymentStatus)}</td>
+            <td>${statusBadge(o.status)}</td>
+            <td>${fmtDate(o.createdAt)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    `;
+    renderPagination('orders-pagination', meta, 'orders');
+  } catch(e) {
+    document.getElementById('orders-table-body').innerHTML =
+      `<div class="empty">Failed: ${e.message}</div>`;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PAGE: FEES
+═══════════════════════════════════════════════════════════ */
+async function fees(pg) {
+  const s = pageState.fees;
+  if (pg !== undefined) s.page = pg;
+
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="table-card">
+      <div class="table-header">
+        <h3>Platform Fees</h3>
+        <div class="table-controls">
+          <select id="fee-type" onchange="pageState.fees.type=this.value;fees(1)">
+            <option value="">All Types</option>
+            ${['REGISTRATION','TRANSACTION','HAULAGE_COMMISSION','LISTING']
+              .map(r=>`<option ${s.type===r?'selected':''}>${r}</option>`).join('')}
+          </select>
+          <select id="fee-status" onchange="pageState.fees.status=this.value;fees(1)">
+            <option value="">All Status</option>
+            ${['PENDING','PAID','WAIVED','FAILED']
+              .map(r=>`<option ${s.status===r?'selected':''}>${r}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div id="fees-table-body"><div class="loading">Loading fees </div></div>
+      <div class="pagination" id="fees-pagination"></div>
+    </div>
+  `;
+
+  try {
+    const q = buildQuery({ page: s.page, limit: 30, type: s.type, status: s.status });
+    const { data, meta, summary } = await apiFetch('/admin/fees' + q);
+    const tbody = document.getElementById('fees-table-body');
+
+    /* Summary row */
+    const summaryHtml = summary?.length
+      ? `<div style="padding:14px 20px;border-bottom:1px solid var(--gray-100);display:flex;gap:16px;flex-wrap:wrap">
+          ${summary.map(r => `
+            <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:8px 14px;text-align:center">
+              <div style="font-size:11px;color:var(--gray-500)">${r.type} · ${r.status}</div>
+              <div style="font-weight:700">${fmtMoney(r._sum.amount)} (${r._count})</div>
+            </div>
+          `).join('')}
+         </div>` : '';
+
+    if (!data.length) {
+      tbody.innerHTML = summaryHtml + '<div class="empty">No fee records found.</div>';
+      return;
+    }
+
+    tbody.innerHTML = summaryHtml + `
+      <table>
+        <thead>
+          <tr>
+            <th>User</th><th>Role</th><th>Type</th><th>Amount</th>
+            <th>Status</th><th>Reference</th><th>Created</th><th>Paid At</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.map(f => `
+          <tr>
+            <td>${f.user?.firstName||''} ${f.user?.lastName||''}<br>
+              <span class="mono" style="font-size:11px">${f.user?.phone||''}</span></td>
+            <td>${roleBadge(f.user?.role||'')}</td>
+            <td>${statusBadge(f.type)}</td>
+            <td><b>${fmtMoney(f.amount)}</b></td>
+            <td>${statusBadge(f.status)}</td>
+            <td class="mono" style="font-size:11px">${f.referenceId||'—'}</td>
+            <td>${fmtDate(f.createdAt)}</td>
+            <td>${fmtDate(f.paidAt)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    `;
+    renderPagination('fees-pagination', meta, 'fees');
+  } catch(e) {
+    document.getElementById('fees-table-body').innerHTML =
+      `<div class="empty">Failed: ${e.message}</div>`;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PAGE: DISPUTES
+═══════════════════════════════════════════════════════════ */
+async function disputes(pg) {
+  const s = pageState.disputes;
+  if (pg !== undefined) s.page = pg;
+
+  const c = document.getElementById('content');
+  c.innerHTML = `
+    <div class="table-card">
+      <div class="table-header">
+        <h3>⚖️ Dispute Queue — Orders with status DISPUTED</h3>
+      </div>
+      <div id="disputes-table-body"><div class="loading">Loading disputes </div></div>
+      <div class="pagination" id="disputes-pagination"></div>
+    </div>
+  `;
+
+  try {
+    const q = buildQuery({ page: s.page, limit: 20 });
+    const { data, meta } = await apiFetch('/admin/disputes' + q);
+    const tbody = document.getElementById('disputes-table-body');
+
+    if (!data.length) {
+      tbody.innerHTML = `
+        <div style="padding:60px;text-align:center">
+          <div style="font-size:40px;margin-bottom:12px">✅</div>
+          <div style="font-size:15px;font-weight:700;color:var(--gray-700)">No open disputes</div>
+          <div style="color:var(--gray-500);margin-top:6px">All disputes have been resolved.</div>
+        </div>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Order #</th><th>Buyer</th><th>Seller</th><th>Items</th>
+            <th>Total</th><th>Date</th><th>Resolve</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${data.map(o => `
+          <tr>
+            <td class="mono">${o.orderNumber}</td>
+            <td>${o.buyer?.firstName||''} ${o.buyer?.lastName||''}<br>
+              <a href="tel:${o.buyer?.phone}" class="mono" style="font-size:11px;color:var(--green-700)">${o.buyer?.phone||''}</a></td>
+            <td>${o.seller?.firstName||''} ${o.seller?.lastName||''}<br>
+              <a href="tel:${o.seller?.phone}" class="mono" style="font-size:11px;color:var(--green-700)">${o.seller?.phone||''}</a></td>
+            <td>${(o.items||[]).map(i=>i.product?.name).filter(Boolean).join(', ') || '—'}</td>
+            <td><b>${fmtMoney(o.total)}</b></td>
+            <td>${fmtDate(o.updatedAt)}</td>
+            <td>
+              <button class="btn btn-sm btn-green" onclick="resolveDispute('${o.id}','${o.orderNumber}','COMPLETED')">✅ Complete</button>
+              <button class="btn btn-sm btn-ghost" onclick="resolveDispute('${o.id}','${o.orderNumber}','REFUNDED')">↩️ Refund</button>
+              <button class="btn btn-sm btn-red"   onclick="resolveDispute('${o.id}','${o.orderNumber}','CANCELLED')">❌ Cancel</button>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    `;
+    renderPagination('disputes-pagination', meta, 'disputes');
+  } catch(e) {
+    document.getElementById('disputes-table-body').innerHTML =
+      `<div class="empty">Failed: ${e.message}</div>`;
+  }
+}
+
+function resolveDispute(orderId, orderNumber, resolution) {
+  const labels = { COMPLETED: '✅ Mark Completed', REFUNDED: '↩️ Issue Refund', CANCELLED: '❌ Cancel Order' };
+  const classes = { COMPLETED: 'btn-green', REFUNDED: 'btn-ghost', CANCELLED: 'btn-red' };
+  const descriptions = {
+    COMPLETED: 'The dispute is resolved in the seller\'s favour. Order will be marked COMPLETED.',
+    REFUNDED:  'The dispute is resolved in the buyer\'s favour. Order will be marked REFUNDED.',
+    CANCELLED: 'Cancel this order. Both parties will be notified.',
+  };
+  openModal(
+    `Resolve Dispute — #${orderNumber}`,
+    `<p>${descriptions[resolution]}</p>
+     <p style="margin-top:12px;font-size:12px;color:var(--gray-500)">
+       Both the buyer and seller will receive a notification.
+     </p>`,
+    async () => {
+      await apiFetch(`/admin/disputes/${orderId}/resolve`, 'PATCH', { resolution });
+      toast(`Dispute resolved: ${resolution}`, resolution === 'COMPLETED' ? 'success' : '');
+      disputes();
+    },
+    labels[resolution], classes[resolution],
+  );
+}
+</script>
+</body>
+</html>

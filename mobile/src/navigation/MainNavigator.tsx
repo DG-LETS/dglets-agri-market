@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator }     from '@react-navigation/stack';
 import { useQuery }  from '@tanstack/react-query';
 import { Colors, Typography, Spacing } from '@theme/index';
+import { useSettingsStore } from '@store/settingsStore';
 import { useCartStore } from '@store/cartStore';
 import { useAuthStore } from '@store/authStore';
 
@@ -21,9 +22,10 @@ import { InboxScreen }          from '@screens/main/InboxScreen';
 import { ChatScreen }           from '@screens/main/ChatScreen';
 import { ProfileScreen }        from '@screens/main/ProfileScreen';
 import { EditProfileScreen }    from '@screens/main/EditProfileScreen';
-import { SellerDashboardScreen } from '@screens/main/SellerDashboardScreen';
-import { SavedProductsScreen }  from '@screens/main/SavedProductsScreen';
-import { HaulageJobsScreen }    from '@screens/main/HaulageJobsScreen';
+import { SellerDashboardScreen }          from '@screens/main/SellerDashboardScreen';
+import { SavedProductsScreen }           from '@screens/main/SavedProductsScreen';
+import { HaulageJobsScreen }             from '@screens/main/HaulageJobsScreen';
+import { HaulageProviderDashboardScreen } from '@screens/main/HaulageProviderDashboardScreen';
 import { notificationsApi, messagesApi } from '@services/api';
 
 /* ══════════════════════════════════════
@@ -49,14 +51,22 @@ export type MarketStackParamList = {
 export type OrdersStackParamList = {
   OrdersList:  undefined;
   OrderDetail: { orderId: string };
-  RateReview:  { orderId: string; subjectId: string; subjectName: string; isBuyer: boolean };
+  RateReview:  {
+    orderId:      string;
+    haulageJobId?: string;     /* set for haulage-provider ratings */
+    subjectId:    string;
+    subjectName:  string;
+    isBuyer:      boolean;
+    isHaulageRating?: boolean; /* controls label copy */
+  };
 };
 
 export type ProfileStackParamList = {
-  ProfileHome:     undefined;
-  EditProfile:     { section?: 'basic' | 'farmer' | 'buyer' } | undefined;
-  SellerDashboard: undefined;
-  SavedProducts:   undefined;
+  ProfileHome:              undefined;
+  EditProfile:              { section?: 'basic' | 'farmer' | 'buyer' } | undefined;
+  SellerDashboard:          undefined;
+  HaulageProviderDashboard: undefined;
+  SavedProducts:            undefined;
 };
 
 export type MessagesStackParamList = {
@@ -124,10 +134,11 @@ const ProfileStack = createStackNavigator<ProfileStackParamList>();
 function ProfileNavigator() {
   return (
     <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
-      <ProfileStack.Screen name="ProfileHome"     component={ProfileScreen} />
-      <ProfileStack.Screen name="EditProfile"     component={EditProfileScreen} />
-      <ProfileStack.Screen name="SellerDashboard" component={SellerDashboardScreen} />
-      <ProfileStack.Screen name="SavedProducts"   component={SavedProductsScreen} />
+      <ProfileStack.Screen name="ProfileHome"              component={ProfileScreen} />
+      <ProfileStack.Screen name="EditProfile"              component={EditProfileScreen} />
+      <ProfileStack.Screen name="SellerDashboard"          component={SellerDashboardScreen} />
+      <ProfileStack.Screen name="HaulageProviderDashboard" component={HaulageProviderDashboardScreen} />
+      <ProfileStack.Screen name="SavedProducts"            component={SavedProductsScreen} />
     </ProfileStack.Navigator>
   );
 }
@@ -159,6 +170,8 @@ function TabIcon({ emoji, label, focused, badge }: {
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export function MainNavigator() {
+  const { darkMode } = useSettingsStore();
+
   /* Unread notifications → Orders tab badge */
   const { data: notifData } = useQuery({
     queryKey: ['notifications-meta'],
@@ -189,7 +202,7 @@ export function MainNavigator() {
     <Tab.Navigator
       screenOptions={{
         headerShown:     false,
-        tabBarStyle:     tabStyles.bar,
+        tabBarStyle:     [tabStyles.bar, darkMode && tabStyles.barDark],
         tabBarShowLabel: false,
       }}
     >
@@ -261,6 +274,7 @@ export function MainNavigator() {
 
 const tabStyles = StyleSheet.create({
   bar:          { backgroundColor: Colors.white, borderTopWidth: 1, borderTopColor: Colors.border, height: 70, paddingBottom: 10, paddingTop: 8 },
+  barDark:      { backgroundColor: '#111f16', borderTopColor: '#1e3526' },
   item:         { alignItems: 'center', justifyContent: 'center', gap: 3 },
   emoji:        { fontSize: 22, opacity: 0.45 },
   emojiActive:  { opacity: 1 },

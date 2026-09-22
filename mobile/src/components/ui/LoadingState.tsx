@@ -1,23 +1,28 @@
 import React from 'react';
 import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
-import { Colors, Typography, Spacing } from '@theme/index';
+import { useThemeColors, Typography, Spacing } from '@theme/index';
 
 interface LoadingStateProps {
-  message?: string;
+  message?:    string;
   fullScreen?: boolean;
 }
 
 export function LoadingState({ message, fullScreen = false }: LoadingStateProps) {
+  const C = useThemeColors();
   return (
-    <View style={[styles.container, fullScreen && styles.fullScreen]}>
-      <ActivityIndicator size="large" color={Colors.green[700]} />
-      {message && <Text style={styles.message}>{message}</Text>}
+    <View style={[
+      styles.container,
+      fullScreen && { flex: 1, backgroundColor: C.background },
+    ]}>
+      <ActivityIndicator size="large" color={C.green[700]} />
+      {message && (
+        <Text style={[styles.message, { color: C.textMuted }]}>{message}</Text>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container:  { alignItems: 'center', justifyContent: 'center', padding: Spacing[8] },
-  fullScreen: { flex: 1, backgroundColor: Colors.white },
-  message:    { ...Typography.bodyMedium, color: Colors.textMuted, marginTop: Spacing[3] },
+  container: { alignItems: 'center', justifyContent: 'center', padding: Spacing[8] },
+  message:   { ...Typography.bodyMedium, marginTop: Spacing[3] },
 });

@@ -1,14 +1,53 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { PushService }   from './push.service';
 
 @Injectable()
 export class NotificationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly push:   PushService,
+  ) {}
 
-  async create(userId: string, type: string, title: string, body: string, data?: any) {
-    return this.prisma.notification.create({
+  /**
+   * Create a DB notification AND fire a push notification.
+   * Push failures are non-fatal — the DB record is always created first.
+   */
+  async create(
+    userId: string,
+    type:   string,
+    title:  string,
+    body:   string,
+    data?:  any,
+  ) {
+    const notification = await this.prisma.notification.create({
       data: { userId, type: type as any, title, body, data },
     });
+
+    /* Fire push — non-blocking, errors swallowed inside PushService */
+    this.push.sendToUser(userId, title, body, data ?? {}).catch(() => {});
+
+    return notification;
+  }
+
+  /** Create notification for multiple users at once (e.g. new haulage job broadcast) */
+  async createBulk(
+    userIds: string[],
+    type:    string,
+    title:   string,
+    body:    string,
+    data?:   any,
+  ) {
+    if (userIds.length === 0) return;
+
+    await this.prisma.notification.createMany({
+      data: userIds.map(userId => ({
+        userId, type: type as any, title, body, data,
+      })),
+      skipDuplicates: true,
+    });
+
+    await this.push.sendToUsers(userIds, title, body, data ?? {}).catch(() => {});
   }
 
   async getMyNotifications(userId: string, page = 1, limit = 20) {

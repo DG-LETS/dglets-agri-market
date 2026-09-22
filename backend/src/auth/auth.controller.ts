@@ -67,10 +67,10 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Logout and revoke refresh token' })
   logout(@Body() dto: RefreshTokenDto) {
+    /* No JWT guard — the refresh token itself is the credential for logout.
+       This prevents a 401 loop when the access token has already expired. */
     return this.authService.logout(dto.refreshToken);
   }
 

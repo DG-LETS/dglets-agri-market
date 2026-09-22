@@ -1,7 +1,8 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -16,23 +17,31 @@ async function bootstrap() {
   /* API versioning */
   app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
 
-  /* CORS */
+  /* CORS — locked to CORS_ORIGIN env var; never defaults to * in production */
+  const corsOrigin = configService.get<string>('CORS_ORIGIN', '');
   app.enableCors({
-    origin: configService.get<string>('CORS_ORIGIN', '*'),
+    origin: corsOrigin === '*' || !corsOrigin ? corsOrigin || true : corsOrigin.split(',').map(s => s.trim()),
     credentials: true,
   });
 
   /* Global validation pipe */
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      transformOptions: { enableImplicitConversion: true },
+      whitelist:              true,
+      forbidNonWhitelisted:   true,
+      transform:              true,
+      transformOptions:       { enableImplicitConversion: true },
     }),
   );
 
-  /* Swagger API docs */
+  /* ── Global rate-limiting guard ──
+     Enforces ThrottlerModule tiers defined in AppModule.
+     The /health endpoint is excluded via @SkipThrottle() on its controller.
+  ── */
+  const reflector = app.get(Reflector);
+  app.useGlobalGuards(new ThrottlerGuard({}, undefined as any, reflector));
+
+  /* Swagger API docs — dev only */
   if (configService.get<string>('NODE_ENV') !== 'production') {
     const config = new DocumentBuilder()
       .setTitle('DG-LETS Agri Market API')
@@ -46,7 +55,9 @@ async function bootstrap() {
 
   await app.listen(port);
   console.log(`\n🌾 DG-LETS Agri Market API running on: http://localhost:${port}/api`);
-  console.log(`📖 API Docs: http://localhost:${port}/api/docs\n`);
+  if (configService.get<string>('NODE_ENV') !== 'production') {
+    console.log(`📖 API Docs: http://localhost:${port}/api/docs\n`);
+  }
 }
 
 bootstrap();

@@ -1,26 +1,28 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors, Typography, Spacing } from '@theme/index';
+import { useThemeColors, Typography, Spacing } from '@theme/index';
 
 interface ScreenHeaderProps {
-  title:        string;
-  subtitle?:    string;
-  showBack?:    boolean;
-  onBack?:      () => void;
+  title:         string;
+  subtitle?:     string;
+  showBack?:     boolean;
+  onBack?:       () => void;
   rightElement?: React.ReactNode;
-  dark?:        boolean;
+  dark?:         boolean;
 }
 
 export function ScreenHeader({
   title, subtitle, showBack, onBack, rightElement, dark = false,
 }: ScreenHeaderProps) {
   const insets = useSafeAreaInsets();
-  const bg     = dark ? Colors.green[700] : Colors.white;
-  const fg     = dark ? Colors.white : Colors.textPrimary;
+  const C      = useThemeColors();
+
+  const bg = dark ? C.green[700] : C.white;
+  const fg = dark ? '#ffffff' : C.textPrimary;
 
   return (
-    <View style={[styles.container, { backgroundColor: bg, paddingTop: insets.top + Spacing[2] }]}>
+    <View style={[styles.container, { backgroundColor: bg, borderBottomColor: C.border, paddingTop: insets.top + Spacing[2] }]}>
       <StatusBar barStyle={dark ? 'light-content' : 'dark-content'} backgroundColor={bg} />
       <View style={styles.inner}>
         <View style={styles.left}>
@@ -31,7 +33,11 @@ export function ScreenHeader({
           )}
           <View>
             <Text style={[styles.title, { color: fg }]}>{title}</Text>
-            {subtitle && <Text style={[styles.subtitle, { color: dark ? 'rgba(255,255,255,.75)' : Colors.textMuted }]}>{subtitle}</Text>}
+            {subtitle && (
+              <Text style={[styles.subtitle, { color: dark ? 'rgba(255,255,255,.75)' : C.textMuted }]}>
+                {subtitle}
+              </Text>
+            )}
           </View>
         </View>
         {rightElement && <View style={styles.right}>{rightElement}</View>}
@@ -41,7 +47,7 @@ export function ScreenHeader({
 }
 
 const styles = StyleSheet.create({
-  container: { borderBottomWidth: 1, borderBottomColor: Colors.border },
+  container: { borderBottomWidth: 1 },
   inner:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: Spacing[5], paddingBottom: Spacing[3] },
   left:      { flexDirection: 'row', alignItems: 'center', flex: 1 },
   backBtn:   { marginRight: Spacing[3] },

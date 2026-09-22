@@ -6,7 +6,7 @@ import { HaulageService } from './haulage.service';
 import { JwtAuthGuard }   from '../auth/guards/jwt-auth.guard';
 import { CurrentUser }    from '../auth/decorators/current-user.decorator';
 
-@Controller('haulage')
+@Controller({ path: 'haulage', version: '1' })
 @UseGuards(JwtAuthGuard)
 export class HaulageController {
   constructor(private readonly haulage: HaulageService) {}

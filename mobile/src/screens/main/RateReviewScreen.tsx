@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
   TouchableOpacity, TextInput, Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Colors, Typography, Spacing, Radius, Shadow } from '@theme/index';
+import { useThemeColors, Typography, Spacing, Radius, Shadow } from '@theme/index';
 import { Button } from '@components/ui';
-import { api } from '@services/api';
+import { reviewsApi } from '@services/api';
 import { useAuthStore } from '@store/authStore';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import type { RouteProp } from '@react-navigation/native';
@@ -19,13 +19,13 @@ type Props = {
 };
 
 const RATING_LABELS = ['', 'Very Poor', 'Poor', 'Average', 'Good', 'Excellent'];
-const RATING_EMOJIS = ['', '😞', '😕', '😐', '😊', '🤩'];
+const RATING_EMOJIS = ['', 'ðŸ˜ž', 'ðŸ˜•', 'ðŸ˜', 'ðŸ˜Š', 'ðŸ¤©'];
 
 const QUICK_TAGS_BUYER  = ['Fresh produce', 'As described', 'Good packaging', 'Fast response', 'Trustworthy'];
 const QUICK_TAGS_SELLER = ['Prompt payment', 'Clear communication', 'Good buyer', 'Reliable'];
 
 export function RateReviewScreen({ navigation, route }: Props) {
-  const { orderId, subjectId, subjectName, isBuyer } = route.params as any;
+  const { orderId, haulageJobId, subjectId, subjectName, isBuyer, isHaulageRating } = route.params as any;
   const insets      = useSafeAreaInsets();
   const { user }    = useAuthStore();
   const queryClient = useQueryClient();
@@ -34,11 +34,14 @@ export function RateReviewScreen({ navigation, route }: Props) {
   const [comment,  setComment] = useState('');
   const [tags,     setTags]    = useState<string[]>([]);
 
-  const quickTags = isBuyer ? QUICK_TAGS_BUYER : QUICK_TAGS_SELLER;
+  const quickTags = isHaulageRating
+    ? ['On time', 'Careful with cargo', 'Good communication', 'Trustworthy', 'Professional']
+    : isBuyer ? QUICK_TAGS_BUYER : QUICK_TAGS_SELLER;
 
   const mutation = useMutation({
-    mutationFn: () => api.post('/reviews', {
-      orderId,
+    mutationFn: () => reviewsApi.submit({
+      orderId:      orderId || undefined,
+      haulageJobId: haulageJobId || undefined,
       subjectId,
       rating,
       comment: comment.trim() || undefined,
@@ -47,9 +50,12 @@ export function RateReviewScreen({ navigation, route }: Props) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['order', orderId] });
       queryClient.invalidateQueries({ queryKey: ['orders'] });
+      queryClient.invalidateQueries({ queryKey: ['haulage-active-jobs'] });
       Alert.alert(
-        '⭐ Review Submitted!',
-        'Thank you for your feedback. It helps build trust on DG-LETS.',
+        'â­ Review Submitted!',
+        isHaulageRating
+          ? 'Thank you! Your feedback helps maintain quality delivery standards.'
+          : 'Thank you for your feedback. It helps build trust on DG-LETS.',
         [{ text: 'OK', onPress: () => navigation.goBack() }],
       );
     },
@@ -75,7 +81,7 @@ export function RateReviewScreen({ navigation, route }: Props) {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Text style={styles.backText}>←</Text>
+          <Text style={styles.backText}>â†</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Rate & Review</Text>
         <View style={styles.backBtn} />
@@ -96,7 +102,7 @@ export function RateReviewScreen({ navigation, route }: Props) {
           </View>
           <View style={styles.subjectInfo}>
             <Text style={styles.subjectLabel}>
-              {isBuyer ? 'Rate the seller' : 'Rate the buyer'}
+              {isHaulageRating ? 'Rate the delivery driver' : isBuyer ? 'Rate the seller' : 'Rate the buyer'}
             </Text>
             <Text style={styles.subjectName}>{subjectName}</Text>
           </View>
@@ -114,7 +120,7 @@ export function RateReviewScreen({ navigation, route }: Props) {
                 activeOpacity={0.7}
               >
                 <Text style={[styles.star, star <= rating && styles.starFilled]}>
-                  {star <= rating ? '★' : '☆'}
+                  {star <= rating ? 'â˜…' : 'â˜†'}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -149,8 +155,8 @@ export function RateReviewScreen({ navigation, route }: Props) {
           <Text style={styles.sectionTitle}>Write a Review (optional)</Text>
           <TextInput
             style={styles.commentInput}
-            placeholder={`Share your experience with ${subjectName}…`}
-            placeholderTextColor={Colors.gray[400]}
+            placeholder={`Share your experience with ${subjectName}â€¦`}
+            placeholderTextColor={C.gray[400]}
             value={comment}
             onChangeText={setComment}
             multiline
@@ -163,7 +169,7 @@ export function RateReviewScreen({ navigation, route }: Props) {
         {/* Submit */}
         <View style={styles.section}>
           <Button
-            title={mutation.isPending ? 'Submitting…' : '⭐ Submit Review'}
+            title={mutation.isPending ? 'Submittingâ€¦' : 'â­ Submit Review'}
             onPress={handleSubmit}
             loading={mutation.isPending}
             disabled={rating === 0}
@@ -179,38 +185,39 @@ export function RateReviewScreen({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1, backgroundColor: Colors.background },
+  flex: { flex: 1, backgroundColor: C.background },
 
-  header:       { backgroundColor: Colors.white, flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing[5], paddingVertical: Spacing[4], borderBottomWidth: 1, borderBottomColor: Colors.border },
+  header:       { backgroundColor: C.white, flexDirection: 'row', alignItems: 'center', paddingHorizontal: Spacing[5], paddingVertical: Spacing[4], borderBottomWidth: 1, borderBottomColor: C.border },
   backBtn:      { width: 40 },
-  backText:     { fontSize: 22, color: Colors.textSecondary },
-  headerTitle:  { ...Typography.titleLarge, color: Colors.textPrimary, flex: 1, textAlign: 'center' },
+  backText:     { fontSize: 22, color: C.textSecondary },
+  headerTitle:  { ...Typography.titleLarge, color: C.textPrimary, flex: 1, textAlign: 'center' },
 
-  subjectCard:  { backgroundColor: Colors.white, margin: Spacing[4], borderRadius: Radius.xl, padding: Spacing[5], flexDirection: 'row', alignItems: 'center', gap: Spacing[4], borderWidth: 1, borderColor: Colors.border, ...Shadow.sm },
-  subjectAvatar:{ width: 56, height: 56, borderRadius: 28, backgroundColor: Colors.green[700], alignItems: 'center', justifyContent: 'center' },
-  subjectAvatarText: { ...Typography.headingMedium, color: Colors.white },
+  subjectCard:  { backgroundColor: C.white, margin: Spacing[4], borderRadius: Radius.xl, padding: Spacing[5], flexDirection: 'row', alignItems: 'center', gap: Spacing[4], borderWidth: 1, borderColor: C.border, ...Shadow.sm },
+  subjectAvatar:{ width: 56, height: 56, borderRadius: 28, backgroundColor: C.green[700], alignItems: 'center', justifyContent: 'center' },
+  subjectAvatarText: { ...Typography.headingMedium, color: C.white },
   subjectInfo:  { flex: 1 },
-  subjectLabel: { ...Typography.bodySmall, color: Colors.textMuted, marginBottom: 2 },
-  subjectName:  { ...Typography.titleLarge, color: Colors.textPrimary },
+  subjectLabel: { ...Typography.bodySmall, color: C.textMuted, marginBottom: 2 },
+  subjectName:  { ...Typography.titleLarge, color: C.textPrimary },
 
   section:      { paddingHorizontal: Spacing[4], marginBottom: Spacing[5] },
-  sectionTitle: { ...Typography.titleLarge, color: Colors.textPrimary, marginBottom: Spacing[4] },
+  sectionTitle: { ...Typography.titleLarge, color: C.textPrimary, marginBottom: Spacing[4] },
 
   starsRow:    { flexDirection: 'row', gap: Spacing[3], marginBottom: Spacing[3] },
   starBtn:     { padding: Spacing[1] },
-  star:        { fontSize: 40, color: Colors.gray[300] },
-  starFilled:  { color: Colors.gold[500] },
-  ratingLabel: { ...Typography.titleMedium, color: Colors.textSecondary },
+  star:        { fontSize: 40, color: C.gray[300] },
+  starFilled:  { color: C.gold[500] },
+  ratingLabel: { ...Typography.titleMedium, color: C.textSecondary },
 
   tagsRow:     { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing[2] },
-  tag:         { paddingHorizontal: Spacing[4], paddingVertical: Spacing[2], backgroundColor: Colors.white, borderRadius: 50, borderWidth: 1.5, borderColor: Colors.border },
-  tagActive:   { backgroundColor: Colors.green[700], borderColor: Colors.green[700] },
-  tagText:     { ...Typography.bodyMedium, color: Colors.textSecondary, fontWeight: '600' },
-  tagTextActive: { color: Colors.white },
+  tag:         { paddingHorizontal: Spacing[4], paddingVertical: Spacing[2], backgroundColor: C.white, borderRadius: 50, borderWidth: 1.5, borderColor: C.border },
+  tagActive:   { backgroundColor: C.green[700], borderColor: C.green[700] },
+  tagText:     { ...Typography.bodyMedium, color: C.textSecondary, fontWeight: '600' },
+  tagTextActive: { color: C.white },
 
-  commentInput:{ backgroundColor: Colors.white, borderWidth: 1.5, borderColor: Colors.border, borderRadius: Radius.lg, padding: Spacing[4], ...Typography.bodyLarge, color: Colors.textPrimary, textAlignVertical: 'top', minHeight: 120 },
-  charCount:   { ...Typography.caption, color: Colors.textMuted, textAlign: 'right', marginTop: Spacing[1] },
+  commentInput:{ backgroundColor: C.white, borderWidth: 1.5, borderColor: C.border, borderRadius: Radius.lg, padding: Spacing[4], ...Typography.bodyLarge, color: C.textPrimary, textAlignVertical: 'top', minHeight: 120 },
+  charCount:   { ...Typography.caption, color: C.textMuted, textAlign: 'right', marginTop: Spacing[1] },
 
   skipBtn:     { alignItems: 'center', marginTop: Spacing[4] },
-  skipText:    { ...Typography.bodyMedium, color: Colors.textMuted },
+  skipText:    { ...Typography.bodyMedium, color: C.textMuted },
 });
+
