@@ -54,12 +54,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set lowercase image tag
+      - name: Normalize image owner
         if: github.event_name == 'push'
         id: image
         shell: bash
         run: |
-          echo "name=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/dglets-backend:staging" >> "$GITHUB_OUTPUT"
+          echo "owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_OUTPUT"
 
       - name: Build and push ARM64 Docker image
         if: github.event_name == 'push'
@@ -68,4 +68,4 @@ jobs:
           context: ./backend
           push: true
           platforms: linux/arm64
-          tags: ${{ steps.image.outputs.name }}
+          tags: ghcr.io/${{ steps.image.outputs.owner }}/dglets-backend:staging
