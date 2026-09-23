@@ -1,8 +1,7 @@
-import { NestFactory, Reflector } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
-import { ThrottlerGuard } from '@nestjs/throttler';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -33,13 +32,6 @@ async function bootstrap() {
       transformOptions:       { enableImplicitConversion: true },
     }),
   );
-
-  /* ── Global rate-limiting guard ──
-     Enforces ThrottlerModule tiers defined in AppModule.
-     The /health endpoint is excluded via @SkipThrottle() on its controller.
-  ── */
-  const reflector = app.get(Reflector);
-  app.useGlobalGuards(new ThrottlerGuard({}, undefined as any, reflector));
 
   /* Swagger API docs — dev only */
   if (configService.get<string>('NODE_ENV') !== 'production') {
