@@ -1,0 +1,51 @@
+name: Backend CD - AWS Staging
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-cd.yml"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build ARM64 Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: false
+          platforms: linux/arm64
+          tags: dglets-backend:staging
+
+      - name: Deploy to AWS staging EC2
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.AWS_EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.AWS_EC2_SSH_KEY }}
+          script: |
+            set -e
+
+            cd ~/dglets-backend
+
+            docker stop dglets-backend 2>/dev/null || true
+            docker rm dglets-backend 2>/dev/null || true
+
+            docker pull ${{ secrets.DOCKER_IMAGE }}
+
+            docker run -d \
+              --name dglets-backend \
+              --restart unless-stopped \
+              -p 127.0.0.1:8080:8080 \
+              ${{ secrets.DOCKER_IMAGE }}
+
+            sleep 10
+
+            curl -f http://127.0.0.1:8080/health

@@ -10,6 +10,10 @@ on:
       - main
       - master
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   backend-ci:
     name: Build and Test Backend
@@ -42,5 +46,19 @@ jobs:
       - name: Run tests
         run: npm test -- --passWithNoTests
 
-      - name: Build Docker image
-        run: docker build -t dglets-backend:ci .
+      - name: Login to GitHub Container Registry
+        if: github.event_name == 'push'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push ARM64 Docker image
+        if: github.event_name == 'push'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          platforms: linux/arm64
+          tags: ghcr.io/${{ github.repository_owner }}/dglets-backend:staging
