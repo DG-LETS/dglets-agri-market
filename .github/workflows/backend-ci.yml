@@ -54,6 +54,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set lowercase image tag
+        if: github.event_name == 'push'
+        id: image
+        shell: bash
+        run: |
+          echo "name=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/dglets-backend:staging" >> "$GITHUB_OUTPUT"
+
       - name: Build and push ARM64 Docker image
         if: github.event_name == 'push'
         uses: docker/build-push-action@v6
@@ -61,4 +68,4 @@ jobs:
           context: ./backend
           push: true
           platforms: linux/arm64
-          tags: ghcr.io/${{ github.repository_owner }}/dglets-backend:staging
+          tags: ${{ steps.image.outputs.name }}
