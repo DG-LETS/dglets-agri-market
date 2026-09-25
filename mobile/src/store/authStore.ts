@@ -33,12 +33,17 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const accessToken  = await storage.getItem('accessToken');
       const refreshToken = await storage.getItem('refreshToken');
       if (accessToken && refreshToken) {
-        const { data } = await usersApi.getMe();
-        set({ user: data, accessToken, isAuthenticated: true });
+        try {
+          const { data } = await usersApi.getMe();
+          set({ user: data, accessToken, isAuthenticated: true });
+        } catch {
+          /* Backend unreachable (Render cold start) — clear tokens and show login */
+          await storage.deleteItem('accessToken');
+          await storage.deleteItem('refreshToken');
+        }
       }
     } catch {
-      await storage.deleteItem('accessToken');
-      await storage.deleteItem('refreshToken');
+      /* Storage error — fail gracefully */
     } finally {
       set({ isInitialized: true });
     }

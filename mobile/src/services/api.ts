@@ -17,8 +17,9 @@ const emitSessionExpired = () => sessionListeners.forEach(fn => fn());
 
 export const api = axios.create({
   baseURL: API_URL,
-  /* Short timeout in demo mode so failed requests fail fast, not slow */
-  timeout: API_URL.includes('localhost') || API_URL === 'http://10.217.112.100:3000/api/v1' ? 3000 : 15000,
+  /* Render free tier can take 50+ seconds to wake — give it time.
+     Local dev uses a short timeout so failures are fast. */
+  timeout: API_URL.includes('localhost') || API_URL === 'http://10.232.43.100:3000/api/v1' ? 3000 : 60000,
   headers: { 'Content-Type': 'application/json' },
 });
 
