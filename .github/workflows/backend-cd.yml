@@ -43,7 +43,7 @@ jobs:
             docker run -d \
               --name dglets-backend \
               --restart unless-stopped \
-              -p 127.0.0.1:8080:8080 \
+              -p 127.0.0.1:3000:3000 \
               ${{ secrets.DOCKER_IMAGE }}
 
             sleep 10
