@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Note from the Founder & CEO — DG-LETS Agri Market</title>
+  <meta name="description" content="A message from Emwenbun Daniel Osadolor, Founder & CEO of DG-LETS Agri Market. Our vision for the future of agricultural commerce in Nigeria." />
+  <link rel="icon" type="image/png" href="images/logo.png" />
+  <link rel="apple-touch-icon" href="images/logo.png" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* ── Mobile navbar override ── */
+    @media (max-width: 860px) {
+      .nav-cta-desktop              { display: none !important; }
+      .nav-logo-text .logo-sub      { display: none !important; }
+      .nav-links                    { display: none !important; }
+      .hamburger                    { display: flex !important; }
+      .btn-whatsapp-nav             { display: none !important; }
+      .nav-right .coming-soon-pill  { display: none !important; }
+      .nav-right .btn-download      { display: none !important; }
+      .nav-inner                    { height: 60px !important; }
+    }
+
+    /* ── Founder page specific styles ── */
+    .founder-hero {
+      background: linear-gradient(160deg, #0f2d1a 0%, #1e5c3a 60%, #2d7a4f 100%);
+      padding: 120px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .founder-hero::before {
+      content: '';
+      position: absolute;
+      top: -100px; right: -100px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(76,175,117,.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .founder-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -80px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(201,144,12,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .founder-hero-inner {
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 48px;
+      align-items: center;
+    }
+    .founder-eyebrow {
+      font-size: .8rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: #74c69d;
+      margin-bottom: 16px; display: block;
+    }
+    .founder-hero h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900; color: white;
+      letter-spacing: -.03em; line-height: 1.15;
+      margin-bottom: 20px;
+    }
+    .founder-hero h1 em {
+      font-style: normal;
+      background: linear-gradient(90deg, #74c69d, #52b788);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .founder-hero-desc {
+      font-size: 1.05rem; color: rgba(255,255,255,.75);
+      line-height: 1.75; max-width: 560px;
+    }
+    .founder-avatar-wrap {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 14px; flex-shrink: 0;
+    }
+    .founder-avatar {
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 4px solid rgba(255,255,255,.2);
+      box-shadow: 0 0 0 8px rgba(82,183,136,.15);
+      flex-shrink: 0;
+    }
+    .founder-avatar img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: top center;
+      display: block;
+    }
+    .founder-name-tag {
+      text-align: center;
+    }
+    .founder-name-tag strong {
+      font-size: .95rem; font-weight: 800;
+      color: white; display: block; margin-bottom: 2px;
+    }
+    .founder-name-tag span {
+      font-size: .75rem; color: rgba(255,255,255,.55);
+      line-height: 1.4; display: block;
+    }
+
+    /* ── Article body ── */
+    .founder-article {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 72px 24px 100px;
+    }
+    .founder-article .lead {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.2rem; font-style: italic;
+      color: #374151; line-height: 1.8;
+      border-left: 4px solid #1e5c3a;
+      padding-left: 24px;
+      margin-bottom: 48px;
+    }
+    .founder-section {
+      margin-bottom: 56px;
+    }
+    .founder-section-title {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px;
+    }
+    .founder-section-title .section-emoji {
+      font-size: 1.6rem;
+      width: 48px; height: 48px;
+      background: #f0f7f1;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .founder-section-title h2 {
+      font-size: 1.25rem; font-weight: 800;
+      color: #0f2d1a; letter-spacing: -.02em;
+    }
+    .founder-article p {
+      font-size: 1rem; color: #374151;
+      line-height: 1.85; margin-bottom: 18px;
+    }
+    .founder-article p:last-child { margin-bottom: 0; }
+
+    /* Ecosystem grid */
+    .ecosystem-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin: 28px 0;
+    }
+    .eco-card {
+      background: #f9fafb;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 20px;
+      transition: all .2s;
+    }
+    .eco-card:hover {
+      border-color: #4caf75;
+      box-shadow: 0 4px 16px rgba(30,92,58,.1);
+      transform: translateY(-2px);
+    }
+    .eco-card .ec-icon { font-size: 1.6rem; margin-bottom: 10px; }
+    .eco-card h3 { font-size: .92rem; font-weight: 800; color: #0f2d1a; margin-bottom: 6px; }
+    .eco-card p { font-size: .83rem; color: #6b7280; line-height: 1.55; margin: 0; }
+
+    /* Vision list */
+    .vision-list {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 12px;
+      margin: 20px 0;
+    }
+    .vision-list li {
+      display: flex; align-items: flex-start; gap: 12px;
+      font-size: .97rem; color: #374151; line-height: 1.65;
+    }
+    .vision-list li::before {
+      content: '→';
+      color: #1e5c3a; font-weight: 800;
+      flex-shrink: 0; margin-top: 2px;
+    }
+
+    /* Quote pull */
+    .pull-quote {
+      background: linear-gradient(135deg, #1e5c3a, #2d7a4f);
+      border-radius: 16px;
+      padding: 36px 40px;
+      margin: 48px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .pull-quote::before {
+      content: '\201C';
+      position: absolute; top: -10px; left: 24px;
+      font-size: 8rem; color: rgba(255,255,255,.08);
+      font-family: Georgia, serif; line-height: 1;
+    }
+    .pull-quote p {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.15rem; font-style: italic;
+      color: white; line-height: 1.75;
+      margin: 0; position: relative; z-index: 1;
+    }
+
+    /* Divider */
+    .founder-divider {
+      border: none;
+      border-top: 1px solid #e5e7eb;
+      margin: 48px 0;
+    }
+
+    /* Closing / signature */
+    .founder-closing {
+      background: #f0f7f1;
+      border-radius: 20px;
+      padding: 40px;
+      margin-top: 56px;
+      text-align: center;
+    }
+    .founder-closing .closing-tagline {
+      font-size: 1.1rem; font-weight: 800;
+      color: #1e5c3a; letter-spacing: .03em;
+      margin-bottom: 24px; display: block;
+    }
+    .founder-closing .sig-name {
+      font-size: 1.1rem; font-weight: 800;
+      color: #0f2d1a; display: block; margin-bottom: 4px;
+    }
+    .founder-closing .sig-title {
+      font-size: .85rem; color: #6b7280;
+      display: block; margin-bottom: 2px;
+    }
+    .founder-closing .sig-company {
+      font-size: .82rem; font-weight: 700;
+      color: #1e5c3a; display: block;
+    }
+    .founder-closing .sig-avatar {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: block;
+      margin: 0 auto 20px;
+      border: 3px solid #1e5c3a;
+      box-shadow: 0 4px 16px rgba(30,92,58,.2);
+    }
+
+    /* CTA at bottom */
+    .founder-cta {
+      background: #0f2d1a;
+      padding: 72px 0;
+      text-align: center;
+    }
+    .founder-cta h2 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 900; color: white;
+      letter-spacing: -.03em; margin-bottom: 14px;
+    }
+    .founder-cta p {
+      font-size: 1rem; color: rgba(255,255,255,.65);
+      margin-bottom: 32px; max-width: 480px;
+      margin-left: auto; margin-right: auto;
+      line-height: 1.65;
+    }
+    .founder-cta-form {
+      display: flex; gap: 0;
+      max-width: 420px; margin: 0 auto 12px;
+    }
+    .founder-cta-form input {
+      flex: 1; padding: 13px 18px;
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.2);
+      border-right: none;
+      border-radius: 10px 0 0 10px;
+      color: white; font-size: .92rem;
+      outline: none; font-family: 'Inter', sans-serif;
+    }
+    .founder-cta-form input::placeholder { color: rgba(255,255,255,.35); }
+    .founder-cta-form input:focus { border-color: rgba(255,255,255,.45); }
+    .founder-cta-form button {
+      background: #c8960c; color: white;
+      border: none; padding: 13px 20px;
+      border-radius: 0 10px 10px 0;
+      font-size: .88rem; font-weight: 700;
+      cursor: pointer; white-space: nowrap;
+      transition: background .2s; font-family: 'Inter', sans-serif;
+    }
+    .founder-cta-form button:hover { background: #b07d0a; }
+    .founder-cta-note {
+      font-size: .75rem; color: rgba(255,255,255,.35);
+      display: flex; align-items: center;
+      justify-content: center; gap: 5px;
+    }
+
+    /* Back link */
+    .back-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      color: rgba(255,255,255,.65); font-size: .85rem;
+      font-weight: 600; margin-bottom: 32px;
+      transition: color .2s;
+    }
+    .back-link:hover { color: white; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .founder-hero-inner { grid-template-columns: 1fr; }
+      .founder-avatar-wrap { flex-direction: row; align-items: center; gap: 16px; }
+      .founder-avatar { width: 80px; height: 80px; font-size: 2rem; }
+      .founder-name-tag { text-align: left; }
+      .ecosystem-grid { grid-template-columns: 1fr; }
+      .pull-quote { padding: 28px 24px; }
+      .founder-closing { padding: 28px 20px; }
+      .founder-cta-form { flex-direction: column; }
+      .founder-cta-form input  { border-right: 1px solid rgba(255,255,255,.2); border-radius: 10px 10px 0 0; border-bottom: none; }
+      .founder-cta-form button { border-radius: 0 0 10px 10px; }
+    }
+    @media (max-width: 480px) {
+      .founder-hero { padding: 80px 0 48px; }
+      .founder-hero h1 { font-size: 1.7rem; }
+      .founder-hero-desc { font-size: .92rem; }
+      .founder-avatar-wrap { gap: 12px; }
+      .founder-avatar { width: 64px; height: 64px; }
+      .founder-article { padding: 48px 0 72px; }
+      .founder-article .lead { font-size: 1rem; padding-left: 16px; }
+      .ecosystem-grid { grid-template-columns: 1fr; gap: 12px; }
+      .pull-quote { padding: 24px 18px; }
+      .pull-quote p { font-size: 1rem; }
+      .founder-cta { padding: 48px 0; }
+      .founder-cta h2 { font-size: 1.5rem; }
+      .founder-closing { padding: 24px 16px; }
+      .vision-list li { font-size: .9rem; }
+      .founder-section-title h2 { font-size: 1.1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════
+     NAVBAR
+════════════════════════════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">
+          <img src="images/logo.png" alt="DG-LETS Logo" style="width:42px;height:42px;object-fit:contain;border-radius:8px;" />
+        </div>
+        <div class="nav-logo-text">
+          <span class="logo-name">DG-LETS</span>
+          <span class="logo-sub">Agri Market Place App</span>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#features">Features</a>
+        <a href="index.html#how-it-works">How It Works</a>
+        <a href="index.html#categories">Categories</a>
+        <a href="founder.html" class="active">About Us</a>
+        <a href="index.html#contact">Contact Us</a>
+      </div>
+      <div class="nav-right">
+        <button class="btn-download nav-cta-desktop" onclick="window.location.href='index.html#register'">
+          📥 <span>Get Early Access</span>
+        </button>
+        <span class="coming-soon-pill nav-cta-desktop">Coming Soon</span>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="index.html">Home</a>
+      <a href="index.html#features">Features</a>
+      <a href="index.html#how-it-works">How It Works</a>
+      <a href="founder.html">About Us</a>
+      <a href="index.html#contact">Contact Us</a>
+      <a href="https://wa.me/2348070566642?text=Hello%20DG-LETS%2C%20I%20want%20to%20know%20more."
+         target="_blank" rel="noopener" class="mobile-whatsapp-link">💬 Chat on WhatsApp</a>
+      <button class="btn-download" onclick="window.location.href='index.html#register'">📥 Get Early Access</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════
+     HERO
+════════════════════════════════════ -->
+<section class="founder-hero">
+  <div class="container">
+    <div class="founder-hero-inner">
+      <div>
+        <a href="index.html" class="back-link">← Back to Home</a>
+        <span class="founder-eyebrow">A Note from the Founder &amp; CEO</span>
+        <h1>We Are Not Just Building<br>an App. We Are Building<br>a <em>New Way Agriculture</em><br>Connects With People.</h1>
+        <p class="founder-hero-desc">
+          A message on the vision, purpose and future of DG-LETS Agri Market — and why we believe technology can transform agricultural commerce in Nigeria and beyond.
+        </p>
+      </div>
+      <div class="founder-avatar-wrap">
+        <div class="founder-avatar">
+          <img src="images/founder.jpg" alt="Emwenbun Daniel Osadolor — Founder & CEO, DG-LETS Agri Market" />
+        </div>
+        <div class="founder-name-tag">
+          <strong>Emwenbun Daniel Osadolor</strong>
+          <span>Founder &amp; CEO</span>
+          <span>DG-LETS Agri &amp; Tech Nig Ltd</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     ARTICLE BODY
+════════════════════════════════════ -->
+<main>
+  <article class="founder-article">
+
+    <!-- Opening lead -->
+    <p class="lead">
+      Agriculture has always been one of the foundations of our society. Farmers work tirelessly to produce the food that feeds families, businesses, and communities. Yet despite the importance of agriculture, there is still a major gap between the people who produce food and the people who need it.
+    </p>
+
+    <!-- Problem -->
+    <div class="founder-section fade-up">
+      <p>
+        Farmers often struggle to reach reliable markets and get fair visibility for their products. Buyers and households can struggle to find genuine, fresh, trustworthy farm produce at the right price. Businesses may find it difficult to connect with reliable suppliers, while logistics remains one of the biggest challenges in moving agricultural products efficiently from one location to another.
+      </p>
+      <p>
+        At DG-LETS AGRI MARKET, we believe technology can help bridge these gaps.
+      </p>
+      <p>
+        That is why we are building something bigger than an ordinary online marketplace. We are building a digital agricultural ecosystem designed to bring together farmers, buyers, households, businesses, produce suppliers, and delivery and haulage partners within one growing platform.
+      </p>
+      <p>Our vision is simple but ambitious:</p>
+    </div>
+
+    <!-- Pull quote -->
+    <div class="pull-quote fade-up">
+      <p>
+        To make access to agricultural products easier, make markets more accessible for farmers, improve trust in agricultural transactions, and create a smarter connection between food, technology, logistics, and people.
+      </p>
+    </div>
+
+    <!-- Vision section -->
+    <div class="founder-section fade-up">
+      <div class="founder-section-title">
+        <div class="section-emoji">🌱</div>
+        <h2>Our Vision: From Farm to Phone</h2>
+      </div>
+      <p>Imagine being able to open your phone, explore available agricultural products, discover farmers and verified produce suppliers, compare available options, and conveniently place an order from wherever you are.</p>
+      <ul class="vision-list">
+        <li>Imagine a busy parent being able to order fresh food without spending hours moving from market to market.</li>
+        <li>Imagine a restaurant or business being able to connect with agricultural suppliers more efficiently.</li>
+        <li>Imagine farmers having greater visibility beyond their immediate communities.</li>
+        <li>Imagine delivery riders and haulage providers having access to agricultural delivery opportunities through a growing digital ecosystem.</li>
+      </ul>
+      <p>This is the future we are working toward.</p>
+      <p><strong>From Farm to Phone. From Farm to Doorstep.</strong></p>
+    </div>
+
+    <hr class="founder-divider" />
+
+    <!-- What we are building -->
+    <div class="founder-section fade-up">
+      <div class="founder-section-title">
+        <div class="section-emoji">🚜</div>
+        <h2>What We Are Building</h2>
+      </div>
+      <p>
+        DG-LETS AGRI MARKET is being designed as a technology-driven marketplace where different parts of the agricultural value chain can connect. Our long-term ecosystem is expected to bring together:
+      </p>
+      <div class="ecosystem-grid">
+        <div class="eco-card">
+          <div class="ec-icon">🌾</div>
+          <h3>Farmers &amp; Produce Sellers</h3>
+          <p>Farmers and agricultural suppliers will have opportunities to showcase their available products and connect with potential customers.</p>
+        </div>
+        <div class="eco-card">
+          <div class="ec-icon">🛒</div>
+          <h3>Buyers &amp; Households</h3>
+          <p>Individuals and families will be able to explore agricultural products and conveniently order what they need.</p>
+        </div>
+        <div class="eco-card">
+          <div class="ec-icon">🏢</div>
+          <h3>Businesses &amp; Bulk Buyers</h3>
+          <p>Restaurants, food vendors, retailers, processors, and other businesses will be able to discover agricultural products and suppliers that meet their needs.</p>
+        </div>
+        <div class="eco-card">
+          <div class="ec-icon">🏍️</div>
+          <h3>Delivery &amp; Haulage Partners</h3>
+          <p>Bikers, delivery providers, and haulage companies will have opportunities to participate in moving agricultural products from sellers to buyers.</p>
+        </div>
+        <div class="eco-card">
+          <div class="ec-icon">🤖</div>
+          <h3>Smart Technology &amp; AI</h3>
+          <p>As the platform grows, we envision intelligent features that help users discover products, make better choices, and create a smarter agricultural marketplace experience.</p>
+        </div>
+        <div class="eco-card">
+          <div class="ec-icon">📍</div>
+          <h3>Smart Location Discovery</h3>
+          <p>Our long-term goal includes making it easier to discover products and suppliers based on location, availability, affordability, ratings, and other useful factors.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="founder-divider" />
+
+    <!-- Only the beginning -->
+    <div class="founder-section fade-up">
+      <div class="founder-section-title">
+        <div class="section-emoji">🚀</div>
+        <h2>But This Is Only the Beginning</h2>
+      </div>
+      <p>The first version of DG-LETS AGRI MARKET is only the foundation. Our foresight extends beyond simply creating a platform where people buy and sell farm produce. We are thinking about the future of agriculture in Nigeria and beyond.</p>
+      <ul class="vision-list">
+        <li>A future where technology makes agricultural markets more connected.</li>
+        <li>A future where farmers are not limited only by geographical distance.</li>
+        <li>A future where consumers can have greater visibility into where their food comes from.</li>
+        <li>A future where logistics can be better connected with agricultural commerce.</li>
+        <li>A future where data and intelligent technology can help improve decision-making across the agricultural ecosystem.</li>
+        <li>A future where agriculture becomes more digitally accessible to the next generation.</li>
+      </ul>
+      <p>And we intend to be part of building that future.</p>
+    </div>
+
+    <hr class="founder-divider" />
+
+    <!-- Our approach -->
+    <div class="founder-section fade-up">
+      <div class="founder-section-title">
+        <div class="section-emoji">💡</div>
+        <h2>Our Exclusive Approach</h2>
+      </div>
+      <p>We are not rushing to build just another marketplace. We are building with a long-term vision.</p>
+      <p>Our approach is to grow strategically, listen to real users, understand the challenges faced by farmers and buyers, and continuously improve the platform based on real-world needs.</p>
+      <p>
+        This means that the people joining us early will not simply be watching from the outside. They will be among the first communities helping shape the future of what DG-LETS AGRI MARKET becomes.
+      </p>
+      <p>
+        Our early farmers, buyers, logistics partners, and supporters represent something important — they are the foundation of the ecosystem we are building.
+      </p>
+    </div>
+
+    <hr class="founder-divider" />
+
+    <!-- Looking ahead -->
+    <div class="founder-section fade-up">
+      <div class="founder-section-title">
+        <div class="section-emoji">🔮</div>
+        <h2>Looking Ahead</h2>
+      </div>
+      <p>In the years ahead, we envision DG-LETS AGRI MARKET evolving into a more intelligent and connected agricultural ecosystem. We are exploring possibilities that include smarter product discovery, improved supplier visibility, digital trust systems, logistics integration, AI-powered experiences, and other innovations that can make agricultural commerce more efficient.</p>
+      <p>Our ambition is to continuously grow beyond the limitations of traditional buying and selling. We want to help create a platform where agriculture and technology work together.</p>
+      <ul class="vision-list">
+        <li>Where the farmer can find more opportunities.</li>
+        <li>Where the buyer can find more convenience.</li>
+        <li>Where businesses can discover reliable agricultural connections.</li>
+        <li>Where delivery and haulage providers can participate in agricultural commerce.</li>
+        <li>Where innovation continues to create new possibilities.</li>
+      </ul>
+      <p>This is a long journey. But every great ecosystem begins with a first step.</p>
+    </div>
+
+    <hr class="founder-divider" />
+
+    <!-- Invitation -->
+    <div class="founder-section fade-up">
+      <div class="founder-section-title">
+        <div class="section-emoji">🌍</div>
+        <h2>An Invitation to Be Part of the Beginning</h2>
+      </div>
+      <p>Right now, we are building. We are planning. We are designing. We are connecting. And we are preparing for the next stage.</p>
+      <p>DG-LETS AGRI MARKET is still on its journey toward launch, but the vision behind it is already much bigger than a single application. We are building a community. We are building connections. We are building opportunities.</p>
+      <p>To everyone who believes in innovation, agriculture, technology, and the power of building solutions for real problems:</p>
+      <p><strong>This is your invitation to watch closely.</strong></p>
+    </div>
+
+    <!-- Signature card -->
+    <div class="founder-closing fade-up">
+      <div class="sig-avatar">
+        <img src="images/founder.jpg" alt="Emwenbun Daniel Osadolor" style="width:100%;height:100%;object-fit:cover;object-position:top center;border-radius:50%;display:block;" />
+      </div>
+      <span class="closing-tagline">
+        🌱 Agriculture should be easier to access, easier to connect,<br>and ready for the digital future.
+      </span>
+      <p style="color:#374151;font-size:.95rem;line-height:1.75;margin-bottom:24px;font-style:italic">
+        "The farms are ready. The markets are evolving. Technology is changing everything. And something exciting is growing.
+        Welcome to the future we are building. Welcome to DG-LETS AGRI MARKET."
+      </p>
+      <div style="border-top:1px solid #d1d5db;padding-top:20px;margin-top:4px">
+        <span class="sig-name">— Emwenbun Daniel Osadolor</span>
+        <span class="sig-title">Founder &amp; CEO</span>
+        <span class="sig-company">DG-LETS Agri &amp; Tech Nig Ltd</span>
+        <div style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px">
+          <span style="font-size:.82rem;font-weight:700;color:#1e5c3a;letter-spacing:.04em">FROM FARM TO PHONE. FROM FARM TO DOORSTEP.</span>
+        </div>
+      </div>
+    </div>
+
+  </article>
+</main>
+
+<!-- ═══════════════════════════════════
+     BOTTOM CTA
+════════════════════════════════════ -->
+<section class="founder-cta">
+  <div class="container">
+    <h2>Ready to Be Part of the Journey?</h2>
+    <p>Join our early access list and be among the first to experience DG-LETS Agri Market when we launch.</p>
+    <form class="founder-cta-form" id="founderNotifyForm" novalidate>
+      <input type="email" id="founder-email" placeholder="Enter your email address" required />
+      <button type="submit">🔔 Notify Me</button>
+    </form>
+    <p class="founder-cta-note">🔒 No spam. Unsubscribe anytime.</p>
+    <div style="margin-top:24px">
+      <a href="index.html#register" style="color:#74c69d;font-size:.88rem;font-weight:600;text-decoration:underline">
+        Or fill the full early access form →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════
+     FOOTER
+════════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-top">
+    <div class="footer-logo-col">
+      <div class="footer-logo">
+        <div class="fl-icon">
+          <img src="images/logo.png" alt="DG-LETS Logo" style="width:44px;height:44px;object-fit:contain;border-radius:8px;" />
+        </div>
+        <div class="fl-text">
+          <span class="fl-name">DG-LETS</span>
+          <span class="fl-sub">Agri Market Place App</span>
+        </div>
+      </div>
+      <p class="footer-tagline">The future of agriculture trade is here.<br>The app is coming soon!</p>
+      <span class="footer-coming-soon">COMING SOON</span>
+      <div class="social-icons" style="margin-top:16px">
+        <a href="https://wa.me/2348070566642" target="_blank" rel="noopener" class="social-icon whatsapp" title="WhatsApp">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        </a>
+        <a href="#" class="social-icon facebook"  title="Facebook — Coming Soon"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+        <a href="https://www.instagram.com/dgletsagritechng" target="_blank" rel="noopener" class="social-icon instagram" title="Instagram @dgletsagritechng"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+        <a href="#" class="social-icon twitter"   title="Twitter/X — Coming Soon"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+        <a href="#" class="social-icon tiktok"    title="TikTok — Coming Soon"><svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.75a4.85 4.85 0 01-1.01-.06z"/></svg></a>
+      </div>
+    </div>
+    <div class="footer-mid-col">
+      <p>DG-LETS Agri Market Place connects farmers, buyers, suppliers and service providers in one smart platform.</p>
+      <ul class="footer-checklist">
+        <li>Farmer to Buyer Connections</li>
+        <li>MVP Development in Progress</li>
+        <li>Secure &amp; Seamless Transactions</li>
+        <li>More Features Coming Soon</li>
+      </ul>
+    </div>
+    <div class="footer-right-col">
+      <div class="footer-notify">
+        <p>Get notified when we launch.</p>
+        <div class="notify-row">
+          <input type="email" id="footer-email-founder" placeholder="Enter your email address" />
+          <button type="button" id="notifyBtnFounder">🔔 Notify Me</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 DG-LETS Agri Market Place App. All rights reserved.</span>
+    <span class="footer-bottom-tagline">✦ DG-LETS… Empowering Agriculture. Building Tomorrow.</span>
+  </div>
+</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast"><span>🎉</span><span id="toastMsg"></span></div>
+
+<script>
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbyqd46JMtB_OE0HTqAmpNiQECswBwVuBRz4rFlwhOd9Bhqb4zPsNGzRwCIou2kPx1bN/exec';
+
+/* Navbar */
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.style.boxShadow = window.scrollY > 10 ? '0 2px 12px rgba(0,0,0,.1)' : '';
+}, { passive: true });
+
+/* Mobile menu */
+const hamburger = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+hamburger.addEventListener('click', () => {
+  const open = mobileMenu.classList.toggle('open');
+  hamburger.setAttribute('aria-expanded', open);
+  const spans = hamburger.querySelectorAll('span');
+  if (open) {
+    spans[0].style.cssText = 'transform:rotate(45deg) translate(5px,5px)';
+    spans[1].style.cssText = 'opacity:0';
+    spans[2].style.cssText = 'transform:rotate(-45deg) translate(5px,-5px)';
+  } else { spans.forEach(s => s.style.cssText = ''); }
+});
+
+/* Toast */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 4500);
+}
+
+function isEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()); }
+
+async function submitEmail(email, source, btn, originalText) {
+  try {
+    const payload = { email, source, userAgent: navigator.userAgent };
+    const list = JSON.parse(localStorage.getItem('dglets_signups') || '[]');
+    list.push({ ...payload, ts: new Date().toISOString() });
+    localStorage.setItem('dglets_signups', JSON.stringify(list));
+    if (SHEET_URL) {
+      await fetch(SHEET_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    }
+    btn.textContent = '✓ You\'re in!';
+    btn.style.background = '#2d7a4f';
+    btn.disabled = true;
+    showToast('📬 We\'ll notify you when we launch!');
+    setTimeout(() => { btn.textContent = originalText; btn.style.background = ''; btn.disabled = false; }, 5000);
+  } catch(e) { console.warn('Submission failed:', e); }
+}
+
+/* Hero CTA form */
+const founderForm = document.getElementById('founderNotifyForm');
+if (founderForm) {
+  founderForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const inp = document.getElementById('founder-email');
+    if (!isEmail(inp.value)) { inp.style.borderColor = 'rgba(239,68,68,.7)'; return; }
+    inp.style.borderColor = '';
+    const btn = founderForm.querySelector('button');
+    await submitEmail(inp.value.trim(), 'founder-page-cta', btn, '🔔 Notify Me');
+    inp.value = '';
+  });
+}
+
+/* Footer notify */
+const notifyBtnFounder = document.getElementById('notifyBtnFounder');
+if (notifyBtnFounder) {
+  notifyBtnFounder.addEventListener('click', async () => {
+    const inp = document.getElementById('footer-email-founder');
+    if (!isEmail(inp.value)) { inp.style.borderColor = 'rgba(255,255,255,.5)'; return; }
+    inp.style.borderColor = '';
+    await submitEmail(inp.value.trim(), 'founder-page-footer', notifyBtnFounder, '🔔 Notify Me');
+    inp.value = '';
+  });
+}
+
+/* Fade-up animations */
+if ('IntersectionObserver' in window) {
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('visible'); io.unobserve(en.target); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => io.observe(el));
+} else {
+  document.querySelectorAll('.fade-up').forEach(el => el.classList.add('visible'));
+}
+
+/* Smooth scroll */
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const el = document.querySelector(a.getAttribute('href'));
+    if (el) { e.preventDefault(); window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 70, behavior: 'smooth' }); }
+  });
+});
+</script>
+</body>
+</html>

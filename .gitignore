@@ -66,3 +66,4 @@ deploy2.ps1
 
 # Duplicate root-level assets
 /images/logo.png
+terraform/*.pem
