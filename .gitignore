@@ -67,3 +67,15 @@ deploy2.ps1
 # Duplicate root-level assets
 /images/logo.png
 terraform/*.pem
+
+# Production environment files
+.env.production
+.env.production.*
+backend/.env.production
+
+# Terraform state and local files
+terraform/.terraform/
+terraform/*.tfstate
+terraform/.tfstate.
+terraform/*.pem
+terraform/*.key
