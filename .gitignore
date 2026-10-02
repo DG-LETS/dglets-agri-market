@@ -60,7 +60,7 @@ deploy2.ps1
 # WhatsApp images
 *.jpeg
 *.jpg
-!landing/images/
+!landing/public/images/
 !docs/images/
 !images/founder.jpg
 
