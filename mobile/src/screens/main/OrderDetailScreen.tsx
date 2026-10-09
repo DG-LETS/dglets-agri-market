@@ -1,3 +1,4 @@
+import { Truck } from "lucide-react-native";
 ﻿import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
@@ -437,7 +438,7 @@ export function OrderDetailScreen({ navigation, route }: Props) {
           haulageJobsData.status === 'DELIVERED' && (
           <View style={styles.section}>
             <Button
-              title="ðŸš› Rate the Delivery Driver"
+              title=" Rate the Delivery Driver"
               variant="outline"
               onPress={() => {
                 const driver = haulageJobsData.awardedTo;

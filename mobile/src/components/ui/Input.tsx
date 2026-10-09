@@ -1,3 +1,4 @@
+import { Eye, EyeOff } from "lucide-react-native";
 import React, { useState } from 'react';
 import {
   View, TextInput, Text, TouchableOpacity,
@@ -51,7 +52,7 @@ export function Input({
         />
         {isPassword && (
           <TouchableOpacity style={s.iconRight} onPress={() => setRevealed(r => !r)}>
-            <Text style={s.eyeIcon}>{revealed ? '🙈' : '👁️'}</Text>
+            <Text style={s.eyeIcon}>{revealed ? <EyeOff size={20} color="#666" /> : <Eye size={20} color="#666" />}</Text>
           </TouchableOpacity>
         )}
         {!isPassword && rightIcon && <View style={s.iconRight}>{rightIcon}</View>}

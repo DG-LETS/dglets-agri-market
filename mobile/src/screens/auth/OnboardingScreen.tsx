@@ -1,3 +1,4 @@
+import { Wheat, Map, Truck } from "lucide-react-native";
 import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, Dimensions, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -10,10 +11,10 @@ const { width } = Dimensions.get('window');
 
 /* Onboarding is always full-screen coloured — dark mode doesn't apply */
 const slides = [
-  { id: '1', emoji: '🌾', title: 'Connect Farmers\nto Buyers',       description: 'Find verified farmers and fresh produce directly. No middlemen, fair prices, real inventory.', bg: Colors.green[700] },
-  { id: '2', emoji: '🗺️', title: 'Smart Map\nDiscovery',             description: 'Find the cheapest, nearest, highest-rated suppliers using our intelligent Smart Map.',           bg: Colors.green[800] },
-  { id: '3', emoji: '🚛', title: 'Integrated\nHaulage',              description: 'Approved logistics partners bid on your delivery. Track in real-time from farm to doorstep.',    bg: Colors.green[600] },
-  { id: '4', emoji: '🏆', title: 'Earn DGR\nRewards',               description: 'Every purchase, review and referral earns you DGR reward tokens.',                               bg: Colors.green[700] },
+  { id: '1', emoji: <Wheat size={20} color="#666" />, title: 'Connect Farmers\nto Buyers',       description: 'Find verified farmers and fresh produce directly. No middlemen, fair prices, real inventory.', bg: Colors.green[700] },
+  { id: '2', emoji: <Map size={20} color="#666" />, title: 'Smart Map\nDiscovery',             description: 'Find the cheapest, nearest, highest-rated suppliers using our intelligent Smart Map.',           bg: Colors.green[800] },
+  { id: '3', emoji: <Truck size={20} color="#666" />, title: 'Integrated\nHaulage',              description: 'Approved logistics partners bid on your delivery. Track in real-time from farm to doorstep.',    bg: Colors.green[600] },
+  { id: '4', icon: 'Trophy', title: 'Earn DGR\nRewards',               description: 'Every purchase, review and referral earns you DGR reward tokens.',                               bg: Colors.green[700] },
 ];
 
 type Props = { navigation: StackNavigationProp<AuthStackParamList, 'Onboarding'> };

@@ -1,3 +1,4 @@
+import { Hourglass, PartyPopper, Lock, Check, Lightbulb } from "lucide-react-native";
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert, Linking, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -81,7 +82,7 @@ export function RegistrationFeeScreen({ navigation }: Props) {
   if (!feeStatus?.required || feeStatus?.paid) {
     return (
       <View style={[s.flex, s.center, { paddingTop: insets.top }]}>
-        <Text style={s.doneIcon}>🎉</Text>
+        <PartyPopper size={24} color="#666" />
         <Text style={s.doneTitle}>Account Activated!</Text>
         <Text style={s.doneSub}>Your account is active. Welcome to DG-LETS Agri Market!</Text>
         <Button title="Enter the Marketplace →" onPress={() => navigation.replace('Login')} size="lg" style={s.doneBtn} />
@@ -104,7 +105,7 @@ export function RegistrationFeeScreen({ navigation }: Props) {
           <React.Fragment key={step.label}>
             <View style={s.progressStep}>
               <View style={[s.progressDot, step.done && s.progressDotDone, (step as any).active && s.progressDotActive]}>
-                {step.done && <Text style={s.progressCheck}>✓</Text>}
+                {step.done && <Check size={20} color="#4CAF50" />}
               </View>
               <Text style={[s.progressLabel, (step as any).active && { color: C.green[700], fontWeight: '700' }]}>{step.label}</Text>
             </View>
@@ -135,7 +136,7 @@ export function RegistrationFeeScreen({ navigation }: Props) {
 
       {/* Fee note */}
       <View style={s.feeNote}>
-        <Text style={s.feeNoteTitle}>💡 How DG-LETS fees work</Text>
+        <Text style={s.feeNoteTitle}><Lightbulb size={20} color="#666" /> How DG-LETS fees work</Text>
         <Text style={s.feeNoteText}>• <Text style={{ fontWeight: '700' }}>Registration fee (one-time):</Text> ₦{feeStatus?.amount?.toLocaleString()} — paid once to activate.</Text>
         <Text style={s.feeNoteText}>• <Text style={{ fontWeight: '700' }}>Transaction fee:</Text> 2.05% deducted automatically from each completed order.</Text>
         {role === 'HAULAGE' && <Text style={s.feeNoteText}>• <Text style={{ fontWeight: '700' }}>Delivery commission:</Text> 5% of each delivery fee deducted when a job completes.</Text>}
@@ -143,11 +144,11 @@ export function RegistrationFeeScreen({ navigation }: Props) {
       </View>
 
       <View style={s.secureRow}>
-        <Text style={s.secureText}>🔒 Secure payment via Paystack. Your card details are never stored by DG-LETS.</Text>
+        <Text style={s.secureText}> Secure payment via Paystack. Your card details are never stored by DG-LETS.</Text>
       </View>
 
       <Button
-        title={paying || payMutation.isPending ? '⏳ Opening Paystack…' : `💳 Pay ₦${feeStatus?.amount?.toLocaleString()} & Activate`}
+        title={paying || payMutation.isPending ? ' Opening Paystack…' : `Pay ₦${feeStatus?.amount?.toLocaleString()} & Activate`}
         onPress={handlePay} loading={paying || payMutation.isPending} size="lg" style={s.payBtn}
       />
       <TouchableOpacity style={s.skipBtn} onPress={handleSkip}>

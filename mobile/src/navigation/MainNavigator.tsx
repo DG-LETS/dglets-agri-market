@@ -1,3 +1,4 @@
+import { Wheat, Map, Package, MessageSquare, User, Truck, Home } from "lucide-react-native";
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -211,7 +212,7 @@ export function MainNavigator() {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ focused }) =>
-            <TabIcon emoji="🏠" label="Home" focused={focused} />,
+            <TabIcon icon="Home" label="Home" focused={focused} />,
         }}
       />
       <Tab.Screen
@@ -219,7 +220,7 @@ export function MainNavigator() {
         component={MarketNavigator}
         options={{
           tabBarIcon: ({ focused }) =>
-            <TabIcon emoji="🌾" label="Market" focused={focused} badge={cartCount} />,
+            <TabIcon emoji="Wheat" label="Market" focused={focused} badge={cartCount} />,
         }}
       />
       <Tab.Screen
@@ -228,7 +229,7 @@ export function MainNavigator() {
         options={{
           tabBarIcon: ({ focused }) => (
             <View style={[tabStyles.mapBtn, focused && tabStyles.mapBtnActive]}>
-              <Text style={tabStyles.mapEmoji}>🗺️</Text>
+              <Text style={tabStyles.mapEmoji}></Text>
             </View>
           ),
         }}
@@ -238,7 +239,7 @@ export function MainNavigator() {
         component={OrdersNavigator}
         options={{
           tabBarIcon: ({ focused }) =>
-            <TabIcon emoji="📦" label="Orders" focused={focused} badge={unreadNotifs} />,
+            <TabIcon emoji="Package" label="Orders" focused={focused} badge={unreadNotifs} />,
         }}
       />
       {/* Haulage Jobs tab — only visible to HAULAGE role */}
@@ -248,7 +249,7 @@ export function MainNavigator() {
           component={HaulageJobsScreen}
           options={{
             tabBarIcon: ({ focused }) =>
-              <TabIcon emoji="🚛" label="Jobs" focused={focused} />,
+              <TabIcon emoji="Truck" label="Jobs" focused={focused} />,
           }}
         />
       )}
@@ -257,7 +258,7 @@ export function MainNavigator() {
         component={MessagesNavigator}
         options={{
           tabBarIcon: ({ focused }) =>
-            <TabIcon emoji="💬" label="Chat" focused={focused} badge={unreadMessages} />,
+            <TabIcon emoji="MessageSquare" label="Chat" focused={focused} badge={unreadMessages} />,
         }}
       />
       <Tab.Screen
@@ -265,7 +266,7 @@ export function MainNavigator() {
         component={ProfileNavigator}
         options={{
           tabBarIcon: ({ focused }) =>
-            <TabIcon emoji="👤" label="Me" focused={focused} />,
+            <TabIcon emoji="User" label="Me" focused={focused} />,
         }}
       />
     </Tab.Navigator>

@@ -1,3 +1,4 @@
+import { User } from "lucide-react-native";
 ﻿import React, { useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
@@ -242,14 +243,14 @@ export function EditProfileScreen({ navigation, route }: Props) {
               render={({ field: { value, onChange, onBlur } }) => (
                 <Input label="First Name" value={value} onChangeText={onChange} onBlur={onBlur}
                   error={basicForm.formState.errors.firstName?.message}
-                  leftIcon={<Text>ðŸ‘¤</Text>} required />
+                  leftIcon={<User size={24} color="#666" />} required />
               )}
             />
             <Controller control={basicForm.control} name="lastName"
               render={({ field: { value, onChange, onBlur } }) => (
                 <Input label="Last Name" value={value} onChangeText={onChange} onBlur={onBlur}
                   error={basicForm.formState.errors.lastName?.message}
-                  leftIcon={<Text>ðŸ‘¤</Text>} required />
+                  leftIcon={<User size={24} color="#666" />} required />
               )}
             />
             <Controller control={basicForm.control} name="email"

@@ -1,3 +1,4 @@
+import { Wheat, Package, MapPin, Search, X } from "lucide-react-native";
 import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -55,7 +56,7 @@ export function MarketScreen({ navigation, route }: Props) {
     setLocLoading(true);
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') { Alert.alert('📍 Location Permission', 'Allow location access in Settings.'); return; }
+      if (status !== 'granted') { Alert.alert(' Location Permission', 'Allow location access in Settings.'); return; }
       const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
       setUserCoords({ lat: loc.coords.latitude, lng: loc.coords.longitude });
       setNearMe(true);
@@ -72,7 +73,7 @@ export function MarketScreen({ navigation, route }: Props) {
           <Text style={s.title}>Marketplace</Text>
           <View style={s.titleActions}>
             <TouchableOpacity style={[s.nearMeBtn, nearMe && s.nearMeBtnActive]} onPress={handleNearMeToggle} disabled={locLoading} activeOpacity={0.8}>
-              <Text style={[s.nearMeBtnText, nearMe && s.nearMeBtnTextActive]}>{locLoading ? '📍…' : nearMe ? `📍 ${radiusKm}km` : '📍 Near Me'}</Text>
+              <Text style={[s.nearMeBtnText, nearMe && s.nearMeBtnTextActive]}>{locLoading ? '…' : nearMe ? ` ${radiusKm}km` : ' Near Me'}</Text>
             </TouchableOpacity>
             {nearMe && <TouchableOpacity style={s.radiusBtn} onPress={cycleRadius}><Text style={s.radiusBtnText}>⇄</Text></TouchableOpacity>}
             {isSeller && <TouchableOpacity style={s.listBtn} onPress={() => navigation.navigate('CreateListing')}><Text style={s.listBtnText}>+ List</Text></TouchableOpacity>}
@@ -82,24 +83,24 @@ export function MarketScreen({ navigation, route }: Props) {
       </View>
       {nearMe && (
         <View style={s.nearMeBanner}>
-          <Text style={s.nearMeBannerText}>📍 Showing farms & sellers within {radiusKm}km · Sorted by distance</Text>
-          <TouchableOpacity onPress={() => { setNearMe(false); setUserCoords(null); }}><Text style={s.nearMeBannerClose}>✕</Text></TouchableOpacity>
+          <Text style={s.nearMeBannerText}> Showing farms & sellers within {radiusKm}km · Sorted by distance</Text>
+          <TouchableOpacity onPress={() => { setNearMe(false); setUserCoords(null); }}><X size={20} color="#666" /></TouchableOpacity>
         </View>
       )}
       {cats && (
-        <FlatList horizontal data={[{ id: undefined, name: 'All', icon: '🌾' }, ...cats] as any[]}
+        <FlatList horizontal data={[{ id: undefined, name: 'All', icon: <Wheat size={20} color="#666" /> }, ...cats] as any[]}
           keyExtractor={(_item, i) => String(i)} showsHorizontalScrollIndicator={false}
           contentContainerStyle={s.catList}
           renderItem={({ item }) => (
             <TouchableOpacity style={[s.catChip, catId === item.id && s.catChipActive]} onPress={() => setCatId(item.id)}>
-              <Text style={s.catIcon}>{item.icon || '📦'}</Text>
+              <Text style={s.catIcon}>{item.icon || <Package size={20} color="#666" />}</Text>
               <Text style={[s.catName, catId === item.id && s.catNameActive]}>{item.name}</Text>
             </TouchableOpacity>
           )}
         />
       )}
       {isLoading ? <LoadingState message={nearMe ? 'Finding nearby farmers…' : 'Loading products…'} /> : products.length === 0 ? (
-        <EmptyState icon={nearMe ? '📍' : '🔍'}
+        <EmptyState icon={nearMe ? <MapPin size={20} color="#666" /> : <Search size={20} color="#666" />}
           title={nearMe ? `No farms within ${radiusKm}km` : 'No products found'}
           description={nearMe ? `Try increasing the radius by tapping ⇄.` : 'Try a different search or category.'}
           actionLabel={nearMe ? `Expand to ${RADIUS_OPTIONS[Math.min(RADIUS_OPTIONS.indexOf(radiusKm) + 1, RADIUS_OPTIONS.length - 1)]}km` : 'Clear search'}

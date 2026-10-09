@@ -1,3 +1,4 @@
+import { Map, Package, MapPin, Banknote, Truck } from "lucide-react-native";
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,7 +16,7 @@ export function SmartMapScreen() {
         <Text style={s.subtitle}>Find nearby farmers & suppliers</Text>
       </View>
       <View style={s.body}>
-        <Text style={s.icon}>🗺️</Text>
+        <Map size={24} color="#666" />
         <Text style={s.heading}>Smart Map Coming in Phase 2</Text>
         <Text style={s.desc}>
           Smart Map will use your location to find nearby verified farmers, compare prices,
@@ -23,12 +24,12 @@ export function SmartMapScreen() {
         </Text>
         <View style={s.featureList}>
           {[
-            '📍 GPS-based discovery',
-            '💰 Cheapest near me',
+            ' GPS-based discovery',
+            ' Cheapest near me',
             '⭐ Top rated near me',
-            '📦 Available now',
-            '🚛 Bulk supplier matching',
-            '🤖 AI-powered recommendations',
+            ' Available now',
+            ' Bulk supplier matching',
+            'AI-powered recommendations',
           ].map(f => (
             <View key={f} style={s.featureItem}>
               <Text style={s.featureText}>{f}</Text>

@@ -1,3 +1,4 @@
+import { Package } from "lucide-react-native";
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -53,7 +54,7 @@ export function OrdersScreen({ navigation }: Props) {
         )}
       </View>
       {isLoading ? <LoadingState message="Loading orders…" /> : !data?.length ? (
-        <EmptyState icon="📦" title="No orders yet" description="Your orders will appear here once you start buying or selling." />
+        <EmptyState icon="Package" title="No orders yet" description="Your orders will appear here once you start buying or selling." />
       ) : (
         <FlatList
           data={data} keyExtractor={item => item.id} contentContainerStyle={s.list}

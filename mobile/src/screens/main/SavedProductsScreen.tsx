@@ -1,3 +1,4 @@
+import { Heart, ArrowLeft } from "lucide-react-native";
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -33,13 +34,13 @@ export function SavedProductsScreen({ navigation }: Props) {
     <View style={[s.flex, { paddingTop: insets.top }]}>
       <View style={s.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}>
-          <Text style={s.backText}>←</Text>
+          <Text style={s.backText}></Text>
         </TouchableOpacity>
         <Text style={s.headerTitle}>Saved Products</Text>
         <View style={s.backBtn} />
       </View>
       {isLoading ? <LoadingState message="Loading saved products…" /> : saved.length === 0 ? (
-        <EmptyState icon="❤️" title="No saved products" description="Products you save will appear here. Browse the marketplace and tap the heart icon to save." />
+        <EmptyState icon="Heart" title="No saved products" description="Products you save will appear here. Browse the marketplace and tap the heart icon to save." />
       ) : (
         <FlatList
           data={saved} keyExtractor={item => item.id} numColumns={2}
@@ -52,7 +53,7 @@ export function SavedProductsScreen({ navigation }: Props) {
                 onPress={() => (navigation as any).navigate('MarketTab', { screen: 'ProductDetail', params: { productId: item.product.id } })}
               />
               <TouchableOpacity style={s.unsaveBtn} onPress={() => unsaveMutation.mutate(item.product.id)}>
-                <Text style={s.unsaveBtnText}>❤️ Saved</Text>
+                <Text style={s.unsaveBtnText}> Saved</Text>
               </TouchableOpacity>
             </View>
           )}

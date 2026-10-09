@@ -1,3 +1,4 @@
+import { Wheat, Heart, Hourglass, MessageSquare, PartyPopper, MapPin, ArrowLeft } from "lucide-react-native";
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, Image,
@@ -46,7 +47,7 @@ export function ProductDetailScreen({ navigation, route }: Props) {
     mutationFn: () => ordersApi.create({ items: [{ productId, quantity: qty }] }).then(r => r.data),
     onSuccess: (order) => {
       queryClient.invalidateQueries({ queryKey: ['orders'] });
-      Alert.alert('🎉 Order Placed!', `Order ${order.orderNumber} created. Total: ₦${order.total?.toLocaleString()}`, [
+      Alert.alert(' Order Placed!', `Order ${order.orderNumber} created. Total: ₦${order.total?.toLocaleString()}`, [
         { text: 'View Order', onPress: () => (navigation as any).navigate('OrdersTab', { screen: 'OrderDetail', params: { orderId: order.id } }) },
         { text: 'OK' },
       ]);
@@ -64,7 +65,7 @@ export function ProductDetailScreen({ navigation, route }: Props) {
       return;
     }
     addItem(product, qty);
-    Alert.alert('Added to Cart ✓', `${qty} × ${product.name} added.`, [
+    Alert.alert('Added to Cart', `${qty} × ${product.name} added.`, [
       { text: 'Keep Shopping', style: 'cancel' },
       { text: 'View Cart', onPress: () => navigation.navigate('Cart') },
     ]);
@@ -107,11 +108,11 @@ export function ProductDetailScreen({ navigation, route }: Props) {
         <View style={s.imageContainer}>
           {images.length > 0
             ? <Image source={{ uri: images[imageIdx] }} style={s.mainImage} resizeMode="cover" />
-            : <View style={[s.mainImage, s.noImage]}><Text style={s.noImageIcon}>🌾</Text></View>
+            : <View style={[s.mainImage, s.noImage]}><Text style={s.noImageIcon}></Text></View>
           }
           <View style={[s.imageHeader, { paddingTop: insets.top + Spacing[2] }]}>
-            <TouchableOpacity style={s.headerBtn} onPress={() => navigation.goBack()}><Text style={s.headerBtnText}>←</Text></TouchableOpacity>
-            <TouchableOpacity style={s.headerBtn} onPress={() => saveMutation.mutate()}><Text style={s.headerBtnText}>{saved ? '❤️' : '🤍'}</Text></TouchableOpacity>
+            <TouchableOpacity style={s.headerBtn} onPress={() => navigation.goBack()}><Text style={s.headerBtnText}></Text></TouchableOpacity>
+            <TouchableOpacity style={s.headerBtn} onPress={() => saveMutation.mutate()}><Text style={s.headerBtnText}>{saved ? <Heart size={20} color="#666" /> : <Heart size={20} color="#999" />}</Text></TouchableOpacity>
           </View>
           {images.length > 1 && (
             <View style={s.thumbRow}>
@@ -129,7 +130,7 @@ export function ProductDetailScreen({ navigation, route }: Props) {
             <Text style={s.name}>{product.name}</Text>
             <View style={s.badgeRow}>
               {product.status === 'PUBLISHED' && <Badge label="Available" variant="success" />}
-              {product.deliveryAvailable && <Badge label="🚚 Delivery" variant="info" />}
+              {product.deliveryAvailable && <Badge label="Delivery" variant="info" />}
               {product.qualityGrade && <Badge label={product.qualityGrade} variant="green" />}
             </View>
           </View>
@@ -140,7 +141,7 @@ export function ProductDetailScreen({ navigation, route }: Props) {
             <View style={s.statDiv} />
             <View style={s.stat}><Text style={s.statVal}>{product.viewCount ?? 0}</Text><Text style={s.statLabel}>Views</Text></View>
             <View style={s.statDiv} />
-            <View style={s.stat}><Text style={s.statVal}>📍 {product.state}</Text><Text style={s.statLabel}>{product.lga || 'Nigeria'}</Text></View>
+            <View style={s.stat}><Text style={s.statVal}> {product.state}</Text><Text style={s.statLabel}>{product.lga || 'Nigeria'}</Text></View>
           </View>
           {product.description ? (
             <View style={s.section}><Text style={s.sectionTitle}>Description</Text><Text style={s.desc}>{product.description}</Text></View>
@@ -151,7 +152,7 @@ export function ProductDetailScreen({ navigation, route }: Props) {
               {product.harvestDate && <View style={s.detailItem}><Text style={s.detailLabel}>Harvest Date</Text><Text style={s.detailVal}>{new Date(product.harvestDate).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })}</Text></View>}
               {product.processingStatus && <View style={s.detailItem}><Text style={s.detailLabel}>Processing</Text><Text style={s.detailVal}>{product.processingStatus}</Text></View>}
               <View style={s.detailItem}><Text style={s.detailLabel}>MOQ</Text><Text style={s.detailVal}>{product.moq} {product.quantityUnit}</Text></View>
-              <View style={s.detailItem}><Text style={s.detailLabel}>Delivery</Text><Text style={s.detailVal}>{product.deliveryAvailable ? '✓ Available' : 'Pickup only'}</Text></View>
+              <View style={s.detailItem}><Text style={s.detailLabel}>Delivery</Text><Text style={s.detailVal}>{product.deliveryAvailable ? 'Available' : 'Pickup only'}</Text></View>
             </View>
           </View>
           {product.seller && (
@@ -161,12 +162,12 @@ export function ProductDetailScreen({ navigation, route }: Props) {
                 <View style={s.sellerAvatar}><Text style={s.sellerAvatarText}>{product.seller.firstName?.[0]}{product.seller.lastName?.[0]}</Text></View>
                 <View style={s.sellerInfo}>
                   <Text style={s.sellerName}>{product.seller.firstName} {product.seller.lastName}</Text>
-                  {product.seller.farmerProfile?.state && <Text style={s.sellerLoc}>📍 {product.seller.farmerProfile.state}</Text>}
-                  {product.seller.verification?.phoneVerified && <Text style={s.sellerVerified}>✓ Verified seller</Text>}
+                  {product.seller.farmerProfile?.state && <Text style={s.sellerLoc}> {product.seller.farmerProfile.state}</Text>}
+                  {product.seller.verification?.phoneVerified && <Text style={s.sellerVerified}>Verified seller</Text>}
                 </View>
                 {!isMine && (
                   <TouchableOpacity style={[s.waBtn, messaging && { opacity: 0.6 }]} onPress={handleAskSeller} disabled={messaging}>
-                    <Text style={s.waBtnText}>{messaging ? '⏳' : '💬'}</Text>
+                    <Text style={s.waBtnText}>{messaging ? <Hourglass size={20} color="#666" /> : <MessageSquare size={20} color="#666" />}</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -193,7 +194,7 @@ export function ProductDetailScreen({ navigation, route }: Props) {
       </ScrollView>
       {!isMine && (
         <View style={[s.bottomBar, { paddingBottom: insets.bottom + Spacing[3] }]}>
-          <Button title={messaging ? '⏳' : '💬 Ask'} variant="outline" fullWidth={false} style={s.askBtn} onPress={handleAskSeller} disabled={messaging} />
+          <Button title={messaging ? <Hourglass size={20} color="#666" /> : ' Ask'} variant="outline" fullWidth={false} style={s.askBtn} onPress={handleAskSeller} disabled={messaging} />
           <Button title="Add to Cart" variant="outline" fullWidth={false} style={s.cartBtn} onPress={handleAddToCart} />
           <Button title={orderMutation.isPending ? 'Placing…' : 'Order Now'} variant="primary" fullWidth={false} style={s.orderBtn} onPress={handleQuickOrder} disabled={orderMutation.isPending} />
         </View>

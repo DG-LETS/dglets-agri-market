@@ -1,3 +1,4 @@
+import { Search } from "lucide-react-native";
 import React from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
 import { useThemeColors, Typography, Radius, Spacing, Shadow } from '@theme/index';
@@ -27,7 +28,7 @@ export function SearchBar({
       Shadow.sm,
       style,
     ]}>
-      <Text style={styles.searchIcon}>🔍</Text>
+      <Text style={styles.searchIcon}></Text>
       <TextInput
         style={[styles.input, { color: C.textPrimary }]}
         value={value}

@@ -1,3 +1,4 @@
+import { Wheat, MessageSquare } from "lucide-react-native";
 import React, { useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, RefreshControl, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -66,7 +67,7 @@ export function InboxScreen({ navigation }: Props) {
             <Text style={s.convName} numberOfLines={1}>{firstName} {lastName}</Text>
             <Text style={s.convTime}>{formatTime(item.lastMessageAt)}</Text>
           </View>
-          {item.product && <Text style={s.convProduct} numberOfLines={1}>🌾 {item.product.name}</Text>}
+          {item.product && <Text style={s.convProduct} numberOfLines={1}> {item.product.name}</Text>}
           <View style={s.convBottom}>
             <Text style={[s.convPreview, unread > 0 && s.convPreviewUnread]} numberOfLines={1}>
               {lastMsg ? `${isMe ? 'You: ' : ''}${lastMsg.body}` : 'No messages yet — say hello!'}
@@ -87,7 +88,7 @@ export function InboxScreen({ navigation }: Props) {
         {conversations.length > 0 && <Text style={s.headerSub}>{conversations.length} conversation{conversations.length !== 1 ? 's' : ''}</Text>}
       </View>
       {isLoading ? <LoadingState message="Loading messages…" /> : conversations.length === 0 ? (
-        <EmptyState icon="💬" title="No messages yet" description="When you contact a seller or a buyer messages you, conversations will appear here." />
+        <EmptyState icon="MessageSquare" title="No messages yet" description="When you contact a seller or a buyer messages you, conversations will appear here." />
       ) : (
         <FlatList
           data={conversations} keyExtractor={item => item.id} renderItem={renderItem}

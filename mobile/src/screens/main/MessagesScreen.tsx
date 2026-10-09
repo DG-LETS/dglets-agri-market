@@ -1,3 +1,4 @@
+import { MessageSquare } from "lucide-react-native";
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -14,7 +15,7 @@ export function MessagesScreen() {
         <Text style={s.title}>Messages</Text>
       </View>
       <View style={s.body}>
-        <Text style={s.icon}>💬</Text>
+        <MessageSquare size={24} color="#666" />
         <Text style={s.heading}>Messaging Coming in Phase 5</Text>
         <Text style={s.desc}>
           Real-time chat with farmers, buyers and haulage partners.

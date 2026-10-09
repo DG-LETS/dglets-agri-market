@@ -1,3 +1,4 @@
+import { ArrowLeft } from "lucide-react-native";
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -28,7 +29,7 @@ export function ScreenHeader({
         <View style={styles.left}>
           {showBack && (
             <TouchableOpacity onPress={onBack} style={styles.backBtn} hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}>
-              <Text style={[styles.backIcon, { color: fg }]}>←</Text>
+              <Text style={[styles.backIcon, { color: fg }]}></Text>
             </TouchableOpacity>
           )}
           <View>

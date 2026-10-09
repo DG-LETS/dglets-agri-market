@@ -1,3 +1,4 @@
+import { Wheat, Smartphone, Phone, Lock } from "lucide-react-native";
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -42,7 +43,7 @@ export function LoginScreen({ navigation }: Props) {
         contentContainerStyle={[s.container, { paddingTop: insets.top + Spacing[6], paddingBottom: insets.bottom + Spacing[8] }]}
         keyboardShouldPersistTaps="handled">
         <View style={s.header}>
-          <View style={s.logoWrap}><Text style={s.logoEmoji}>🌾</Text></View>
+          <View style={s.logoWrap}><Text style={s.logoEmoji}></Text></View>
           <Text style={s.appName}>DG-LETS</Text>
           <Text style={s.appSub}>AGRI MARKET</Text>
           <Text style={s.heading}>Welcome back</Text>
@@ -53,7 +54,7 @@ export function LoginScreen({ navigation }: Props) {
             render={({ field: { value, onChange, onBlur } }) => (
               <Input label="Phone number or email" placeholder="08012345678 or email@example.com"
                 value={value} onChangeText={onChange} onBlur={onBlur}
-                error={errors.identifier?.message} leftIcon={<Text>📞</Text>} required />
+                error={errors.identifier?.message} leftIcon={<Phone size={24} color="#666" />} required />
             )}
           />
           {!useOtp && (
@@ -61,12 +62,12 @@ export function LoginScreen({ navigation }: Props) {
               render={({ field: { value, onChange, onBlur } }) => (
                 <Input label="Password" placeholder="Enter your password"
                   value={value} onChangeText={onChange} onBlur={onBlur}
-                  error={errors.password?.message} secureTextEntry leftIcon={<Text>🔒</Text>} />
+                  error={errors.password?.message} secureTextEntry leftIcon={<Lock size={24} color="#666" />} />
               )}
             />
           )}
           <TouchableOpacity style={s.otpToggle} onPress={() => setUseOtp(v => !v)}>
-            <Text style={s.otpToggleText}>{useOtp ? '🔑 Sign in with password instead' : '📱 Sign in with OTP instead'}</Text>
+            <Text style={s.otpToggleText}>{useOtp ? 'Sign in with password instead' : 'Sign in with OTP instead'}</Text>
           </TouchableOpacity>
           {!useOtp && (
             <TouchableOpacity style={s.forgotBtn} onPress={() => navigation.navigate('ForgotPassword')}>

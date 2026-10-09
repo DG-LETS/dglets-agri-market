@@ -1,3 +1,4 @@
+import { Hourglass, MessageSquare, ArrowLeft, Banknote, Truck } from "lucide-react-native";
 ﻿import React from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
@@ -17,11 +18,11 @@ type Props = {
 };
 
 const JOB_STATUS: Record<string, { label: string; variant: any; emoji: string }> = {
-  OPEN:       { label: 'Open',       variant: 'warning', emoji: '📋' },
-  AWARDED:    { label: 'Awarded',    variant: 'info',    emoji: '🚛' },
-  IN_TRANSIT: { label: 'In Transit', variant: 'info',    emoji: '🚚' },
-  DELIVERED:  { label: 'Delivered',  variant: 'success', emoji: '✅' },
-  CANCELLED:  { label: 'Cancelled',  variant: 'error',   emoji: '❌' },
+  OPEN:       { label: 'Open',       variant: 'warning', icon: 'ClipboardList' },
+  AWARDED:    { label: 'Awarded',    variant: 'info',    emoji: <Truck size={20} color="#666" /> },
+  IN_TRANSIT: { label: 'In Transit', variant: 'info',    icon: 'Truck' },
+  DELIVERED:  { label: 'Delivered',  variant: 'success', icon: 'CheckCircle' },
+  CANCELLED:  { label: 'Cancelled',  variant: 'error',   icon: 'XCircle' },
 };
 
 export function HaulageProviderDashboardScreen({ navigation }: Props) {
@@ -47,7 +48,7 @@ export function HaulageProviderDashboardScreen({ navigation }: Props) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['haulage-active-jobs'] });
       queryClient.invalidateQueries({ queryKey: ['haulage-my-applications'] });
-      Alert.alert('✅ Job Completed', 'Delivery confirmed. Your commission has been calculated.');
+      Alert.alert('Job Completed', 'Delivery confirmed. Your commission has been calculated.');
     },
     onError: (e: any) => Alert.alert('Error', e?.response?.data?.message ?? 'Could not complete job.'),
   });
@@ -74,7 +75,7 @@ export function HaulageProviderDashboardScreen({ navigation }: Props) {
   };
 
   const handleComplete = (jobId: string, orderNum: string) => {
-    Alert.alert('✅ Confirm Delivery', `Mark job for order #${orderNum} as DELIVERED?\n\nMake sure the buyer has received the goods.`, [
+    Alert.alert('Confirm Delivery', `Mark job for order #${orderNum} as DELIVERED?\n\nMake sure the buyer has received the goods.`, [
       { text: 'Not yet', style: 'cancel' },
       { text: 'Confirm Delivered', onPress: () => completeMutation.mutate(jobId) },
     ]);
@@ -85,7 +86,7 @@ export function HaulageProviderDashboardScreen({ navigation }: Props) {
       {/* Header */}
       <View style={s.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}>
-          <Text style={s.backText}>←</Text>
+          <Text style={s.backText}></Text>
         </TouchableOpacity>
         <Text style={s.headerTitle}>My Dashboard</Text>
         <View style={s.backBtn} />
@@ -97,7 +98,7 @@ export function HaulageProviderDashboardScreen({ navigation }: Props) {
 
         {/* Greeting */}
         <View style={s.greeting}>
-          <Text style={s.greetingText}>Hello, {user?.firstName} 🚛</Text>
+          <Text style={s.greetingText}>Hello, {user?.firstName} </Text>
           <Text style={s.greetingRole}>Haulage Partner</Text>
         </View>
 
@@ -106,10 +107,10 @@ export function HaulageProviderDashboardScreen({ navigation }: Props) {
           <Text style={s.sectionTitle}>Overview</Text>
           <View style={s.statsGrid}>
             {[
-              { emoji: '⚡', label: 'Active Jobs',   value: activeJobs.length.toString(),   color: C.green[600] },
-              { emoji: '📝', label: 'Applied',        value: applications.length.toString(), color: C.info },
-              { emoji: '⏳', label: 'Pending Reply',  value: pendingApps.length.toString(),  color: C.warning },
-              { emoji: '✅', label: 'Accepted',        value: completedApps.length.toString(),color: C.success },
+              { icon: 'Zap', label: 'Active Jobs',   value: activeJobs.length.toString(),   color: C.green[600] },
+              { icon: 'ClipboardList', label: 'Applied',        value: applications.length.toString(), color: C.info },
+              { emoji: <Hourglass size={20} color="#666" />, label: 'Pending Reply',  value: pendingApps.length.toString(),  color: C.warning },
+              { icon: 'CheckCircle', label: 'Accepted',        value: completedApps.length.toString(),color: C.success },
             ].map(item => (
               <View key={item.label} style={[s.statCard, { borderTopColor: item.color, borderTopWidth: 3 }]}>
                 <Text style={s.statEmoji}>{item.emoji}</Text>
@@ -128,7 +129,7 @@ export function HaulageProviderDashboardScreen({ navigation }: Props) {
               <Text style={s.earningsAmount}>₦{estimatedEarnings.toLocaleString('en-NG', { maximumFractionDigits: 0 })}</Text>
               <Text style={s.earningsSub}>After 5% commission · {completedApps.length} job{completedApps.length !== 1 ? 's' : ''}</Text>
             </View>
-            <Text style={s.earningsIcon}>💰</Text>
+            <Banknote size={24} color="#666" />
           </View>
         </View>
 
@@ -137,7 +138,7 @@ export function HaulageProviderDashboardScreen({ navigation }: Props) {
           <Text style={s.sectionTitle}>Active Jobs</Text>
           {activeJobs.length === 0 ? (
             <View style={s.emptyCard}>
-              <Text style={s.emptyIcon}>🚛</Text>
+              <Truck size={24} color="#666" />
               <Text style={s.emptyText}>No active jobs right now.</Text>
               <Text style={s.emptySubText}>Browse the Jobs tab to find deliveries in your area.</Text>
             </View>
@@ -169,12 +170,12 @@ export function HaulageProviderDashboardScreen({ navigation }: Props) {
                     <View style={s.cargoItem}><Text style={s.cargoLabel}>Your Payout</Text><Text style={[s.cargoValue, { color: C.green[700], fontWeight: '700' }]}>{job.agreedFee ? `₦${(job.agreedFee * 0.95).toLocaleString('en-NG', { maximumFractionDigits: 0 })}` : '—'}</Text></View>
                   </View>
                   <View style={s.jobActions}>
-                    {seller?.phone && <TouchableOpacity style={s.waBtn} onPress={() => handleWhatsApp(seller.phone, job.order?.orderNumber)}><Text style={s.waBtnText}>💬 Seller</Text></TouchableOpacity>}
-                    {buyer?.phone  && <TouchableOpacity style={s.waBtn} onPress={() => handleWhatsApp(buyer.phone,  job.order?.orderNumber)}><Text style={s.waBtnText}>💬 Buyer</Text></TouchableOpacity>}
+                    {seller?.phone && <TouchableOpacity style={s.waBtn} onPress={() => handleWhatsApp(seller.phone, job.order?.orderNumber)}><Text style={s.waBtnText}> Seller</Text></TouchableOpacity>}
+                    {buyer?.phone  && <TouchableOpacity style={s.waBtn} onPress={() => handleWhatsApp(buyer.phone,  job.order?.orderNumber)}><Text style={s.waBtnText}> Buyer</Text></TouchableOpacity>}
                     {['AWARDED','IN_TRANSIT'].includes(job.status) && (
                       <TouchableOpacity style={[s.doneBtn, completeMutation.isPending && { opacity: 0.6 }]}
                         onPress={() => handleComplete(job.id, job.order?.orderNumber)} disabled={completeMutation.isPending}>
-                        <Text style={s.doneBtnText}>{completeMutation.isPending ? 'Confirming…' : '✅ Mark Delivered'}</Text>
+                        <Text style={s.doneBtnText}>{completeMutation.isPending ? 'Confirming…' : 'Mark Delivered'}</Text>
                       </TouchableOpacity>
                     )}
                   </View>

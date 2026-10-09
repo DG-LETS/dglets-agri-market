@@ -1,3 +1,4 @@
+import { Smartphone, ArrowLeft, Lightbulb } from "lucide-react-native";
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -78,8 +79,8 @@ export function OtpScreen({ navigation, route }: Props) {
   return (
     <KeyboardAvoidingView style={s.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={[s.container, { paddingTop: insets.top + Spacing[6], paddingBottom: insets.bottom + Spacing[8] }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}><Text style={s.backIcon}>←</Text></TouchableOpacity>
-        <View style={s.iconWrap}><Text style={s.icon}>📱</Text></View>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}><ArrowLeft size={24} color="#666" /></TouchableOpacity>
+        <View style={s.iconWrap}><Smartphone size={24} color="#666" /></View>
         <Text style={s.heading}>Enter OTP</Text>
         <Text style={s.subheading}>We sent a 6-digit code to {phone} to {purposeLabel[purpose] ?? 'continue'}.</Text>
         <View style={s.otpRow}>
@@ -98,7 +99,7 @@ export function OtpScreen({ navigation, route }: Props) {
             : <TouchableOpacity onPress={handleResend} disabled={resending}><Text style={s.resendLink}>{resending ? 'Sending…' : 'Resend code'}</Text></TouchableOpacity>
           }
         </View>
-        <Text style={s.devHint}>💡 Development: Check server console for OTP</Text>
+        <Text style={s.devHint}><Lightbulb size={16} color="#666" /> Development: Check server console for OTP</Text>
       </View>
     </KeyboardAvoidingView>
   );

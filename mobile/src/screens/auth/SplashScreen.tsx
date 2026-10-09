@@ -1,3 +1,4 @@
+import { Wheat } from "lucide-react-native";
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { Colors, Typography, Spacing } from '@theme/index';
@@ -24,7 +25,7 @@ export function SplashScreen({ navigation }: Props) {
     <View style={styles.container}>
       <Animated.View style={[styles.content, { opacity, transform: [{ translateY }] }]}>
         <View style={styles.logoWrap}>
-          <Text style={styles.logoEmoji}>🌾</Text>
+          <Text style={styles.logoEmoji}></Text>
         </View>
         <Text style={styles.appName}>DG-LETS</Text>
         <Text style={styles.appSub}>AGRI MARKET</Text>

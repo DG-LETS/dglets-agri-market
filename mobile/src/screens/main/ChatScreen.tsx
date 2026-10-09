@@ -1,3 +1,4 @@
+import { Wheat, ArrowLeft, Check, Hand, Send } from "lucide-react-native";
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TextInput,
@@ -77,7 +78,7 @@ export function ChatScreen({ navigation, route }: Props) {
   });
 
   const handleReport = () => {
-    Alert.alert('⚠️ Report User', 'Why are you reporting this user?', [
+    Alert.alert('Report User', 'Why are you reporting this user?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Spam / Scam', onPress: () => submitReport('Spam or scam') },
       { text: 'Inappropriate', onPress: () => submitReport('Inappropriate behaviour') },
@@ -85,7 +86,7 @@ export function ChatScreen({ navigation, route }: Props) {
     ]);
   };
   const submitReport = async (reason: string) => {
-    try { await messagesApi.reportUser(conversationId, recipientId, reason); Alert.alert('✓ Reported', 'Thank you. Our team will review this report.'); }
+    try { await messagesApi.reportUser(conversationId, recipientId, reason); Alert.alert('Reported', 'Thank you. Our team will review this report.'); }
     catch { Alert.alert('Error', 'Could not submit report. Please try again.'); }
   };
 
@@ -109,7 +110,7 @@ export function ChatScreen({ navigation, route }: Props) {
           <Text style={[s.bubbleText, isMe ? s.bubbleTextMe : s.bubbleTextThem]}>{msg.body}</Text>
           <View style={s.bubbleMeta}>
             <Text style={[s.bubbleTime, isMe && s.bubbleTimeMe]}>{formatTime(msg.createdAt)}</Text>
-            {isMe && <Text style={[s.readTick, read && s.readTickRead]}>{read ? '✓✓' : '✓'}</Text>}
+            {isMe && <Text style={[s.readTick, read && s.readTickRead]}>{read ? <Check size={16} color="#4CAF50" /> : <Check size={16} color="#999" />}</Text>}
           </View>
         </View>
       </View>
@@ -122,7 +123,7 @@ export function ChatScreen({ navigation, route }: Props) {
     <KeyboardAvoidingView style={s.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined} keyboardVerticalOffset={0}>
       <View style={[s.flex, { paddingTop: insets.top }]}>
         <View style={s.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}><Text style={s.backText}>←</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}><Text style={s.backText}></Text></TouchableOpacity>
           <View style={s.headerCenter}>
             <View style={s.headerAvatar}><Text style={s.headerAvatarText}>{recipientName?.[0]?.toUpperCase() ?? '?'}</Text></View>
             <View>
@@ -134,7 +135,7 @@ export function ChatScreen({ navigation, route }: Props) {
         </View>
         {productName && (
           <View style={s.productBanner}>
-            <Text style={s.productBannerIcon}>🌾</Text>
+            <Text style={s.productBannerIcon}></Text>
             <Text style={s.productBannerText} numberOfLines={1}>Re: <Text style={{ fontWeight: '700' }}>{productName}</Text></Text>
           </View>
         )}
@@ -144,7 +145,7 @@ export function ChatScreen({ navigation, route }: Props) {
           onContentSizeChange={() => flatRef.current?.scrollToEnd({ animated: false })}
           ListEmptyComponent={
             <View style={s.emptyChat}>
-              <Text style={s.emptyChatIcon}>👋</Text>
+              <Hand size={48} color="#666" />
               <Text style={s.emptyChatText}>Start the conversation.{productName ? `\nAsk about "${productName}".` : ''}</Text>
             </View>
           }
@@ -159,7 +160,7 @@ export function ChatScreen({ navigation, route }: Props) {
             onPress={() => { if (!text.trim()) return; sendMutation.mutate(); }}
             disabled={!text.trim() || sendMutation.isPending}
           >
-            {sendMutation.isPending ? <ActivityIndicator size="small" color="#fff" /> : <Text style={s.sendBtnText}>➤</Text>}
+            {sendMutation.isPending ? <ActivityIndicator size="small" color="#fff" /> : <Send size={24} color="white" />}
           </TouchableOpacity>
         </View>
       </View>

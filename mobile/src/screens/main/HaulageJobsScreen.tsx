@@ -1,3 +1,4 @@
+import { Truck } from "lucide-react-native";
 ﻿import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, FlatList,
@@ -145,7 +146,7 @@ export function HaulageJobsScreen() {
       {/* â”€â”€ Info banner â”€â”€ */}
       <View style={s.infoBanner}>
         <Text style={s.infoBannerText}>
-          ðŸš› Showing orders that need delivery. Apply for jobs in your coverage area.
+           Showing orders that need delivery. Apply for jobs in your coverage area.
         </Text>
       </View>
 
@@ -154,7 +155,7 @@ export function HaulageJobsScreen() {
         <LoadingState message="Finding delivery jobsâ€¦" />
       ) : jobs.length === 0 ? (
         <EmptyState
-          icon="ðŸš›"
+          icon="Truck"
           title="No jobs right now"
           description={
             stateFilter !== 'All States'
@@ -266,7 +267,7 @@ export function HaulageJobsScreen() {
                     disabled={alreadyApplied || applyMutation.isPending}
                   >
                     <Text style={s.applyBtnText}>
-                      {alreadyApplied ? 'âœ“ Applied' : applyMutation.isPending ? 'Applyingâ€¦' : 'ðŸš› Apply for Job'}
+                      {alreadyApplied ? 'âœ“ Applied' : applyMutation.isPending ? 'Applyingâ€¦' : ' Apply for Job'}
                     </Text>
                   </TouchableOpacity>
                 </View>

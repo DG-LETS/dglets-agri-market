@@ -1,3 +1,4 @@
+import { Wheat, ArrowLeft, User, Phone, Mail, Lock, Truck, CheckSquare, Square } from "lucide-react-native";
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -20,13 +21,13 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 const roles = [
-  { id: 'FARMER',     label: 'Farmer',     emoji: '👨‍🌾', desc: 'Sell your produce' },
-  { id: 'BUYER',      label: 'Buyer',      emoji: '🛒',  desc: 'Buy farm produce' },
-  { id: 'TRADER',     label: 'Trader',     emoji: '🏪',  desc: 'Trade & aggregate' },
-  { id: 'AGGREGATOR', label: 'Aggregator', emoji: '🤝',  desc: 'Aggregate produce' },
-  { id: 'HAULAGE',    label: 'Logistics',  emoji: '🚛',  desc: 'Deliver goods' },
-  { id: 'PROCESSOR',  label: 'Processor',  emoji: '🏭',  desc: 'Process & export' },
-  { id: 'EXPORTER',   label: 'Exporter',   emoji: '🌍',  desc: 'Export produce' },
+  { id: 'FARMER',     label: 'Farmer',     icon: 'User', desc: 'Sell your produce' },
+  { id: 'BUYER',      label: 'Buyer',      icon: 'ShoppingCart',  desc: 'Buy farm produce' },
+  { id: 'TRADER',     label: 'Trader',     icon: 'Store',  desc: 'Trade & aggregate' },
+  { id: 'AGGREGATOR', label: 'Aggregator', icon: 'Handshake',  desc: 'Aggregate produce' },
+  { id: 'HAULAGE',    label: 'Logistics',  emoji: <Truck size={20} color="#666" />,  desc: 'Deliver goods' },
+  { id: 'PROCESSOR',  label: 'Processor',  icon: 'Factory',  desc: 'Process & export' },
+  { id: 'EXPORTER',   label: 'Exporter',   icon: 'Globe',  desc: 'Export produce' },
 ];
 
 type Props = { navigation: StackNavigationProp<AuthStackParamList, 'Register'> };
@@ -46,6 +47,15 @@ export function RegisterScreen({ navigation }: Props) {
   };
 
   const onSubmit = async (data: FormData) => {
+    const isSeller = ['FARMER', 'TRADER', 'AGGREGATOR', 'PROCESSOR', 'EXPORTER'].includes(selectedRole);
+    if (!agreeTerms) {
+      Alert.alert('Required', 'Please agree to the Terms & Conditions to continue.');
+      return;
+    }
+    if (isSeller && !agreeSeller) {
+      Alert.alert('Required', 'Please confirm the seller declarations to continue.');
+      return;
+    }
     try {
       const result = await registerUser({ ...data, role: selectedRole, email: data.email || undefined });
       navigation.navigate('Otp', { userId: result.userId, purpose: 'verify_phone', phone: data.phone });
@@ -62,7 +72,7 @@ export function RegisterScreen({ navigation }: Props) {
         contentContainerStyle={[s.container, { paddingTop: insets.top + Spacing[4], paddingBottom: insets.bottom + Spacing[8] }]}
         keyboardShouldPersistTaps="handled">
         <TouchableOpacity onPress={() => step === 2 ? setStep(1) : navigation.goBack()} style={s.backBtn}>
-          <Text style={s.backIcon}>←</Text>
+          <ArrowLeft size={24} color="#666" />
         </TouchableOpacity>
         <Text style={s.heading}>Create account</Text>
         <Text style={s.subheading}>Join Nigeria's agricultural marketplace</Text>
@@ -75,15 +85,15 @@ export function RegisterScreen({ navigation }: Props) {
           <View>
             <Controller control={control} name="firstName"
               render={({ field: { value, onChange, onBlur } }) => (
-                <Input label="First Name" placeholder="e.g. Musa" value={value} onChangeText={onChange} onBlur={onBlur} error={errors.firstName?.message} leftIcon={<Text>👤</Text>} required />
+                <Input label="First Name" placeholder="e.g. Musa" value={value} onChangeText={onChange} onBlur={onBlur} error={errors.firstName?.message} leftIcon={<User size={24} color="#666" />} required />
               )} />
             <Controller control={control} name="lastName"
               render={({ field: { value, onChange, onBlur } }) => (
-                <Input label="Last Name" placeholder="e.g. Abdullahi" value={value} onChangeText={onChange} onBlur={onBlur} error={errors.lastName?.message} leftIcon={<Text>👤</Text>} required />
+                <Input label="Last Name" placeholder="e.g. Abdullahi" value={value} onChangeText={onChange} onBlur={onBlur} error={errors.lastName?.message} leftIcon={<User size={24} color="#666" />} required />
               )} />
             <Controller control={control} name="phone"
               render={({ field: { value, onChange, onBlur } }) => (
-                <Input label="Phone Number" placeholder="e.g. 08012345678" value={value} onChangeText={onChange} onBlur={onBlur} error={errors.phone?.message} keyboardType="phone-pad" leftIcon={<Text>📞</Text>} required />
+                <Input label="Phone Number" placeholder="e.g. 08012345678" value={value} onChangeText={onChange} onBlur={onBlur} error={errors.phone?.message} keyboardType="phone-pad" leftIcon={<Phone size={24} color="#666" />} required />
               )} />
             <Button title="Continue" onPress={handleNext} size="lg" style={s.btn} />
           </View>
@@ -102,12 +112,25 @@ export function RegisterScreen({ navigation }: Props) {
             </View>
             <Controller control={control} name="email"
               render={({ field: { value, onChange, onBlur } }) => (
-                <Input label="Email (optional)" placeholder="email@example.com" value={value} onChangeText={onChange} onBlur={onBlur} error={errors.email?.message} keyboardType="email-address" leftIcon={<Text>✉️</Text>} />
+                <Input label="Email (optional)" placeholder="email@example.com" value={value} onChangeText={onChange} onBlur={onBlur} error={errors.email?.message} keyboardType="email-address" leftIcon={<Mail size={24} color="#666" />} />
               )} />
             <Controller control={control} name="password"
               render={({ field: { value, onChange, onBlur } }) => (
-                <Input label="Password (optional)" placeholder="At least 8 characters" value={value} onChangeText={onChange} onBlur={onBlur} error={errors.password?.message} secureTextEntry leftIcon={<Text>🔒</Text>} hint="Leave blank to use OTP login" />
+                <Input label="Password (optional)" placeholder="At least 8 characters" value={value} onChangeText={onChange} onBlur={onBlur} error={errors.password?.message} secureTextEntry leftIcon={<Lock size={24} color="#666" />} hint="Leave blank to use OTP login" />
               )} />
+            <View style={s.checkboxContainer}>
+              <TouchableOpacity style={s.checkbox} onPress={() => setAgreeTerms(!agreeTerms)} activeOpacity={0.8}>
+                {agreeTerms ? <CheckSquare size={20} color={C.green[700]} /> : <Square size={20} color={C.gray[400]} />}
+                <Text style={s.checkboxText}>I agree to the DG-LETS Terms & Conditions and acknowledge the Privacy Policy.</Text>
+              </TouchableOpacity>
+              
+              {['FARMER', 'TRADER', 'AGGREGATOR', 'PROCESSOR', 'EXPORTER'].includes(selectedRole) && (
+                <TouchableOpacity style={s.checkbox} onPress={() => setAgreeSeller(!agreeSeller)} activeOpacity={0.8}>
+                  {agreeSeller ? <CheckSquare size={20} color={C.green[700]} /> : <Square size={20} color={C.gray[400]} />}
+                  <Text style={s.checkboxText}>I confirm that the products I list are genuine, accurately described, legally permitted for sale, and that I have the right to sell them.</Text>
+                </TouchableOpacity>
+              )}
+            </View>
             <Button title="Create Account" onPress={handleSubmit(onSubmit)} loading={isLoading} size="lg" style={s.btn} />
           </View>
         )}
@@ -144,5 +167,8 @@ function makeStyles(C: ReturnType<typeof useThemeColors>) {
     loginRow:       { flexDirection: 'row', justifyContent: 'center', marginTop: Spacing[6] },
     loginText:      { ...Typography.bodyMedium, color: C.textMuted },
     loginLink:      { ...Typography.bodyMedium, color: C.green[700], fontWeight: '700' },
+    checkboxContainer: { marginTop: Spacing[2], marginBottom: Spacing[4], gap: Spacing[3] },
+    checkbox:       { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing[2] },
+    checkboxText:   { flex: 1, ...Typography.caption, color: C.textSecondary, lineHeight: 18 },
   });
 }

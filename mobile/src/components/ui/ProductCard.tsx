@@ -1,3 +1,4 @@
+import { Wheat, Heart, Package, MapPin } from "lucide-react-native";
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { useThemeColors, Typography, Radius, Spacing, Shadow } from '@theme/index';
@@ -46,12 +47,12 @@ export function ProductCard({
           <Image source={{ uri: imageUri }} style={s.image} resizeMode="cover" />
         ) : (
           <View style={[s.image, s.imagePlaceholder]}>
-            <Text style={s.imagePlaceholderIcon}>🌾</Text>
+            <Text style={s.imagePlaceholderIcon}></Text>
           </View>
         )}
         {onSave && (
           <TouchableOpacity style={s.saveBtn} onPress={onSave} hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}>
-            <Text style={s.saveIcon}>{saved ? '❤️' : '🤍'}</Text>
+            <Text style={s.saveIcon}>{saved ? <Heart size={20} color="#666" /> : <Heart size={20} color="#999" />}</Text>
           </TouchableOpacity>
         )}
         {isVerified && (
@@ -67,19 +68,19 @@ export function ProductCard({
           <Text style={s.priceUnit}>/{priceUnit}</Text>
         </Text>
         <View style={s.meta}>
-          <Text style={s.metaText}>📦 {quantity.toLocaleString()}{quantityUnit} avail.</Text>
+          <Text style={s.metaText}> {quantity.toLocaleString()}{quantityUnit} avail.</Text>
         </View>
         <View style={s.footer}>
           <View style={s.sellerRow}>
-            <Text style={s.sellerIcon}>🌾</Text>
+            <Text style={s.sellerIcon}></Text>
             <Text style={s.sellerName} numberOfLines={1}>{sellerName}</Text>
           </View>
           <View style={s.right}>
-            {displayDistance && <Text style={s.distance}>📍 {displayDistance}</Text>}
+            {displayDistance && <Text style={s.distance}> {displayDistance}</Text>}
             {rating && <Text style={s.rating}>⭐ {rating.toFixed(1)}</Text>}
           </View>
         </View>
-        <Text style={s.location}>📍 {state}</Text>
+        <Text style={s.location}> {state}</Text>
       </View>
     </TouchableOpacity>
   );

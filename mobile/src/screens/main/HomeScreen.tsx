@@ -1,3 +1,4 @@
+import { Wheat, Map, Package, MapPin, Search, User, Lock, Bell, Sprout } from "lucide-react-native";
 import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, FlatList,
@@ -23,9 +24,9 @@ type Props = {
 
 function greetingText() {
   const h = new Date().getHours();
-  if (h < 12) return 'Good morning 👋';
-  if (h < 17) return 'Good afternoon 👋';
-  return 'Good evening 👋';
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
 }
 
 export function HomeScreen({ navigation }: Props) {
@@ -94,7 +95,7 @@ export function HomeScreen({ navigation }: Props) {
             <Badge label={user?.role ?? 'User'} variant="green" size="sm" style={s.roleBadge} />
           </View>
           <TouchableOpacity style={s.notifBtn} onPress={() => (navigation as any).navigate('ProfileTab')}>
-            <Text style={s.notifIcon}>🔔</Text>
+            <Bell size={24} color="#666" />
             {unread > 0 && (
               <View style={s.notifBadge}>
                 <Text style={s.notifBadgeText}>{unread > 99 ? '99+' : unread}</Text>
@@ -108,7 +109,7 @@ export function HomeScreen({ navigation }: Props) {
       {/* Seller CTA */}
       {isFarmer && (
         <TouchableOpacity style={s.sellerBanner} activeOpacity={0.85} onPress={() => (navigation as any).navigate('MarketTab', { screen: 'CreateListing' })}>
-          <Text style={s.sellerBannerEmoji}>🌾</Text>
+          <Wheat size={28} color="#27ae60" style={s.sellerBannerEmoji} />
           <View style={s.sellerBannerText}>
             <Text style={s.sellerBannerTitle}>List Your Produce</Text>
             <Text style={s.sellerBannerSub}>Reach buyers across Nigeria →</Text>
@@ -122,13 +123,13 @@ export function HomeScreen({ navigation }: Props) {
         <Text style={s.sectionTitle}>Quick Actions</Text>
         <View style={s.quickGrid}>
           {[
-            { emoji: '🔍', label: 'Browse All',   action: () => goToMarket() },
-            { emoji: '🗺️', label: 'Smart Map',    action: () => (navigation as any).navigate('SmartMap') },
-            { emoji: '📦', label: 'My Orders',    action: () => (navigation as any).navigate('OrdersTab') },
-            { emoji: '👤', label: 'My Profile',   action: () => (navigation as any).navigate('ProfileTab') },
+            { emoji: <Search size={20} color="#666" />, label: 'Browse All',   action: () => goToMarket() },
+            { emoji: <Map size={20} color="#666" />, label: 'Smart Map',    action: () => (navigation as any).navigate('SmartMap') },
+            { emoji: <Package size={20} color="#666" />, label: 'My Orders',    action: () => (navigation as any).navigate('OrdersTab') },
+            { emoji: <User size={20} color="#666" />, label: 'My Profile',   action: () => (navigation as any).navigate('ProfileTab') },
           ].map(item => (
             <TouchableOpacity key={item.label} style={s.quickCard} onPress={item.action} activeOpacity={0.8}>
-              <Text style={s.quickEmoji}>{item.emoji}</Text>
+              <View style={s.quickIconWrap}>{item.emoji}</View>
               <Text style={s.quickLabel}>{item.label}</Text>
             </TouchableOpacity>
           ))}
@@ -147,7 +148,7 @@ export function HomeScreen({ navigation }: Props) {
             showsHorizontalScrollIndicator={false} contentContainerStyle={s.catList}
             renderItem={({ item }) => (
               <TouchableOpacity style={s.catCard} onPress={() => goToMarket(item.id)} activeOpacity={0.8}>
-                <View style={s.catIcon}><Text style={s.catIconText}>{item.icon || '📦'}</Text></View>
+                <View style={s.catIcon}><Package size={22} color="#27ae60" /></View>
                 <Text style={s.catName} numberOfLines={1}>{item.name}</Text>
               </TouchableOpacity>
             )}
@@ -158,7 +159,7 @@ export function HomeScreen({ navigation }: Props) {
       {/* Prices ticker */}
       {prices.length > 0 && (
         <View style={s.pricesBanner}>
-          <Text style={s.pricesBannerLabel}>📊 Today's Prices</Text>
+          <Text style={s.pricesBannerLabel}>Today's Prices</Text>
           <FlatList
             horizontal data={prices.slice(0, 8)} keyExtractor={i => i.id}
             showsHorizontalScrollIndicator={false} contentContainerStyle={s.pricesList}
@@ -166,7 +167,7 @@ export function HomeScreen({ navigation }: Props) {
               <View style={s.priceChip}>
                 <Text style={s.priceProduct}>{item.product}</Text>
                 <Text style={s.priceVal}>₦{item.priceAvg?.toLocaleString()}/{item.unit}</Text>
-                <Text style={s.priceState}>📍 {item.state}</Text>
+                <Text style={s.priceState}> {item.state}</Text>
               </View>
             )}
           />
@@ -181,7 +182,7 @@ export function HomeScreen({ navigation }: Props) {
         </View>
         {featured.length === 0 ? (
           <View style={s.emptyFeatured}>
-            <Text style={s.emptyFeaturedIcon}>🌱</Text>
+            <Sprout size={24} color="#666" />
             <Text style={s.emptyFeaturedText}>No listings yet. Be the first to list!</Text>
           </View>
         ) : (
@@ -200,9 +201,9 @@ export function HomeScreen({ navigation }: Props) {
       {/* Trust banner */}
       <View style={s.trustBanner}>
         {[
-          { emoji: '✅', text: 'Verified Sellers' },
-          { emoji: '🔒', text: 'Secure Orders' },
-          { emoji: '🚚', text: 'Fast Delivery' },
+          { icon: 'CheckCircle', text: 'Verified Sellers' },
+          { emoji: <Lock size={20} color="#666" />, text: 'Secure Orders' },
+          { icon: 'Truck', text: 'Fast Delivery' },
         ].map((item, i) => (
           <React.Fragment key={item.text}>
             {i > 0 && <View style={s.trustDiv} />}

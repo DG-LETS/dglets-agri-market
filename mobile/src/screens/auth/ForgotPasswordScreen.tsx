@@ -1,3 +1,4 @@
+import { ArrowLeft, Phone, Lock } from "lucide-react-native";
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -32,15 +33,15 @@ export function ForgotPasswordScreen({ navigation }: Props) {
   return (
     <KeyboardAvoidingView style={s.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <View style={[s.container, { paddingTop: insets.top + Spacing[6], paddingBottom: insets.bottom + Spacing[8] }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}><Text style={s.backIcon}>←</Text></TouchableOpacity>
-        <View style={s.iconWrap}><Text style={s.icon}>🔐</Text></View>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}><ArrowLeft size={24} color="#666" /></TouchableOpacity>
+        <View style={s.iconWrap}><Lock size={48} color="#666" /></View>
         <Text style={s.heading}>Reset password</Text>
         <Text style={s.subheading}>Enter your phone number and we'll send you a reset code.</Text>
         <Input label="Phone number" placeholder="08012345678" value={phone} onChangeText={setPhone}
-          keyboardType="phone-pad" error={error} leftIcon={<Text>📞</Text>} required />
+          keyboardType="phone-pad" error={error} leftIcon={<Phone size={24} color="#666" />} required />
         <Button title="Send Reset Code" onPress={handleSubmit} loading={loading} size="lg" />
         <TouchableOpacity style={s.backToLogin} onPress={() => navigation.navigate('Login')}>
-          <Text style={s.backToLoginText}>← Back to sign in</Text>
+          <Text style={s.backToLoginText}> Back to sign in</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>

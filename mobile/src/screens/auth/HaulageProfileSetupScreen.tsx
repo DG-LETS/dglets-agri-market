@@ -1,3 +1,4 @@
+import { Map, IdCard, Truck, Check, Store, Scale, Calendar, ClipboardList } from "lucide-react-native";
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -11,12 +12,12 @@ import type { AuthStackParamList } from '@navigation/AuthNavigator';
 type Props = { navigation: StackNavigationProp<AuthStackParamList, 'HaulageProfileSetup'> };
 
 const VEHICLE_TYPES = [
-  { id: 'motorcycle',   label: 'Motorcycle / Keke', emoji: '🏍️', capacity: 0.1 },
-  { id: 'pickup',       label: 'Pickup / Van',       emoji: '🚐', capacity: 1   },
-  { id: 'small-truck',  label: 'Small Truck',        emoji: '🚛', capacity: 3   },
-  { id: 'medium-truck', label: 'Medium Truck',       emoji: '🚚', capacity: 7   },
-  { id: 'large-truck',  label: 'Large Truck',        emoji: '🏗️', capacity: 20  },
-  { id: 'multiple',     label: 'Multiple Types',     emoji: '🚜', capacity: 0   },
+  { id: 'motorcycle',   label: 'Motorcycle / Keke', emoji: <Truck size={20} color="#666" />, capacity: 0.1 },
+  { id: 'pickup',       label: 'Pickup / Van',       emoji: <Truck size={20} color="#666" />, capacity: 1   },
+  { id: 'small-truck',  label: 'Small Truck',        emoji: <Truck size={20} color="#666" />, capacity: 3   },
+  { id: 'medium-truck', label: 'Medium Truck',       emoji: <Truck size={20} color="#666" />, capacity: 7   },
+  { id: 'large-truck',  label: 'Large Truck',        emoji: <Truck size={20} color="#666" />, capacity: 20  },
+  { id: 'multiple',     label: 'Multiple Types',     emoji: <Truck size={20} color="#666" />, capacity: 0   },
 ];
 
 const ALL_STATES = [
@@ -72,7 +73,7 @@ export function HaulageProfileSetupScreen({ navigation }: Props) {
       keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 
       <View style={s.header}>
-        <View style={s.iconWrap}><Text style={s.icon}>🚛</Text></View>
+        <View style={s.iconWrap}><Truck size={24} color="#666" /></View>
         <Text style={s.heading}>Set Up Your Haulage Profile</Text>
         <Text style={s.subheading}>Tell buyers and sellers about your logistics service so they can find and trust you.</Text>
       </View>
@@ -80,7 +81,7 @@ export function HaulageProfileSetupScreen({ navigation }: Props) {
       {/* Progress */}
       <View style={s.progressBar}>
         <View style={s.progressStep}>
-          <View style={[s.progressDot, s.progressDotDone]}><Text style={s.progressCheck}>✓</Text></View>
+          <View style={[s.progressDot, s.progressDotDone]}><Check size={20} color="#4CAF50" /></View>
           <Text style={s.progressLabel}>Account</Text>
         </View>
         <View style={s.progressLine} />
@@ -99,7 +100,7 @@ export function HaulageProfileSetupScreen({ navigation }: Props) {
       <View style={s.section}>
         <Text style={s.sectionTitle}>Business Details</Text>
         <Input label="Company / Business Name (optional)" placeholder="e.g. Musa Haulage Services"
-          value={companyName} onChangeText={setCompanyName} leftIcon={<Text>🏢</Text>} />
+          value={companyName} onChangeText={setCompanyName} leftIcon={<Store size={24} color="#666" />} />
       </View>
 
       {/* Vehicle type */}
@@ -123,11 +124,11 @@ export function HaulageProfileSetupScreen({ navigation }: Props) {
         <Text style={s.sectionTitle}>Vehicle Details</Text>
         <Input label="Maximum Capacity (tonnes per trip) *"
           placeholder={selectedVehicle ? `e.g. ${selectedVehicle.capacity}` : 'e.g. 5'}
-          value={vehicleCapacity} onChangeText={setVehicleCapacity} keyboardType="decimal-pad" leftIcon={<Text>⚖️</Text>} />
+          value={vehicleCapacity} onChangeText={setVehicleCapacity} keyboardType="decimal-pad" leftIcon={<Scale size={24} color="#666" />} />
         <Input label="License Plate (optional)" placeholder="e.g. ABJ-123-KJ"
-          value={licensePlate} onChangeText={setLicensePlate} leftIcon={<Text>🪪</Text>} />
+          value={licensePlate} onChangeText={setLicensePlate} leftIcon={<IdCard size={24} color="#666" />} />
         <Input label="Years of Experience (optional)" placeholder="e.g. 5"
-          value={yearsExp} onChangeText={setYearsExp} keyboardType="number-pad" leftIcon={<Text>📅</Text>} />
+          value={yearsExp} onChangeText={setYearsExp} keyboardType="number-pad" leftIcon={<Calendar size={24} color="#666" />} />
       </View>
 
       {/* Coverage states */}
@@ -171,12 +172,12 @@ export function HaulageProfileSetupScreen({ navigation }: Props) {
         <Input label="Main Routes / Coverage Description (optional)"
           placeholder="e.g. Lagos - Abuja - Kano corridor"
           value={coverageRoutes} onChangeText={setCoverageRoutes}
-          leftIcon={<Text>🗺️</Text>} multiline numberOfLines={3} />
+          leftIcon={<Map size={24} color="#666" />} multiline numberOfLines={3} />
       </View>
 
       {/* Info */}
       <View style={s.infoBanner}>
-        <Text style={s.infoBannerTitle}>📋 What happens next?</Text>
+        <Text style={s.infoBannerTitle}><ClipboardList size={20} color="#666" /> What happens next?</Text>
         <Text style={s.infoBannerText}>After completing your profile, you'll pay a one-time activation fee of ₦3,000.</Text>
       </View>
 

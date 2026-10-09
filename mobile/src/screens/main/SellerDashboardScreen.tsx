@@ -1,3 +1,4 @@
+import { Mail } from "lucide-react-native";
 ﻿import React from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
@@ -170,7 +171,7 @@ export function SellerDashboardScreen({ navigation }: Props) {
 
           {recentOrders.length === 0 ? (
             <View style={s.emptyOrders}>
-              <Text style={s.emptyOrdersIcon}>ðŸ“­</Text>
+              <Mail size={24} color="#666" />
               <Text style={s.emptyOrdersText}>No orders yet. Your orders will appear here.</Text>
             </View>
           ) : (

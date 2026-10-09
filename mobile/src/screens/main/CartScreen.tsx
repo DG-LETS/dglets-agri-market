@@ -5,6 +5,7 @@ import {
   Platform, ScrollView, TextInput,
 } from 'react-native';
 import { Image } from 'expo-image';
+import { CheckSquare, Square } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useThemeColors, Typography, Spacing, Radius, Shadow } from '@theme/index';
@@ -42,6 +43,7 @@ export function CartScreen({ navigation }: Props) {
   const [deliveryState,   setDeliveryState]   = useState('');
   const [notes,           setNotes]           = useState('');
   const [showStateList,   setShowStateList]   = useState(false);
+  const [agreeCheckout, setAgreeCheckout] = useState(false);
 
   /* â”€â”€ Place order mutation â”€â”€ */
   const orderMutation = useMutation({
@@ -377,5 +379,8 @@ function makeStyles(C: any) { return StyleSheet.create({
   bottomTotal:   { ...Typography.headingSmall, color: C.green[700] },
   bottomItems:   { ...Typography.caption, color: C.textMuted },
   placeBtn:      { flex: 1, marginLeft: Spacing[4] },
+  checkboxContainer: { paddingHorizontal: Spacing[5], marginTop: Spacing[4], marginBottom: Spacing[2] },
+  checkbox:       { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing[3] },
+  checkboxText:   { flex: 1, ...Typography.bodySmall, color: C.textSecondary, lineHeight: 18 },
 });
 }

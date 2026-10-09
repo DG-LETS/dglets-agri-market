@@ -1,3 +1,4 @@
+import { Wheat, Heart, Hourglass, Camera, Smartphone, IdCard, User, Bell, Sprout, Truck, Moon, BarChart, CreditCard, LogOut, Globe } from "lucide-react-native";
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image, Switch } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -32,7 +33,7 @@ export function ProfileScreen({ navigation }: Props) {
       if (!urls[0]) throw new Error('Upload failed');
       return usersApi.updateMe({ profileImage: urls[0] }).then(r => r.data);
     },
-    onSuccess: () => { refreshUser(); Alert.alert('✓ Profile photo updated!'); },
+    onSuccess: () => { refreshUser(); Alert.alert('Profile photo updated!'); },
     onError: (e: any) => Alert.alert('Update Failed', e?.response?.data?.message ?? 'Could not update photo.'),
   });
 
@@ -72,14 +73,14 @@ export function ProfileScreen({ navigation }: Props) {
             <Text style={s.avatarText}>{user.firstName.charAt(0)}{user.lastName.charAt(0)}</Text>
           )}
           <View style={s.avatarEditBadge}>
-            <Text style={s.avatarEditIcon}>{uploading ? '⏳' : '📷'}</Text>
+            <Text style={s.avatarEditIcon}>{uploading ? <Hourglass size={20} color="#666" /> : <Camera size={20} color="#666" />}</Text>
           </View>
         </TouchableOpacity>
         <Text style={s.name}>{user.firstName} {user.lastName}</Text>
         <Text style={s.phone}>{user.phone}</Text>
         <View style={s.badges}>
           <Badge label={roleLabels[user.role] || user.role} variant="green" />
-          <Badge label={user.status === 'ACTIVE' ? '✓ Active' : user.status} variant={user.status === 'ACTIVE' ? 'success' : 'warning'} />
+          <Badge label={user.status === 'ACTIVE' ? 'Active' : user.status} variant={user.status === 'ACTIVE' ? 'success' : 'warning'} />
         </View>
       </View>
 
@@ -88,15 +89,15 @@ export function ProfileScreen({ navigation }: Props) {
         <Text style={s.sectionTitle}>Verification Status</Text>
         <View style={s.card}>
           {[
-            { label: 'Phone & Email',        status: 'verified',   icon: '📱' },
-            { label: 'Identity Document',     status: 'pending',    icon: '🪪' },
-            { label: 'Farm / Business Info',  status: 'unverified', icon: '🌾' },
+            { label: 'Phone & Email',        status: 'verified',   icon: <Smartphone size={20} color="#666" /> },
+            { label: 'Identity Document',     status: 'pending',    icon: <IdCard size={20} color="#666" /> },
+            { label: 'Farm / Business Info',  status: 'unverified', icon: <Wheat size={20} color="#666" /> },
           ].map(item => (
             <View key={item.label} style={s.verifyRow}>
-              <Text style={s.verifyIcon}>{item.icon}</Text>
+              <View style={s.verifyIcon}>{item.icon}</View>
               <Text style={s.verifyLabel}>{item.label}</Text>
               <Badge
-                label={item.status === 'verified' ? '✓ Verified' : item.status === 'pending' ? 'Pending' : 'Not started'}
+                label={item.status === 'verified' ? 'Verified' : item.status === 'pending' ? 'Pending' : 'Not started'}
                 variant={item.status === 'verified' ? 'success' : item.status === 'pending' ? 'warning' : 'gray'}
                 size="sm"
               />
@@ -110,18 +111,18 @@ export function ProfileScreen({ navigation }: Props) {
         <Text style={s.sectionTitle}>Account</Text>
         <View style={s.card}>
           {isSeller && user.role !== 'HAULAGE' && (
-            <MenuItem emoji="📊" label="Seller Dashboard" onPress={() => navigation.navigate('SellerDashboard')} />
+            <MenuItem icon={<BarChart size={20} color="#666" />} label="Seller Dashboard" onPress={() => navigation.navigate('SellerDashboard')} />
           )}
           {user.role === 'HAULAGE' && (
-            <MenuItem emoji="🚛" label="My Haulage Dashboard" onPress={() => navigation.navigate('HaulageProviderDashboard')} />
+            <MenuItem emoji="Truck" label="My Haulage Dashboard" onPress={() => navigation.navigate('HaulageProviderDashboard')} />
           )}
-          <MenuItem emoji="👤" label="Edit Profile"            onPress={() => navigation.navigate('EditProfile', { section: 'basic' })} />
-          <MenuItem emoji="🌾" label="Farm / Business Profile" onPress={() => navigation.navigate('EditProfile', { section: isSeller ? 'farmer' : 'buyer' })} />
-          <MenuItem emoji="❤️" label="Saved Products"          onPress={() => navigation.navigate('SavedProducts')} />
-          <MenuItem emoji="💳" label="Payout Details"          onPress={() => Alert.alert('Coming Soon', 'Payout details will be available soon.')} />
+          <MenuItem emoji="User" label="Edit Profile"            onPress={() => navigation.navigate('EditProfile', { section: 'basic' })} />
+          <MenuItem emoji="Wheat" label="Farm / Business Profile" onPress={() => navigation.navigate('EditProfile', { section: isSeller ? 'farmer' : 'buyer' })} />
+          <MenuItem emoji="Heart" label="Saved Products"          onPress={() => navigation.navigate('SavedProducts')} />
+          <MenuItem icon={<CreditCard size={20} color="#666" />} label="Payout Details"          onPress={() => Alert.alert('Coming Soon', 'Payout details will be available soon.')} />
 
           <View style={s.menuItem}>
-            <Text style={s.menuEmoji}>🌙</Text>
+            <Moon size={24} color="#666" />
             <Text style={s.menuLabel}>Dark Mode</Text>
             <Switch value={darkMode} onValueChange={toggleDarkMode}
               trackColor={{ false: C.gray[300], true: C.green[600] }}
@@ -129,14 +130,14 @@ export function ProfileScreen({ navigation }: Props) {
           </View>
 
           <View style={s.menuItem}>
-            <Text style={s.menuEmoji}>🔔</Text>
+            <Text style={s.menuEmoji}></Text>
             <Text style={s.menuLabel}>Notifications</Text>
             <Switch value={notificationsEnabled} onValueChange={toggleNotifications}
               trackColor={{ false: C.gray[300], true: C.green[600] }}
               thumbColor={notificationsEnabled ? C.green[200] : '#ffffff'} />
           </View>
 
-          <MenuItem emoji="🌍" label="Language — English" onPress={() => Alert.alert('Coming Soon', 'More languages coming soon.')} />
+          <MenuItem icon={<Globe size={20} color="#666" />} label="Language — English" onPress={() => Alert.alert('Coming Soon', 'More languages coming soon.')} />
         </View>
       </View>
 
@@ -146,7 +147,7 @@ export function ProfileScreen({ navigation }: Props) {
         <TouchableOpacity style={s.rewardCard} activeOpacity={0.8}>
           <View>
             <Text style={s.rewardBalance}>0 DGR</Text>
-            <Text style={s.rewardLabel}>Reward Balance · 🌱 Seed Level</Text>
+            <Text style={s.rewardLabel}>Reward Balance ·  Seed Level</Text>
           </View>
           <Text style={s.rewardArrow}>›</Text>
         </TouchableOpacity>
@@ -155,7 +156,7 @@ export function ProfileScreen({ navigation }: Props) {
       {/* Sign out */}
       <View style={[s.section, { marginTop: Spacing[2] }]}>
         <View style={s.card}>
-          <MenuItem emoji="🚪" label="Sign Out" onPress={handleLogout} danger />
+          <MenuItem icon={<LogOut size={20} color="#666" />} label="Sign Out" onPress={handleLogout} danger />
         </View>
       </View>
 
