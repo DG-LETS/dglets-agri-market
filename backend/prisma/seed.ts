@@ -36,7 +36,28 @@ async function main() {
   }
 
   console.log(`✅ Seeded ${categories.length} categories`);
-  console.log('🎉 Seed complete!');
+
+  /* ── Section 20 & 37: Seed system settings (config-driven platform) ── */
+  console.log('\n🔧 Seeding system settings...');
+  const systemSettings = [
+    { key: 'marketplace_commission_rate', value: '0.05',                                        description: 'Marketplace commission rate (5%). Deducted from seller proceeds.' },
+    { key: 'payment_processing_fee_type', value: 'percentage_with_cap',                         description: 'Payment gateway fee model: percentage | fixed | percentage_with_cap' },
+    { key: 'payment_processing_percentage', value: '0.015',                                     description: 'Payment gateway percentage (Paystack: 1.5%)' },
+    { key: 'payment_processing_fixed_fee',  value: '100',                                       description: 'Paystack flat fee in NGN (for transactions > ₦2,500)' },
+    { key: 'payment_processing_cap',        value: '2000',                                      description: 'Maximum payment processing fee in NGN (Paystack cap = ₦2,000)' },
+    { key: 'logistics_margin_default',      value: '0.10',                                      description: 'DG-LETS default logistics coordination margin (10% of provider quote)' },
+    { key: 'settlement_hold_days',          value: '3',                                         description: 'Auto-release seller proceeds N days after buyer confirmation' },
+    { key: 'platform_positioning',          value: 'FREE TO JOIN. FREE TO LIST. PAY WHEN YOU SELL.', description: 'Core DG-LETS MVP adoption message (Section 34)' },
+  ];
+  for (const s of systemSettings) {
+    await (prisma as any).systemSetting.upsert({
+      where: { key: s.key }, create: s, update: { value: s.value, description: s.description },
+    });
+    console.log(`  ✅ ${s.key} = ${s.value}`);
+  }
+
+  console.log('\n🎉 DG-LETS seed complete!');
+  console.log('   Commission: 5% seller-deducted | Registration: FREE');
 }
 
 main()

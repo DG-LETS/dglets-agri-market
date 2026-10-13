@@ -212,7 +212,7 @@ export function MainNavigator() {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ focused }) =>
-            <TabIcon icon="Home" label="Home" focused={focused} />,
+            <TabIcon emoji="Home" label="Home" focused={focused} />,
         }}
       />
       <Tab.Screen

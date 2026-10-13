@@ -128,7 +128,7 @@ export function HaulageJobsScreen() {
             data={STATES}
             keyExtractor={s => s}
             showsHorizontalScrollIndicator={false}
-            contentContainerstyle={s.filterList}
+            contentContainerStyle={s.filterList}
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={[s.filterPill, stateFilter === item && s.filterPillActive]}
@@ -167,7 +167,7 @@ export function HaulageJobsScreen() {
         <FlatList
           data={jobs}
           keyExtractor={item => item.id}
-          contentContainerstyle={s.list}
+          contentContainerStyle={s.list}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={C.green[700]} />
@@ -200,7 +200,7 @@ export function HaulageJobsScreen() {
                 {/* Route */}
                 <View style={s.routeRow}>
                   <View style={s.routePoint}>
-                    <View style={[s.routeDot, { backgroundcolor: '#16a34a' }]} />
+                    <View style={[s.routeDot, { backgroundColor: '#16a34a' }]} />
                     <View>
                       <Text style={s.routeLabel}>Pickup</Text>
                       <Text style={s.routeLocation}>
@@ -210,7 +210,7 @@ export function HaulageJobsScreen() {
                   </View>
                   <View style={s.routeArrow}><Text style={s.routeArrowText}>â†“</Text></View>
                   <View style={s.routePoint}>
-                    <View style={[s.routeDot, { backgroundcolor: '#ef4444' }]} />
+                    <View style={[s.routeDot, { backgroundColor: '#ef4444' }]} />
                     <View>
                       <Text style={s.routeLabel}>Delivery</Text>
                       <Text style={s.routeLocation}>

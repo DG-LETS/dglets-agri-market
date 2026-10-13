@@ -1,11 +1,11 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
   TouchableOpacity, TextInput, Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useThemeColors, Typography, Spacing, Radius, Shadow } from '@theme/index';
+import { useThemeColors, Typography, Spacing, Radius, Shadow, Colors as C } from '@theme/index';
 import { Button } from '@components/ui';
 import { reviewsApi } from '@services/api';
 import { useAuthStore } from '@store/authStore';

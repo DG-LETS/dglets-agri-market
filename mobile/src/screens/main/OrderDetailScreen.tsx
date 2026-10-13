@@ -7,7 +7,7 @@ import {
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useThemeColors, Typography, Spacing, Radius, Shadow } from '@theme/index';
+import { useThemeColors, Typography, Spacing, Radius, Shadow, Colors as C } from '@theme/index';
 import { Badge, LoadingState, Button } from '@components/ui';
 import { ordersApi, paymentsApi, haulageApi } from '@services/api';
 import { useAuthStore } from '@store/authStore';

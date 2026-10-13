@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { storage } from '@utils/storage';
-import { User, AuthTokens } from '@types/index';
+import { User, AuthTokens } from '../types';
 import { authApi, usersApi } from '@services/api';
 
 interface AuthState {

@@ -109,7 +109,7 @@ export function HomeScreen({ navigation }: Props) {
       {/* Seller CTA */}
       {isFarmer && (
         <TouchableOpacity style={s.sellerBanner} activeOpacity={0.85} onPress={() => (navigation as any).navigate('MarketTab', { screen: 'CreateListing' })}>
-          <Wheat size={28} color="#27ae60" style={s.sellerBannerEmoji} />
+          <View style={{ justifyContent: 'center', alignItems: 'center' }}><Wheat size={28} color="#27ae60" /></View>
           <View style={s.sellerBannerText}>
             <Text style={s.sellerBannerTitle}>List Your Produce</Text>
             <Text style={s.sellerBannerSub}>Reach buyers across Nigeria →</Text>
@@ -243,6 +243,7 @@ function makeStyles(C: ReturnType<typeof useThemeColors>) {
     sectionTitle:  { ...Typography.titleLarge, color: C.textPrimary },
     seeAll:        { ...Typography.labelLarge, color: C.green[600] },
     quickGrid:     { flexDirection: 'row', gap: Spacing[3] },
+    quickIconWrap: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#f3f4f6', alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
     quickCard:     { flex: 1, backgroundColor: C.white, borderRadius: Radius.xl, padding: Spacing[4], alignItems: 'center', borderWidth: 1, borderColor: C.border, ...Shadow.sm },
     quickEmoji:    { fontSize: 26, marginBottom: Spacing[2] },
     quickLabel:    { ...Typography.caption, color: C.textSecondary, fontWeight: '700', textAlign: 'center' },

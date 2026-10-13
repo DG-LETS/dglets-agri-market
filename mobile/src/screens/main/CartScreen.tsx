@@ -28,8 +28,9 @@ const NIGERIAN_STATES = [
 ];
 
 export function CartScreen({ navigation }: Props) {
-  const insets      = useSafeAreaInsets();
+  const insets = useSafeAreaInsets();
   const C = useThemeColors();
+  const s = makeStyles(C);
   const queryClient = useQueryClient();
 
   const {
@@ -114,7 +115,6 @@ export function CartScreen({ navigation }: Props) {
     );
   }
 
-  const s = makeStyles(C);
   return (
     <KeyboardAvoidingView
       style={s.flex}
@@ -161,7 +161,7 @@ export function CartScreen({ navigation }: Props) {
                   {item.image ? (
                     <Image source={{ uri: item.image }} style={s.itemImage} contentFit="cover" />
                   ) : (
-                    <View style={[s.itemImage, styles.itemImagePlaceholder]}>
+                    <View style={[s.itemImage, s.itemImagePlaceholder]}>
                       <Text style={{ fontSize: 24 }}>ðŸŒ¾</Text>
                     </View>
                   )}
@@ -189,7 +189,7 @@ export function CartScreen({ navigation }: Props) {
                   </TouchableOpacity>
                   <Text style={s.qtyVal}>{item.quantity}</Text>
                   <TouchableOpacity
-                    style={[s.qtyBtn, item.quantity >= item.maxQuantity && styles.qtyBtnDisabled]}
+                    style={[s.qtyBtn, item.quantity >= item.maxQuantity && s.qtyBtnDisabled]}
                     onPress={() => updateQty(item.productId, item.quantity + 1)}
                     disabled={item.quantity >= item.maxQuantity}
                   >
@@ -229,7 +229,7 @@ export function CartScreen({ navigation }: Props) {
                 style={s.statePicker}
                 onPress={() => setShowStateList(v => !v)}
               >
-                <Text style={deliveryState ? styles.statePickerVal : styles.statePickerPlaceholder}>
+                <Text style={deliveryState ? s.statePickerVal : s.statePickerPlaceholder}>
                   {deliveryState || 'Select stateâ€¦'}
                 </Text>
                 <Text style={s.statePickerArrow}>{showStateList ? 'â–²' : 'â–¼'}</Text>
@@ -239,10 +239,10 @@ export function CartScreen({ navigation }: Props) {
                   {NIGERIAN_STATES.map(st => (
                     <TouchableOpacity
                       key={st}
-                      style={[s.stateItem, deliveryState === st && styles.stateItemActive]}
+                      style={[s.stateItem, deliveryState === st && s.stateItemActive]}
                       onPress={() => { setDeliveryState(st); setShowStateList(false); }}
                     >
-                      <Text style={[s.stateItemText, deliveryState === st && styles.stateItemTextActive]}>
+                      <Text style={[s.stateItemText, deliveryState === st && s.stateItemTextActive]}>
                         {st}
                       </Text>
                     </TouchableOpacity>
@@ -280,7 +280,7 @@ export function CartScreen({ navigation }: Props) {
                 <Text style={s.summaryLabel}>Delivery fee</Text>
                 <Text style={[s.summaryVal, { color: C.green[600] }]}>Arranged with seller</Text>
               </View>
-              <View style={[s.summaryRow, styles.summaryTotal]}>
+              <View style={[s.summaryRow, s.summaryTotal]}>
                 <Text style={s.summaryTotalLabel}>Total</Text>
                 <Text style={s.summaryTotalVal}>â‚¦{total().toLocaleString()}</Text>
               </View>

@@ -48,26 +48,58 @@ enum ProductStatus {
 }
 
 enum OrderStatus {
+  DRAFT
   PENDING
+  PENDING_PAYMENT
+  PAYMENT_PROCESSING
+  PAID
+  SELLER_CONFIRMED
   CONFIRMED
   PROCESSING
   READY_FOR_PICKUP
   PICKED_UP
   IN_TRANSIT
   DELIVERED
+  BUYER_CONFIRMED
   COMPLETED
   CANCELLED
   DISPUTED
+  REFUND_PENDING
   REFUNDED
+  PARTIALLY_REFUNDED
 }
 
 enum PaymentStatus {
+  INITIATED
   PENDING
   PROCESSING
   PAID
+  SUCCESS
   FAILED
+  CANCELLED
+  REFUND_PENDING
   REFUNDED
   PARTIALLY_REFUNDED
+  DISPUTED
+}
+
+enum SettlementStatus {
+  PENDING_DELIVERY
+  ELIGIBLE_FOR_SETTLEMENT
+  SETTLED
+  HELD
+}
+
+enum LedgerEntryType {
+  BUYER_PAYMENT
+  MARKETPLACE_COMMISSION
+  PAYMENT_PROCESSING_FEE
+  SELLER_PROCEEDS
+  LOGISTICS_PAYMENT
+  LOGISTICS_MARGIN
+  REFUND
+  CHARGEBACK
+  ADJUSTMENT
 }
 
 enum NotificationType {
@@ -122,6 +154,9 @@ model User {
   haulageApplications HaulageApplication[] @relation("HaulageApplications")
   awardedHaulageJobs  HaulageJob[]         @relation("AwardedHaulageJobs")
   platformFees        PlatformFee[]
+  ledgerEntries       TransactionLedger[]
+  buyerRequests       BuyerRequest[]       @relation("BuyerRequests")
+  sellerOffers        SellerOffer[]        @relation("SellerOffers")
 
   @@map("users")
 }
@@ -278,37 +313,55 @@ model SavedProduct {
 // ═══════════════════════════════════════
 
 model Order {
-  id              String        @id @default(uuid())
-  orderNumber     String        @unique
-  buyerId         String
-  sellerId        String
-  status          OrderStatus   @default(PENDING)
-  paymentStatus   PaymentStatus @default(PENDING)
-  subtotal        Float
-  platformFee     Float         @default(0)
-  deliveryFee     Float         @default(0)
-  total           Float
-  deliveryAddress String?
-  deliveryState   String?
-  notes           String?
-  paidAt          DateTime?
-  confirmedAt     DateTime?
-  completedAt     DateTime?
-  cancelledAt     DateTime?
-  cancelReason    String?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id                    String           @id @default(uuid())
+  orderNumber           String           @unique
+  buyerId               String
+  sellerId              String
+  status                OrderStatus      @default(PENDING)
+  paymentStatus         PaymentStatus    @default(PENDING)
+  settlementStatus      SettlementStatus @default(PENDING_DELIVERY)
 
-  buyer     User        @relation("BuyerOrders",  fields: [buyerId],  references: [id])
-  seller    User        @relation("SellerOrders",  fields: [sellerId], references: [id])
-  items     OrderItem[]
-  payment   Payment?
-  reviews   Review[]
-  haulageJob HaulageJob?
+  // Financial snapshot at time of order creation (Section 4 & 13)
+  currency              String           @default("NGN")
+  subtotal              Float            // product_subtotal = Σ(quantity × unit_price)
+  commissionRate        Float            @default(0.05) // snapshot commission rate (e.g. 0.05)
+  commissionAmount      Float            @default(0)    // marketplace_commission = subtotal * commissionRate
+  logisticsBaseCost     Float            @default(0)    // logistics provider quote / actual cost
+  logisticsMargin       Float            @default(0)    // DG-LETS logistics margin
+  deliveryFee           Float            @default(0)    // logisticsBaseCost + logisticsMargin (paid by buyer)
+  paymentProcessingFee  Float            @default(0)    // payment gateway processing fee
+  buyerTotal            Float            // subtotal + deliveryFee
+  sellerGross           Float            // subtotal
+  sellerNet             Float            // subtotal - commissionAmount
+  dgLetsRevenue         Float            @default(0)    // commissionAmount + logisticsMargin
+  refundAmount          Float            @default(0)
+  platformFee           Float            @default(0)    // backward compatibility alias for commissionAmount
+  total                 Float            // backward compatibility alias for buyerTotal
+
+  deliveryAddress       String?
+  deliveryState         String?
+  notes                 String?
+  paidAt                DateTime?
+  confirmedAt           DateTime?
+  settledAt             DateTime?
+  completedAt           DateTime?
+  cancelledAt           DateTime?
+  cancelReason          String?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+
+  buyer         User                @relation("BuyerOrders",  fields: [buyerId],  references: [id])
+  seller        User                @relation("SellerOrders",  fields: [sellerId], references: [id])
+  items         OrderItem[]
+  payment       Payment?
+  reviews       Review[]
+  haulageJob    HaulageJob?
+  ledgerEntries TransactionLedger[]
 
   @@index([buyerId])
   @@index([sellerId])
   @@index([status])
+  @@index([settlementStatus])
   @@map("orders")
 }
 
@@ -332,19 +385,23 @@ model OrderItem {
 // ═══════════════════════════════════════
 
 model Payment {
-  id              String        @id @default(uuid())
-  orderId         String        @unique
-  amount          Float
-  currency        String        @default("NGN")
-  provider        String        // paystack | flutterwave
-  providerRef     String?       @unique
-  status          PaymentStatus @default(PENDING)
-  platformFee     Float         @default(0)
-  sellerAmount    Float         @default(0)
-  metadata        Json?
-  paidAt          DateTime?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id                   String        @id @default(uuid())
+  orderId              String        @unique
+  amount               Float
+  currency             String        @default("NGN")
+  provider             String        // paystack | flutterwave
+  providerRef          String?       @unique
+  idempotencyKey       String?       @unique
+  status               PaymentStatus @default(PENDING)
+  commissionAmount     Float         @default(0)
+  sellerAmount         Float         @default(0)
+  logisticsAmount      Float         @default(0)
+  paymentProcessingFee Float         @default(0)
+  platformFee          Float         @default(0) // alias for commissionAmount
+  metadata             Json?
+  paidAt               DateTime?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
 
   order Order @relation(fields: [orderId], references: [id])
 
@@ -665,3 +722,108 @@ model PlatformFee {
   @@map("platform_fees")
 }
 
+// ═══════════════════════════════════════
+// TRANSACTION LEDGER (Section 14)
+// Immutable double-entry financial record for every money movement.
+// Refunds create reversal entries — records are NEVER deleted.
+// ═══════════════════════════════════════
+
+model TransactionLedger {
+  id          String           @id @default(uuid())
+  orderId     String?
+  userId      String?
+  userRole    String?          // FARMER | BUYER | TRADER | HAULAGE | PLATFORM
+  entryType   LedgerEntryType
+  amount      Float            // positive = credit to that party, negative = debit/reversal
+  currency    String           @default("NGN")
+  status      String           @default("SETTLED") // SETTLED | PENDING | REVERSED
+  reference   String?          // payment gateway ref or internal ref
+  description String?
+  metadata    Json?
+  createdAt   DateTime         @default(now())
+
+  order Order? @relation(fields: [orderId], references: [id])
+  user  User?  @relation(fields: [userId],  references: [id])
+
+  @@index([orderId])
+  @@index([userId])
+  @@index([entryType])
+  @@index([createdAt])
+  @@map("transaction_ledger")
+}
+
+// ═══════════════════════════════════════
+// SYSTEM SETTINGS (Section 20 & 37)
+// Config-driven platform parameters — no hard-coded rates.
+// Admin can change marketplace_commission_rate without a code deploy.
+// ═══════════════════════════════════════
+
+model SystemSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  description String?
+  updatedBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("system_settings")
+}
+
+// ═══════════════════════════════════════
+// BUYER REQUESTS / RFQ (Section 19)
+// ═══════════════════════════════════════
+
+enum RfqStatus {
+  OPEN
+  RECEIVING_OFFERS
+  ACCEPTED
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+model BuyerRequest {
+  id              String    @id @default(uuid())
+  buyerId         String
+  productName     String
+  categoryId      String?
+  quantityNeeded  Float
+  unit            String
+  originState     String?
+  destinationState String?
+  requiredByDate  DateTime?
+  qualitySpec     String?
+  description     String?
+  status          RfqStatus @default(OPEN)
+  expiresAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  buyer  User          @relation("BuyerRequests", fields: [buyerId], references: [id])
+  offers SellerOffer[]
+
+  @@index([buyerId])
+  @@index([status])
+  @@map("buyer_requests")
+}
+
+model SellerOffer {
+  id             String   @id @default(uuid())
+  requestId      String
+  sellerId       String
+  pricePerUnit   Float
+  quantityOffered Float
+  deliveryDays   Int?
+  notes          String?
+  isAccepted     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  request BuyerRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  seller  User         @relation("SellerOffers", fields: [sellerId], references: [id])
+
+  @@index([requestId])
+  @@index([sellerId])
+  @@map("seller_offers")
+}

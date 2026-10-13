@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
   TouchableOpacity, KeyboardAvoidingView, Platform, Alert, Image,
@@ -51,18 +51,19 @@ type Props = {
 function UnitPicker({
   label, value, options, onSelect,
 }: { label: string; value: string; options: string[]; onSelect: (v: string) => void }) {
+  const C = useThemeColors();
   const s = makeStyles(C);
   return (
-    <View style={pickerStyles.wrap}>
-      <Text style={pickerStyles.label}>{label}</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={pickerStyles.row}>
+    <View style={s.fieldWrap}>
+      <Text style={s.fieldLabel}>{label}</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.gradeRow}>
         {options.map(opt => (
           <TouchableOpacity
             key={opt}
-            style={[pickerStyles.chip, value === opt && pickerStyles.chipActive]}
+            style={[s.gradeChip, value === opt && s.gradeChipActive]}
             onPress={() => onSelect(opt)}
           >
-            <Text style={[pickerStyles.chipText, value === opt && pickerStyles.chipTextActive]}>{opt}</Text>
+            <Text style={[s.gradeText, value === opt && s.gradeTextActive]}>{opt}</Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -144,9 +145,9 @@ export function CreateListingScreen({ navigation }: Props) {
         <Text style={s.headerTitle}>New Listing</Text>
         {/* Step indicator */}
         <View style={s.stepRow}>
-          <View style={[s.stepDot, step >= 1 && styles.stepDotOn]} />
+          <View style={[s.stepDot, step >= 1 && s.stepDotOn]} />
           <View style={s.stepLine} />
-          <View style={[s.stepDot, step >= 2 && styles.stepDotOn]} />
+          <View style={[s.stepDot, step >= 2 && s.stepDotOn]} />
         </View>
       </View>
 
@@ -208,11 +209,11 @@ export function CreateListingScreen({ navigation }: Props) {
                   {categories.map((cat: any) => (
                     <TouchableOpacity
                       key={cat.id}
-                      style={[s.catChip, catId === cat.id && styles.catChipActive]}
+                      style={[s.catChip, catId === cat.id && s.catChipActive]}
                       onPress={() => setValue('categoryId', cat.id)}
                     >
                       <Text style={s.catIcon}>{cat.icon || 'ðŸ“¦'}</Text>
-                      <Text style={[s.catText, catId === cat.id && styles.catTextActive]}>{cat.name}</Text>
+                      <Text style={[s.catText, catId === cat.id && s.catTextActive]}>{cat.name}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -266,16 +267,16 @@ export function CreateListingScreen({ navigation }: Props) {
             {/* State */}
             <View style={s.fieldWrap}>
               <Text style={s.fieldLabel}>State <Text style={s.required}>*</Text></Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={pickerStyles.row}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.rowFields}>
                 {NIGERIAN_STATES.map(st => {
                   const stateVal = watch('state');
                   return (
                     <TouchableOpacity
                       key={st}
-                      style={[pickerStyles.chip, stateVal === st && pickerStyles.chipActive]}
+                      style={[s.gradeChip, stateVal === st && s.gradeChipActive]}
                       onPress={() => setValue('state', st)}
                     >
-                      <Text style={[pickerStyles.chipText, stateVal === st && pickerStyles.chipTextActive]}>{st}</Text>
+                      <Text style={[s.gradeText, stateVal === st && s.gradeTextActive]}>{st}</Text>
                     </TouchableOpacity>
                   );
                 })}
@@ -296,10 +297,10 @@ export function CreateListingScreen({ navigation }: Props) {
                 {QUALITY_GRADES.map(g => (
                   <TouchableOpacity
                     key={g}
-                    style={[s.gradeChip, qualityGrade === g && styles.gradeChipActive]}
+                    style={[s.gradeChip, qualityGrade === g && s.gradeChipActive]}
                     onPress={() => setValue('qualityGrade', qualityGrade === g ? undefined : g)}
                   >
-                    <Text style={[s.gradeText, qualityGrade === g && styles.gradeTextActive]}>{g}</Text>
+                    <Text style={[s.gradeText, qualityGrade === g && s.gradeTextActive]}>{g}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -308,7 +309,7 @@ export function CreateListingScreen({ navigation }: Props) {
             {/* Delivery toggle */}
             <View style={s.fieldWrap}>
               <TouchableOpacity
-                style={s.toggleRow}
+                style={[s.fieldWrap, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}
                 onPress={() => setValue('deliveryAvailable', !deliveryAvail)}
                 activeOpacity={0.8}
               >
@@ -316,8 +317,8 @@ export function CreateListingScreen({ navigation }: Props) {
                   <Text style={s.toggleLabel}>ðŸšš Delivery Available</Text>
                   <Text style={s.toggleHint}>Can you arrange delivery to the buyer?</Text>
                 </View>
-                <View style={[s.toggle, deliveryAvail && styles.toggleOn]}>
-                  <View style={[s.toggleThumb, deliveryAvail && styles.toggleThumbOn]} />
+                <View style={[s.toggle, deliveryAvail && s.toggleOn]}>
+                  <View style={[s.toggleThumb, deliveryAvail && s.toggleThumbOn]} />
                 </View>
               </TouchableOpacity>
             </View>
@@ -394,4 +395,4 @@ const pickerStyles = StyleSheet.create({
   chipText:    { ...Typography.labelMedium, color: C.textSecondary },
   chipTextActive: { color: C.green[700], fontWeight: '700' },
 });
-}
+}

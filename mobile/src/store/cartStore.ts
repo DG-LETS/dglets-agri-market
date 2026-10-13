@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Product } from '@types/index';
+import type { Product } from '../types';
 
 export interface CartItem {
   productId:   string;

@@ -144,4 +144,44 @@ export class AdminController {
       limit: limit ? +limit : 30,
     });
   }
+
+  /* ══════════ FINANCIAL REPORTS (Section 21 & 22) ══════════ */
+  @Get('finance/report')
+  getFinancialReport(
+    @Query('from') from?: string,
+    @Query('to')   to?:   string,
+  ) {
+    return this.adminService.getFinancialReport(from, to);
+  }
+
+  /* ══════════ LEDGER / RECONCILIATION (Section 31) ══════════ */
+  @Get('finance/ledger')
+  getLedgerEntries(
+    @Query('entryType') entryType?: string,
+    @Query('from')      from?:      string,
+    @Query('to')        to?:        string,
+    @Query('page')      page?:      string,
+    @Query('limit')     limit?:     string,
+  ) {
+    return this.adminService.getLedgerEntries({
+      entryType, from, to,
+      page:  page  ? +page  : 1,
+      limit: limit ? +limit : 50,
+    });
+  }
+
+  /* ══════════ COMMISSION CONFIG (Section 20) ══════════ */
+  @Get('config/settings')
+  getSystemSettings() {
+    return this.adminService.getSystemSettings();
+  }
+
+  @Patch('config/commission-rate')
+  @HttpCode(HttpStatus.OK)
+  setCommissionRate(
+    @Body('rate') rate: number,
+    @CurrentUser() admin: any,
+  ) {
+    return this.adminService.setCommissionRate(rate, admin.id);
+  }
 }

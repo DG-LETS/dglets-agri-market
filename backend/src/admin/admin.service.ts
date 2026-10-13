@@ -3,6 +3,8 @@ import {
 } from '@nestjs/common';
 import { PrismaService }        from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { LedgerService }        from '../ledger/ledger.service';
+import { CommissionService }    from '../commission/commission.service';
 
 @Injectable()
 export class AdminService {
@@ -11,20 +13,21 @@ export class AdminService {
   constructor(
     private readonly prisma:        PrismaService,
     private readonly notifications: NotificationsService,
+    private readonly ledger:        LedgerService,
+    private readonly commission:    CommissionService,
   ) {}
 
   /* ═══════════════════════════════════════════════════
-     STATS — overview numbers for dashboard
+     STATS — overview numbers for dashboard (Section 21)
   ═══════════════════════════════════════════════════ */
   async getStats() {
     const [
       totalUsers, activeUsers, pendingVerification,
       totalProducts, publishedProducts,
-      totalOrders, pendingOrders, completedOrders,
-      totalRevenue,
+      totalOrders, completedOrders, cancelledOrders,
+      activeSellers, activeBuyers,
       openDisputes,
       openHaulageJobs,
-      totalFees,
     ] = await Promise.all([
       this.prisma.user.count(),
       this.prisma.user.count({ where: { status: 'ACTIVE' } }),
@@ -32,23 +35,61 @@ export class AdminService {
       this.prisma.product.count({ where: { status: { not: 'DELETED' } } }),
       this.prisma.product.count({ where: { status: 'PUBLISHED' } }),
       this.prisma.order.count(),
-      this.prisma.order.count({ where: { status: 'PENDING' } }),
       this.prisma.order.count({ where: { status: 'COMPLETED' } }),
-      this.prisma.payment.aggregate({ where: { status: 'PAID' }, _sum: { amount: true } }),
+      this.prisma.order.count({ where: { status: 'CANCELLED' } }),
+      this.prisma.user.count({ where: { role: { in: ['FARMER', 'TRADER', 'AGGREGATOR', 'PROCESSOR', 'EXPORTER'] }, status: 'ACTIVE' } }),
+      this.prisma.user.count({ where: { role: 'BUYER', status: 'ACTIVE' } }),
       this.prisma.order.count({ where: { status: 'DISPUTED' } }),
       this.prisma.haulageJob.count({ where: { status: 'OPEN' } }),
-      this.prisma.platformFee.aggregate({ where: { status: 'PAID' }, _sum: { amount: true } }),
     ]);
+
+    // Financial KPIs from ledger (Section 22)
+    const financials = await this.ledger.getPlatformRevenueSummary();
+    const commissionRate = await this.commission.getCommissionRate();
 
     return {
       users:       { total: totalUsers, active: activeUsers, pendingVerification },
       products:    { total: totalProducts, published: publishedProducts },
-      orders:      { total: totalOrders, pending: pendingOrders, completed: completedOrders },
-      revenue:     { total: totalRevenue._sum.amount ?? 0 },
+      orders:      { total: totalOrders, completed: completedOrders, cancelled: cancelledOrders },
+      sellers:     { active: activeSellers },
+      buyers:      { active: activeBuyers },
       disputes:    { open: openDisputes },
       haulageJobs: { open: openHaulageJobs },
-      fees:        { collected: totalFees._sum.amount ?? 0 },
+      // Revenue metrics (Section 21)
+      revenue: {
+        gmv:                     financials.gmv,
+        grossMarketplaceRevenue: financials.grossMarketplaceRevenue,
+        logisticsRevenue:        financials.logisticsRevenue,
+        paymentProcessingCosts:  financials.paymentProcessingCosts,
+        refunds:                 financials.refunds,
+        netPlatformRevenue:      financials.netPlatformRevenue,
+        takeRate:                `${financials.takeRate}%`,
+        aov:                     financials.aov,
+      },
+      config: {
+        commissionRate:          `${(commissionRate * 100).toFixed(1)}%`,
+      },
     };
+  }
+
+  /* ═══════════════════════════════════════════════════
+     FINANCIAL KPIs — detailed revenue report (Section 22)
+  ═══════════════════════════════════════════════════ */
+  async getFinancialReport(from?: string, to?: string) {
+    const fromDate = from ? new Date(from) : undefined;
+    const toDate   = to   ? new Date(to)   : undefined;
+    return this.ledger.getPlatformRevenueSummary(fromDate, toDate);
+  }
+
+  /* ═══════════════════════════════════════════════════
+     COMMISSION CONFIG — admin can change rate (Section 20)
+  ═══════════════════════════════════════════════════ */
+  async setCommissionRate(rate: number, adminId: string) {
+    return this.commission.setCommissionRate(rate, adminId);
+  }
+
+  async getSystemSettings() {
+    return this.commission.getAllSettings();
   }
 
   /* ═══════════════════════════════════════════════════
@@ -357,5 +398,43 @@ export class AdminService {
     ]);
 
     return { data: items, meta: { total, page, limit }, summary };
+  }
+
+  /* ═══════════════════════════════════════════════════
+     LEDGER EXPORT — admin reconciliation (Section 31)
+  ═══════════════════════════════════════════════════ */
+  async getLedgerEntries(filters: {
+    entryType?: string;
+    from?:      string;
+    to?:        string;
+    page?:      number;
+    limit?:     number;
+  }) {
+    const page  = filters.page  ?? 1;
+    const limit = filters.limit ?? 50;
+    const where: any = {};
+
+    if (filters.entryType) where.entryType = filters.entryType;
+    if (filters.from || filters.to) {
+      where.createdAt = {};
+      if (filters.from) where.createdAt.gte = new Date(filters.from);
+      if (filters.to)   where.createdAt.lte = new Date(filters.to);
+    }
+
+    const [items, total] = await Promise.all([
+      this.prisma.transactionLedger.findMany({
+        where,
+        include: {
+          order: { select: { id: true, orderNumber: true } },
+          user:  { select: { id: true, firstName: true, lastName: true, role: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip:    (page - 1) * limit,
+        take:    limit,
+      }),
+      this.prisma.transactionLedger.count({ where }),
+    ]);
+
+    return { data: items, meta: { total, page, limit } };
   }
 }

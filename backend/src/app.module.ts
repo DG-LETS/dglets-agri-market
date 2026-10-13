@@ -16,8 +16,11 @@ import { FeesModule }     from './fees/fees.module';
 import { HaulageModule }  from './haulage/haulage.module';
 import { MessagesModule } from './messages/messages.module';
 import { AdminModule }    from './admin/admin.module';
-import { ReviewsModule }  from './reviews/reviews.module';
-import { HealthModule }   from './health/health.module';
+import { ReviewsModule }    from './reviews/reviews.module';
+import { HealthModule }     from './health/health.module';
+import { LedgerModule }     from './ledger/ledger.module';
+import { CommissionModule } from './commission/commission.module';
+import { RfqModule }        from './rfq/rfq.module';
 import appConfig from './config/app.config';
 import authConfig from './config/auth.config';
 import databaseConfig from './config/database.config';
@@ -50,6 +53,9 @@ import databaseConfig from './config/database.config';
     AdminModule,
     ReviewsModule,
     HealthModule,
+    LedgerModule,
+    CommissionModule,
+    RfqModule,
   ],
   providers: [
     {

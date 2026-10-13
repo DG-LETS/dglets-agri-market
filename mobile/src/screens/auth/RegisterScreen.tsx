@@ -38,6 +38,8 @@ export function RegisterScreen({ navigation }: Props) {
   const C         = useThemeColors();
   const [selectedRole, setSelectedRole] = useState('BUYER');
   const [step, setStep] = useState<1 | 2>(1);
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [agreeSeller, setAgreeSeller] = useState(false);
 
   const { control, handleSubmit, formState: { errors }, trigger } = useForm<FormData>({ resolver: zodResolver(schema) });
 

@@ -86,7 +86,7 @@ export function OtpScreen({ navigation, route }: Props) {
         <View style={s.otpRow}>
           {otp.map((digit, i) => (
             <TextInput key={i} ref={el => { inputs.current[i] = el; }}
-              style={[s.otpInput, digit && s.otpInputFilled]}
+              style={[s.otpInput, digit ? s.otpInputFilled : undefined]}
               value={digit} onChangeText={text => handleChange(text, i)}
               onKeyPress={({ nativeEvent: { key } }) => { if (key === 'Backspace' && !otp[i] && i > 0) inputs.current[i - 1]?.focus(); }}
               keyboardType="number-pad" maxLength={1} selectTextOnFocus caretHidden />

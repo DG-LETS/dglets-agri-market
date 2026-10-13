@@ -54,9 +54,9 @@ export function ProfileScreen({ navigation }: Props) {
   const isSeller = ['FARMER','TRADER','AGGREGATOR','PROCESSOR','EXPORTER','HAULAGE'].includes(user.role);
   const s = makeStyles(C);
 
-  const MenuItem = ({ emoji, label, onPress, danger }: { emoji: string; label: string; onPress: () => void; danger?: boolean }) => (
+  const MenuItem = ({ emoji, icon, label, onPress, danger }: { emoji?: string; icon?: React.ReactNode; label: string; onPress: () => void; danger?: boolean }) => (
     <TouchableOpacity style={s.menuItem} onPress={onPress} activeOpacity={0.7}>
-      <Text style={s.menuEmoji}>{emoji}</Text>
+      {icon ? icon : <Text style={s.menuEmoji}>{emoji}</Text>}
       <Text style={[s.menuLabel, danger && s.menuLabelDanger]}>{label}</Text>
       <Text style={s.menuArrow}>›</Text>
     </TouchableOpacity>

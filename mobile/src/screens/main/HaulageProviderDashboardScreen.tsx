@@ -18,11 +18,11 @@ type Props = {
 };
 
 const JOB_STATUS: Record<string, { label: string; variant: any; emoji: string }> = {
-  OPEN:       { label: 'Open',       variant: 'warning', icon: 'ClipboardList' },
-  AWARDED:    { label: 'Awarded',    variant: 'info',    emoji: <Truck size={20} color="#666" /> },
-  IN_TRANSIT: { label: 'In Transit', variant: 'info',    icon: 'Truck' },
-  DELIVERED:  { label: 'Delivered',  variant: 'success', icon: 'CheckCircle' },
-  CANCELLED:  { label: 'Cancelled',  variant: 'error',   icon: 'XCircle' },
+  OPEN:       { label: 'Open',       variant: 'warning', emoji: '📋' },
+  AWARDED:    { label: 'Awarded',    variant: 'info',    emoji: '🚚' },
+  IN_TRANSIT: { label: 'In Transit', variant: 'info',    emoji: '🚛' },
+  DELIVERED:  { label: 'Delivered',  variant: 'success', emoji: '✅' },
+  CANCELLED:  { label: 'Cancelled',  variant: 'error',   emoji: '❌' },
 };
 
 export function HaulageProviderDashboardScreen({ navigation }: Props) {

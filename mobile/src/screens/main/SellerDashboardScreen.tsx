@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
-import { useThemeColors, Typography, Spacing, Radius, Shadow } from '@theme/index';
+import { useThemeColors, Typography, Spacing, Radius, Shadow, Colors as C } from '@theme/index';
 import { Badge, LoadingState, EmptyState } from '@components/ui';
 import { ordersApi, marketplaceApi } from '@services/api';
 import { useAuthStore } from '@store/authStore';
@@ -21,9 +21,8 @@ type Props = {
 function StatCard({ emoji, label, value, sub, color }: {
   emoji: string; label: string; value: string; sub?: string; color?: string;
 }) {
-  const s = makeStyles(C);
   return (
-    <View style={[statStyles.card, color && { borderTopColor: color, borderTopWidth: 3 }]}>
+    <View style={[statStyles.card, color ? { borderTopColor: color, borderTopWidth: 3 } : undefined]}>
       <Text style={statStyles.emoji}>{emoji}</Text>
       <Text style={statStyles.value}>{value}</Text>
       <Text style={statStyles.label}>{label}</Text>
@@ -62,25 +61,25 @@ export function SellerDashboardScreen({ navigation }: Props) {
   const products = myProducts  ?? [];
 
   /* â”€â”€ Derived stats â”€â”€ */
-  const pending   = orders.filter(o => o.status === 'PENDING').length;
-  const active    = orders.filter(o => ['CONFIRMED','PROCESSING','READY_FOR_PICKUP','PICKED_UP','IN_TRANSIT'].includes(o.status)).length;
-  const completed = orders.filter(o => o.status === 'COMPLETED').length;
-  const cancelled = orders.filter(o => o.status === 'CANCELLED').length;
+  const pending   = orders.filter((o: any) => o.status === 'PENDING').length;
+  const active    = orders.filter((o: any) => ['CONFIRMED','PROCESSING','READY_FOR_PICKUP','PICKED_UP','IN_TRANSIT'].includes(o.status)).length;
+  const completed = orders.filter((o: any) => o.status === 'COMPLETED').length;
+  const cancelled = orders.filter((o: any) => o.status === 'CANCELLED').length;
 
   const totalRevenue = orders
-    .filter(o => o.status === 'COMPLETED' && o.paymentStatus === 'PAID')
-    .reduce((sum, o) => sum + (o.subtotal - o.platformFee), 0);
+    .filter((o: any) => o.status === 'COMPLETED' && o.paymentStatus === 'PAID')
+    .reduce((sum: number, o: any) => sum + (o.subtotal - o.platformFee), 0);
 
   const pendingRevenue = orders
-    .filter(o => !['COMPLETED','CANCELLED'].includes(o.status) && o.paymentStatus === 'PAID')
-    .reduce((sum, o) => sum + (o.subtotal - o.platformFee), 0);
+    .filter((o: any) => !['COMPLETED','CANCELLED'].includes(o.status) && o.paymentStatus === 'PAID')
+    .reduce((sum: number, o: any) => sum + (o.subtotal - o.platformFee), 0);
 
-  const activeListings = products.filter(p => p.status === 'PUBLISHED').length;
-  const draftListings  = products.filter(p => p.status === 'DRAFT').length;
+  const activeListings = products.filter((p: any) => p.status === 'PUBLISHED').length;
+  const draftListings  = products.filter((p: any) => p.status === 'DRAFT').length;
 
   /* â”€â”€ Recent orders â”€â”€ */
   const recentOrders = [...orders]
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
 
   const statusBadge: Record<string, any> = {
@@ -208,6 +207,7 @@ export function SellerDashboardScreen({ navigation }: Props) {
 }
 
 const styles = makeStyles(C);
+function getThemeStyles(themeColor: any) { return makeStyles(themeColor); }
 function makeStyles(C: any) { return StyleSheet.create({
   flex: { flex: 1, backgroundColor: C.background },
 

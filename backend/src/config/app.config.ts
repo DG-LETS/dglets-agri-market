@@ -6,23 +6,35 @@ export default registerAs('app', () => ({
   corsOrigin: process.env.CORS_ORIGIN || '*',
   apiPrefix:  process.env.API_PREFIX  || 'api',
 
-  /* Platform transaction fee */
-  platformFeeRate: parseFloat(process.env.PLATFORM_FEE_RATE || '0.0205'),
-  platformFeeMin:  parseFloat(process.env.PLATFORM_FEE_MIN  || '200'),
-  platformFeeCap:  parseFloat(process.env.PLATFORM_FEE_CAP  || '50000'),
+  // ── Section 20 / 37: Configurable marketplace commission ──────────────
+  // Do NOT hard-code 5% in application code. Read from environment.
+  // Admin can override via SystemSetting (DB) at runtime.
+  marketplaceCommissionRate: parseFloat(process.env.MARKETPLACE_COMMISSION_RATE || '0.05'),
 
-  /* One-time registration fees per role (NGN) */
+  // ── Section 7: Payment processing fees — configurable, NOT hard-coded ─
+  paymentProcessingFeeType:       process.env.PAYMENT_FEE_TYPE        || 'percentage', // 'percentage' | 'fixed' | 'percentage_with_cap'
+  paymentProcessingPercentage:    parseFloat(process.env.PAYMENT_FEE_PERCENTAGE   || '0.015'), // e.g. Paystack 1.5%
+  paymentProcessingFixedFee:      parseFloat(process.env.PAYMENT_FEE_FIXED        || '100'),   // NGN flat fee on transactions > ₦2,500
+  paymentProcessingCap:           parseFloat(process.env.PAYMENT_FEE_CAP          || '2000'),  // Paystack cap ₦2,000
+
+  // ── Section 35 / 3: Registration is FREE for all roles (MVP) ──────────
+  // All registration fees are 0. The platform earns on transactions only.
   registrationFees: {
-    FARMER:     parseFloat(process.env.REGISTRATION_FEE_FARMER     || '2000'),
-    TRADER:     parseFloat(process.env.REGISTRATION_FEE_TRADER     || '2000'),
-    AGGREGATOR: parseFloat(process.env.REGISTRATION_FEE_AGGREGATOR || '2000'),
-    PROCESSOR:  parseFloat(process.env.REGISTRATION_FEE_PROCESSOR  || '2000'),
-    EXPORTER:   parseFloat(process.env.REGISTRATION_FEE_EXPORTER   || '5000'),
-    HAULAGE:    parseFloat(process.env.REGISTRATION_FEE_HAULAGE    || '3000'),
-    BUYER:      parseFloat(process.env.REGISTRATION_FEE_BUYER      || '0'),
+    FARMER:     0,
+    TRADER:     0,
+    AGGREGATOR: 0,
+    PROCESSOR:  0,
+    EXPORTER:   0,
+    HAULAGE:    0,
+    BUYER:      0,
     ADMIN:      0,
   } as Record<string, number>,
 
-  /* Haulage commission rate (fraction of delivery fee) */
-  haulageCommissionRate: parseFloat(process.env.HAULAGE_COMMISSION_RATE || '0.05'),
+  // ── Haulage commission rate (fraction of logistics fee — kept separate) ─
+  haulageCommissionRate: parseFloat(process.env.HAULAGE_COMMISSION_RATE || '0.10'),
+
+  // ── Legacy aliases ────────────────────────────────────────────────────
+  platformFeeRate: parseFloat(process.env.MARKETPLACE_COMMISSION_RATE || '0.05'),
+  platformFeeMin:  0,
+  platformFeeCap:  0,
 }));

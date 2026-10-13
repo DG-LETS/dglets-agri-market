@@ -116,7 +116,7 @@ export function ProductDetailScreen({ navigation, route }: Props) {
           </View>
           {images.length > 1 && (
             <View style={s.thumbRow}>
-              {images.map((uri, i) => (
+              {images.map((uri: string, i: number) => (
                 <TouchableOpacity key={i} onPress={() => setImageIdx(i)}>
                   <Image source={{ uri }} style={[s.thumb, i === imageIdx && s.thumbActive]} />
                 </TouchableOpacity>
@@ -194,7 +194,7 @@ export function ProductDetailScreen({ navigation, route }: Props) {
       </ScrollView>
       {!isMine && (
         <View style={[s.bottomBar, { paddingBottom: insets.bottom + Spacing[3] }]}>
-          <Button title={messaging ? <Hourglass size={20} color="#666" /> : ' Ask'} variant="outline" fullWidth={false} style={s.askBtn} onPress={handleAskSeller} disabled={messaging} />
+          <Button title={messaging ? 'Loading...' : 'Ask'} variant="outline" fullWidth={false} style={s.askBtn} onPress={handleAskSeller} disabled={messaging} />
           <Button title="Add to Cart" variant="outline" fullWidth={false} style={s.cartBtn} onPress={handleAddToCart} />
           <Button title={orderMutation.isPending ? 'Placing…' : 'Order Now'} variant="primary" fullWidth={false} style={s.orderBtn} onPress={handleQuickOrder} disabled={orderMutation.isPending} />
         </View>

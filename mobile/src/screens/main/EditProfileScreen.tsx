@@ -9,7 +9,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useThemeColors, Typography, Spacing, Radius } from '@theme/index';
+import { useThemeColors, Typography, Spacing, Radius, Colors as C } from '@theme/index';
 import { Input, Button } from '@components/ui';
 import { useAuthStore } from '@store/authStore';
 import { usersApi } from '@services/api';
@@ -78,11 +78,11 @@ function SectionTab({ label, active, onPress }: { label: string; active: boolean
   const s = makeStyles(C);
   return (
     <TouchableOpacity
-      style={[s.tab, active && styles.tabActive]}
+      style={[s.tab, active && s.tabActive]}
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <Text style={[s.tabText, active && styles.tabTextActive]}>{label}</Text>
+      <Text style={[s.tabText, active && s.tabTextActive]}>{label}</Text>
     </TouchableOpacity>
   );
 }
@@ -98,20 +98,18 @@ function StatePicker({ value, onSelect }: { value: string; onSelect: (v: string)
         style={s.stateBtn}
         onPress={() => setOpen(o => !o)}
       >
-        <Text style={value ? styles.stateBtnVal : styles.stateBtnPlaceholder}>
+        <Text style={value ? s.stateBtnVal : s.stateBtnPlaceholder}>
           {value || 'Select stateâ€¦'}
         </Text>
         <Text style={s.stateBtnArrow}>{open ? 'â–²' : 'â–¼'}</Text>
       </TouchableOpacity>
       {open && (
         <ScrollView style={s.stateList} nestedScrollEnabled>
-          {NIGERIAN_STATES.map(s => (
-            <TouchableOpacity
-              key={s}
-              style={[s.stateItem, value === s && styles.stateItemActive]}
-              onPress={() => { onSelect(s); setOpen(false); }}
+          {NIGERIAN_STATES.map(st => (
+            <TouchableOpacity key={st} style={[s.stateItem, value === st && s.stateItemActive]}
+              onPress={() => { onSelect(st); setOpen(false); }}
             >
-              <Text style={[s.stateItemText, value === s && styles.stateItemTextActive]}>{s}</Text>
+              <Text style={[s.stateItemText, value === st && s.stateItemTextActive]}>{st}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
@@ -342,10 +340,10 @@ export function EditProfileScreen({ navigation, route }: Props) {
                   return (
                     <TouchableOpacity
                       key={bt.value}
-                      style={[s.chip, active && styles.chipActive]}
+                      style={[s.chip, active && s.chipActive]}
                       onPress={() => buyerForm.setValue('buyerType', bt.value)}
                     >
-                      <Text style={[s.chipText, active && styles.chipTextActive]}>{bt.label}</Text>
+                      <Text style={[s.chipText, active && s.chipTextActive]}>{bt.label}</Text>
                     </TouchableOpacity>
                   );
                 })}
